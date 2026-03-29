@@ -6,12 +6,14 @@ using namespace std;
 using namespace seal;
 
 /**
- * @brief 수신자 측: Windowing을 위한 암호화된 거듭제곱 생성
+ * @brief receiver 측: Windowing을 위한 암호화된 거듭제곱 생성
+ * @param encrypted_y receiver가 가지고 있는 데이터 y의 암호문
  * @param l 윈도우 크기 (bit 단위)
- * @param max_degree 송신자 다항식의 최대 차수 (B)
+ * @param max_degree sender가 가진 다항식의 최대 차수 B
+ * @param relinkeys 암호문 간의 곱셈 연산 후에 커진 암호문의 크기를 다시 줄여주는 재선형화 키
  */
 vector<Ciphertext> encrypt_powers(
-    const Ciphertext& encrypted_y,
+	const Ciphertext& encrypted_y,
     int l,
     int max_degree,
     Encryptor& encryptor,
@@ -22,8 +24,7 @@ vector<Ciphertext> encrypt_powers(
     int num_j = static_cast<int>(floor(log2(max_degree) / l)) + 1; // j의 범위 계산
     int max_i = (1 << l) - 1; // i의 범위: 1 ~ 2^l - 1
 
-    // 기본 y의 거듭제곱들을 계산하여 저장함
-    // 논문 규격: y^{i * 2^{l*j}} 
+    // 암호화된 y의 거듭제곱들을 필요한 부분만 계산하여 저장
     for (int j = 0; j < num_j; j++) {
         for (int i = 1; i <= max_i; i++) {
             double exponent = i * pow(2, l * j);
@@ -34,7 +35,7 @@ vector<Ciphertext> encrypt_powers(
                 power = encrypted_y;
             }
             else {
-                // 실제 구현 시 i와 j 조합에 맞춰 효율적인 exponentiation 수행함
+				// y를 exponent만큼 거듭제곱하지 않고, 암호문끼리의 곱셈이 발생할 때마다 relin_keys 를 사용하여 암호문의 크기를 제어하고 노이즈 증가를 관리
                 evaluator.exponentiate(encrypted_y, static_cast<uint64_t>(exponent), relin_keys, power);
             }
             encrypted_powers.push_back(move(power));
@@ -44,9 +45,9 @@ vector<Ciphertext> encrypt_powers(
 }
 
 /**
- * @brief 송신자 측: Windowing 암호문을 이용한 다항식 점곱 연산
- * @param encrypted_powers 수신자가 보낸 거듭제곱 암호문들
- * @param coefficients 송신자의 세트로 생성된 다항식 계수 (Plaintext 벡터)
+ * @brief sender 측: Windowing 암호문을 이용한 다항식 점곱 연산
+ * @param encrypted_powers receiver가 보낸 거듭제곱 암호문들
+ * @param coefficients sender의 세트로 생성된 다항식 계수
  */
 Ciphertext evaluate_polynomial_windowing(
     const vector<Ciphertext>& encrypted_powers,
@@ -54,8 +55,7 @@ Ciphertext evaluate_polynomial_windowing(
     Evaluator& evaluator) {
 
     Ciphertext result;
-    // 첫 번째 항으로 초기화함 (상수항 제외, 계수와 암호화된 거듭제곱의 점곱)
-    // d_i = sum(c_j * y^j) 
+    // result를 첫 번째 항(a_1∙y^1)으로 초기화함
     evaluator.multiply_plain(encrypted_powers[0], coefficients[1], result);
 
     for (size_t k = 1; k < encrypted_powers.size(); k++) {
