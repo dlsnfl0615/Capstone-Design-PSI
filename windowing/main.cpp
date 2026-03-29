@@ -22,7 +22,7 @@ vector<Ciphertext> encrypt_powers(
 
     vector<Ciphertext> encrypted_powers;
     int num_j = static_cast<int>(floor(log2(max_degree) / l)) + 1; // j의 범위 계산
-    int max_i = (1 << l) - 1; // i의 범위: 1 ~ 2^l - 1
+    int max_i = (1 << l) - 1; // == 2^l. i의 범위: 1 ~ 2^l - 1
 
     // 암호화된 y의 거듭제곱들을 필요한 부분만 계산하여 저장
     for (int j = 0; j < num_j; j++) {
@@ -45,29 +45,73 @@ vector<Ciphertext> encrypt_powers(
 }
 
 /**
- * @brief sender 측: Windowing 암호문을 이용한 다항식 점곱 연산
- * @param encrypted_powers receiver가 보낸 거듭제곱 암호문들
- * @param coefficients sender의 세트로 생성된 다항식 계수
+ * @brief sender 측: Windowing 조각들을 조합하여 다항식 연산 수행함
+ * @param windowed_powers receiver가 보낸 암호화된 거듭제곱 조각들
+ * @param coefficients sender가 가진 다항식의 계수들
+ * @param max_degree sender가 가진 다항식의 최대 차수 B
  */
-Ciphertext evaluate_polynomial_windowing(
-    const vector<Ciphertext>& encrypted_powers,
+Ciphertext evaluate_polynomial_combined(
+    const vector<Ciphertext>& windowed_powers,
     const vector<Plaintext>& coefficients,
-    Evaluator& evaluator) {
+    int l,
+    int max_degree,
+    Evaluator& evaluator,
+    RelinKeys& relin_keys) {
 
-    Ciphertext result;
-    // result를 첫 번째 항(a_1∙y^1)으로 초기화함
-    evaluator.multiply_plain(encrypted_powers[0], coefficients[1], result);
+    // 모든 필요한 지수(y^1 ~ y^B)를 담을 배열
+    vector<Ciphertext> all_powers(max_degree + 1);
+    int max_i = (1 << l) - 1;
 
-    for (size_t k = 1; k < encrypted_powers.size(); k++) {
-        if (k + 1 >= coefficients.size()) break;
-
-        Ciphertext temp;
-        evaluator.multiply_plain(encrypted_powers[k], coefficients[k + 1], temp);
-        evaluator.add_inplace(result, temp); // 결과에 누적함
+    // 수신자가 보낸 기초 조각들을 지수 위치에 매핑함
+    int idx = 0;
+    int num_j = static_cast<int>(floor(log2(max_degree) / l)) + 1;
+    for (int j = 0; j < num_j; j++) {
+        for (int i = 1; i <= max_i; i++) {
+            int exp_val = i * (1 << (l * j)); // 기초 조각의 실제 지수 계산함
+            if (exp_val > max_degree) break;
+            all_powers[exp_val] = windowed_powers[idx++]; // 테이블에 배치함
+        }
     }
 
-    // 마지막에 상수항(coefficients[0])을 더해줌
-    evaluator.add_plain_inplace(result, coefficients[0]);
+    // 비어있는 지수 k를 2^l 진법으로 분해하여 조합함
+    for (int k = 1; k <= max_degree; k++) {
+        if (!all_powers[k].is_transparent()) continue; // 조각이 이미 있으면 스킵함
+
+        Ciphertext combined; // 조합된 결과를 담을 변수
+        bool first = true;
+        int temp_k = k; // 현재 조합하려는 지수 k
+        int j = 0;
+        int base = (1 << l); // 진법의 base(기수)
+
+        while (temp_k > 0) {
+            int i = temp_k % base; // k를 2^l 진법으로 나눈 나머지(자릿수 값)임
+            if (i > 0) {
+                // i * 2^(lj)는 수신자가 보낸 기초 조각 지수임
+                int part_exp = i * (1 << (l * j));
+                if (first) {
+                    combined = all_powers[part_exp];
+                    first = false;
+                }
+                else {
+                    evaluator.multiply_inplace(combined, all_powers[part_exp]); // 암호문끼리 곱함
+                    evaluator.relinearize_inplace(combined, relin_keys); // 크기 관리함
+                }
+            }
+            temp_k /= base;
+            j++;
+        }
+        all_powers[k] = combined; // 조합된 결과 저장함
+    }
+
+    // 완성된 지수들로 다항식 dot product 계산함
+    Ciphertext result;
+    evaluator.multiply_plain(all_powers[1], coefficients[1], result); // 1차항 초기화함
+    for (int k = 2; k <= max_degree; k++) {
+        Ciphertext temp;
+        evaluator.multiply_plain(all_powers[k], coefficients[k], temp); // 평문 계수와 곱함
+        evaluator.add_inplace(result, temp); // 합산함
+    }
+    evaluator.add_plain_inplace(result, coefficients[0]); // 상수항 추가함
 
     return result;
 }
