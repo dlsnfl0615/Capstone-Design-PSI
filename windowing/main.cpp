@@ -6,9 +6,9 @@ using namespace std;
 using namespace seal;
 
 /** * @brief receiver 측: Windowing을 위한 암호화된 거듭제곱 생성
- * @param encrypted_y receiver가 가지고 있는 데이터 y의 암호문 [cite: 335]
- * @param l 윈도우 크기 (bit 단위) [cite: 337, 470]
- * @param max_degree sender가 가진 다항식의 최대 차수 B [cite: 136, 470]
+ * @param encrypted_y receiver가 가지고 있는 데이터 y의 암호문
+ * @param l 윈도우 크기 (bit 단위)
+ * @param max_degree sender가 가진 다항식의 최대 차수 B
  * @param relinkeys 암호문 간의 곱셈 연산 후에 커진 암호문의 크기를 다시 줄여주는 재선형화 키
  */
 vector<Ciphertext> encrypt_powers(
@@ -20,13 +20,13 @@ vector<Ciphertext> encrypt_powers(
     RelinKeys& relin_keys) {
 
     vector<Ciphertext> encrypted_powers;
-    int num_j = static_cast<int>(floor(log2(max_degree) / l)) + 1; // j의 범위 계산 [cite: 337]
-    int max_i = (1 << l) - 1; // i의 범위: 1 ~ 2^l - 1 [cite: 337]
+    int num_j = static_cast<int>(floor(log2(max_degree) / l)) + 1; // j의 범위 계산
+    int max_i = (1 << l) - 1; // i의 범위: 1 ~ 2^l - 1
 
-    // 암호화된 y의 거듭제곱들을 필요한 부분만 계산하여 저장 [cite: 478]
+    // 암호화된 y의 거듭제곱들을 필요한 부분만 계산하여 저장
     for (int j = 0; j < num_j; j++) {
         for (int i = 1; i <= max_i; i++) {
-            double exponent = i * pow(2, l * j); // 지수 공식: i * 2^{lj} [cite: 337]
+            double exponent = i * pow(2, l * j); // 지수 공식: i * 2^{lj}
             if (exponent > max_degree) break;
 
             Ciphertext power;
@@ -35,7 +35,7 @@ vector<Ciphertext> encrypt_powers(
             }
             else {
                 // y를 exponent만큼 거듭제곱하지 않고, 암호문끼리의 곱셈이 발생할 때마다 
-                // relin_keys 를 사용하여 암호문의 크기를 제어하고 노이즈 증가를 관리 [cite: 481]
+                // relin_keys 를 사용하여 암호문의 크기를 제어하고 노이즈 증가를 관리
                 evaluator.exponentiate(encrypted_y, static_cast<uint64_t>(exponent), relin_keys, power);
             }
             encrypted_powers.push_back(move(power)); // 생성된 조각 저장 [cite: 479]
