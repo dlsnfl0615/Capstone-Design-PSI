@@ -1,113 +1,83 @@
+﻿#include <iostream>
 #include "seal/seal.h"
-#include <vector>
-#include <cmath>
+#include "windowing.h"
 
 using namespace std;
 using namespace seal;
 
-/** * @brief receiver 측: Windowing을 위한 암호화된 거듭제곱 생성
- * @param encrypted_y receiver가 가지고 있는 데이터 y의 암호문
- * @param l 윈도우 크기 (bit 단위)
- * @param max_degree sender가 가진 다항식의 최대 차수 B
- * @param relinkeys 암호문 간의 곱셈 연산 후에 커진 암호문의 크기를 다시 줄여주는 재선형화 키
- */
-vector<Ciphertext> encrypt_powers(
-    const Ciphertext& encrypted_y,
-    int l,
-    int max_degree,
-    Encryptor& encryptor,
-    Evaluator& evaluator,
-    RelinKeys& relin_keys) {
+int main() {
+    // 1. SEAL 파라미터 설정함
+    EncryptionParameters parms(scheme_type::bfv);
+    size_t poly_modulus_degree = 8192;
+    parms.set_poly_modulus_degree(poly_modulus_degree);
+    parms.set_coeff_modulus(CoeffModulus::BFVDefault(poly_modulus_degree));
+    parms.set_plain_modulus(PlainModulus::Batching(poly_modulus_degree, 20));
 
-    vector<Ciphertext> encrypted_powers;
-    int num_j = static_cast<int>(floor(log2(max_degree) / l)) + 1; // j의 범위 계산
-    int max_i = (1 << l) - 1; // i의 범위: 1 ~ 2^l - 1
+    SEALContext context(parms);
 
-    // 암호화된 y의 거듭제곱들을 필요한 부분만 계산하여 저장
-    for (int j = 0; j < num_j; j++) {
-        for (int i = 1; i <= max_i; i++) {
-            double exponent = i * pow(2, l * j); // 지수 공식: i * 2^{lj}
-            if (exponent > max_degree) break;
+    // 2. 키 생성 및 객체 초기화함
+    KeyGenerator keygen(context);
+    SecretKey secret_key = keygen.secret_key();
+    PublicKey public_key;
+    keygen.create_public_key(public_key);
+    RelinKeys relin_keys;
+    keygen.create_relin_keys(relin_keys);
 
-            Ciphertext power;
-            if (exponent == 1) {
-                power = encrypted_y;
-            }
-            else {
-                // y를 exponent만큼 거듭제곱하지 않고, 암호문끼리의 곱셈이 발생할 때마다 
-                // relin_keys 를 사용하여 암호문의 크기를 제어하고 노이즈 증가를 관리
-                evaluator.exponentiate(encrypted_y, static_cast<uint64_t>(exponent), relin_keys, power);
-            }
-            encrypted_powers.push_back(move(power)); // 생성된 조각 저장 [cite: 479]
-        }
-    }
-    return encrypted_powers;
-}
+    Encryptor encryptor(context, public_key);
+    Evaluator evaluator(context);
+    Decryptor decryptor(context, secret_key);
+    BatchEncoder batch_encoder(context);
 
-/**
- * @brief sender 측: Windowing 조각들을 조합하여 다항식 연산 수행함
- */
-Ciphertext evaluate_polynomial_combined(
-    const vector<Ciphertext>& windowed_powers,
-    const vector<Plaintext>& coefficients,
-    int l,
-    int max_degree,
-    Evaluator& evaluator,
-    RelinKeys& relin_keys) {
+    // 3. 테스트 데이터 준비 (y = 5, l = 2, max_degree = 3)
+    int y_val = 5;
+    int l = 2;
+    int max_degree = 3;
 
-    // 모든 필요한 지수(y^1 ~ y^B)를 담을 테이블임
-    vector<Ciphertext> all_powers(max_degree + 1);
-    int max_i = (1 << l) - 1;
-
-    // 1. 수신자가 보낸 기초 조각들을 지수 위치에 매핑함
-    int idx = 0;
-    int num_j = static_cast<int>(floor(log2(max_degree) / l)) + 1;
-    for (int j = 0; j < num_j; j++) {
-        for (int i = 1; i <= max_i; i++) {
-            int exp_val = i * (1 << (l * j)); // 기초 조각의 실제 지수 계산함
-            if (exp_val > max_degree) break;
-            all_powers[exp_val] = windowed_powers[idx++]; // 테이블에 배치함
-        }
+    // 다항식: 1*y^3 + 2*y^2 + 3*y + 4
+    vector<int64_t> coeff_values = { 4, 3, 2, 1 }; // 상수항부터 시작함
+    vector<Plaintext> plain_coeffs;
+    for (int64_t c : coeff_values) {
+        Plaintext p;
+        batch_encoder.encode(vector<int64_t>(batch_encoder.slot_count(), c), p);
+        plain_coeffs.push_back(p);
     }
 
-    // 2. 비어있는 지수 k를 2^l 진법으로 분해하여 조합함
-    for (int k = 1; k <= max_degree; k++) {
-        if (!all_powers[k].is_transparent()) continue; // 조각이 이미 있으면 스킵함
+    // 4. 입력값 y 암호화함
+    Plaintext plain_y;
+    batch_encoder.encode(vector<int64_t>(batch_encoder.slot_count(), y_val), plain_y);
+    Ciphertext encrypted_y;
+    encryptor.encrypt(plain_y, encrypted_y);
 
-        Ciphertext combined;
-        bool first = true;
-        int temp_k = k;
-        int j = 0;
-        int base = (1 << l);
+    cout << "--- 테스트 시작 ---" << endl;
+    cout << "입력값 y: " << y_val << endl;
+    cout << "다항식: y^3 + 2y^2 + 3y + 4" << endl;
 
-        while (temp_k > 0) {
-            int i = temp_k % base; // 현재 자리수의 값 d_j 도출함
-            if (i > 0) {
-                int part_exp = i * (1 << (l * j)); // 해당 항의 지수임
-                if (first) {
-                    combined = all_powers[part_exp];
-                    first = false;
-                }
-                else {
-                    evaluator.multiply_inplace(combined, all_powers[part_exp]); // 암호문끼리 곱함
-                    evaluator.relinearize_inplace(combined, relin_keys); // 크기 관리함
-                }
-            }
-            temp_k /= base;
-            j++;
-        }
-        all_powers[k] = combined; // 조합된 결과 저장함
+    // 5. Receiver: 거듭제곱 조각 생성함
+    cout << "Step 1: encrypt_powers 실행 중..." << endl;
+    vector<Ciphertext> powers = encrypt_powers(encrypted_y, l, max_degree, encryptor, evaluator, relin_keys);
+
+    // 6. Sender: 다항식 조합 및 연산 실행함
+    cout << "Step 2: evaluate_polynomial_combined 실행 중..." << endl;
+    Ciphertext result_encrypted = evaluate_polynomial_combined(powers, plain_coeffs, l, max_degree, evaluator, relin_keys);
+
+    // 7. 복호화 및 결과 확인함
+    Plaintext plain_result;
+    decryptor.decrypt(result_encrypted, plain_result);
+    vector<int64_t> result_vec;
+    batch_encoder.decode(plain_result, result_vec);
+
+    // 검증: 5^3 + 2(5^2) + 3(5) + 4 = 125 + 50 + 15 + 4 = 194
+    int64_t expected = pow(y_val, 3) + 2 * pow(y_val, 2) + 3 * y_val + 4;
+
+    cout << "계산 결과: " << result_vec[0] << endl;
+    cout << "기대 결과: " << expected << endl;
+
+    if (result_vec[0] == expected) {
+        cout << "결과: 성공!" << endl;
+    }
+    else {
+        cout << "결과: 실패 (노이즈 또는 로직 확인 필요)" << endl;
     }
 
-    // 3. 완성된 지수들로 다항식 점곱 계산함
-    Ciphertext result;
-    evaluator.multiply_plain(all_powers[1], coefficients[1], result); // 1차항 초기화함
-    for (int k = 2; k <= max_degree; k++) {
-        Ciphertext temp;
-        evaluator.multiply_plain(all_powers[k], coefficients[k], temp); // 평문 계수와 곱함
-        evaluator.add_inplace(result, temp); // 합산함
-    }
-    evaluator.add_plain_inplace(result, coefficients[0]); // 상수항 추가함
-
-    return result;
+	return 0;
 }
