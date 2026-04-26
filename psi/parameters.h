@@ -6,6 +6,7 @@ const int m = 8192; // 해시 테이블의 전체 빈 (Bin) 개수. 바깥 벡�
 const int h = 4; // 해시 함수 개수
 const int B = 74; // sender 빈 당 할당되는 일차원 배열의 길이
 const uint64_t bitlen = 54; // 원본 데이터 길이. 비트화했을 때의 최대 길이
+const int CUCKOO_MAX_KICK = 500;
 
 const int n = 32768; // 다항식 차수
 const int t = 42; // 평문 계수

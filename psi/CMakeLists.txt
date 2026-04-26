@@ -14,6 +14,9 @@ add_executable(psi
     receiver/hashing.h
     receiver/hashing.cpp
     receiver/receiver.cpp
+    receiver/psi_receiver.h
+    receiver/psi_receiver.cpp
+    external/murmur3.cpp
 )
 
 target_include_directories(psi PRIVATE
