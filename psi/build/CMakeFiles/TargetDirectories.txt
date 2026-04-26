@@ -1,0 +1,3 @@
+C:/Capstone-Design-PSI/psi/build/CMakeFiles/psi.dir
+C:/Capstone-Design-PSI/psi/build/CMakeFiles/edit_cache.dir
+C:/Capstone-Design-PSI/psi/build/CMakeFiles/rebuild_cache.dir

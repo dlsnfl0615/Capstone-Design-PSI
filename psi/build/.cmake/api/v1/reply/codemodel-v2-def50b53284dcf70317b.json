@@ -1,0 +1,132 @@
+{
+	"configurations" : 
+	[
+		{
+			"abstractTargets" : 
+			[
+				{
+					"directoryIndex" : 0,
+					"id" : "Microsoft.GSL::GSL::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-Microsoft.GSL__GSL-Debug-e07b394a09af40a26486.json",
+					"name" : "Microsoft.GSL::GSL",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "OpenMP::OpenMP_CXX::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-OpenMP__OpenMP_CXX-Debug-19cdddf17305eb839125.json",
+					"name" : "OpenMP::OpenMP_CXX",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "SEAL::seal::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-SEAL__seal-Debug-6d37cd5edad34e2c8073.json",
+					"name" : "SEAL::seal",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "Threads::Threads::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-Threads__Threads-Debug-e6f675a2f53d28f171f7.json",
+					"name" : "Threads::Threads",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "ZLIB::ZLIB::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-ZLIB__ZLIB-Debug-94b8ab042a6a8ed36878.json",
+					"name" : "ZLIB::ZLIB",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "zstd::libzstd::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-zstd__libzstd-Debug-0e6cbed199c01215513a.json",
+					"name" : "zstd::libzstd",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "zstd::libzstd_shared::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-zstd__libzstd_shared-Debug-28d0c94b5182d68c981f.json",
+					"name" : "zstd::libzstd_shared",
+					"projectIndex" : 0
+				}
+			],
+			"directories" : 
+			[
+				{
+					"abstractTargetIndexes" : 
+					[
+						0,
+						1,
+						2,
+						3,
+						4,
+						5,
+						6
+					],
+					"build" : ".",
+					"jsonFile" : "directory-.-Debug-f040eec181a89de70dbe.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.20"
+					},
+					"projectIndex" : 0,
+					"source" : ".",
+					"targetIndexes" : 
+					[
+						0
+					]
+				}
+			],
+			"name" : "Debug",
+			"projects" : 
+			[
+				{
+					"abstractTargetIndexes" : 
+					[
+						0,
+						1,
+						2,
+						3,
+						4,
+						5,
+						6
+					],
+					"directoryIndexes" : 
+					[
+						0
+					],
+					"name" : "psi",
+					"targetIndexes" : 
+					[
+						0
+					]
+				}
+			],
+			"targets" : 
+			[
+				{
+					"directoryIndex" : 0,
+					"id" : "psi::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-psi-Debug-b6990610a130e7bfb2bb.json",
+					"name" : "psi",
+					"projectIndex" : 0
+				}
+			]
+		}
+	],
+	"kind" : "codemodel",
+	"paths" : 
+	{
+		"build" : "C:/Capstone-Design-PSI/psi/build",
+		"source" : "C:/Capstone-Design-PSI/psi"
+	},
+	"version" : 
+	{
+		"major" : 2,
+		"minor" : 10
+	}
+}

@@ -1,0 +1,20 @@
+[
+{
+  "directory": "C:/Capstone-Design-PSI/psi/build",
+  "command": "C:\\PROGRA~1\\MICROS~3\\18\\COMMUN~1\\VC\\Tools\\MSVC\\1450~1.357\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP -IC:\\Capstone-Design-PSI\\psi\\src -IC:\\Capstone-Design-PSI\\psi\\external -external:IC:\\vcpkg\\installed\\x64-windows\\include\\SEAL-4.1 -external:IC:\\vcpkg\\installed\\x64-windows\\include -external:W0 /DWIN32 /D_WINDOWS /EHsc /Zi /Ob0 /Od /RTC1 -std:c++17 -MDd -openmp /FoCMakeFiles\\psi.dir\\receiver\\data_loader.cpp.obj /FdCMakeFiles\\psi.dir\\ /FS -c C:\\Capstone-Design-PSI\\psi\\receiver\\data_loader.cpp",
+  "file": "C:/Capstone-Design-PSI/psi/receiver/data_loader.cpp",
+  "output": "C:/Capstone-Design-PSI/psi/build/CMakeFiles/psi.dir/receiver/data_loader.cpp.obj"
+},
+{
+  "directory": "C:/Capstone-Design-PSI/psi/build",
+  "command": "C:\\PROGRA~1\\MICROS~3\\18\\COMMUN~1\\VC\\Tools\\MSVC\\1450~1.357\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP -IC:\\Capstone-Design-PSI\\psi\\src -IC:\\Capstone-Design-PSI\\psi\\external -external:IC:\\vcpkg\\installed\\x64-windows\\include\\SEAL-4.1 -external:IC:\\vcpkg\\installed\\x64-windows\\include -external:W0 /DWIN32 /D_WINDOWS /EHsc /Zi /Ob0 /Od /RTC1 -std:c++17 -MDd -openmp /FoCMakeFiles\\psi.dir\\receiver\\hashing.cpp.obj /FdCMakeFiles\\psi.dir\\ /FS -c C:\\Capstone-Design-PSI\\psi\\receiver\\hashing.cpp",
+  "file": "C:/Capstone-Design-PSI/psi/receiver/hashing.cpp",
+  "output": "C:/Capstone-Design-PSI/psi/build/CMakeFiles/psi.dir/receiver/hashing.cpp.obj"
+},
+{
+  "directory": "C:/Capstone-Design-PSI/psi/build",
+  "command": "C:\\PROGRA~1\\MICROS~3\\18\\COMMUN~1\\VC\\Tools\\MSVC\\1450~1.357\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP -IC:\\Capstone-Design-PSI\\psi\\src -IC:\\Capstone-Design-PSI\\psi\\external -external:IC:\\vcpkg\\installed\\x64-windows\\include\\SEAL-4.1 -external:IC:\\vcpkg\\installed\\x64-windows\\include -external:W0 /DWIN32 /D_WINDOWS /EHsc /Zi /Ob0 /Od /RTC1 -std:c++17 -MDd -openmp /FoCMakeFiles\\psi.dir\\receiver\\receiver.cpp.obj /FdCMakeFiles\\psi.dir\\ /FS -c C:\\Capstone-Design-PSI\\psi\\receiver\\receiver.cpp",
+  "file": "C:/Capstone-Design-PSI/psi/receiver/receiver.cpp",
+  "output": "C:/Capstone-Design-PSI/psi/build/CMakeFiles/psi.dir/receiver/receiver.cpp.obj"
+}
+]
