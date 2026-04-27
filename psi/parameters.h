@@ -1,6 +1,8 @@
+#pragma once
+
 #include <stdint.h>
 
-const int Nx = 5;
+const int Nx = 5535;
 const int Ny = 10;
 const int m = 8192; // 해시 테이블의 전체 빈 (Bin) 개수. 바깥 벡터 길이
 const int h = 4; // 해시 함수 개수
@@ -13,5 +15,5 @@ const int t = 42; // 평문 계수
 // const int q 자동으로 생성됨
 
 const int l = 3; // 윈도잉 파라미터
-const int alpha = 64; // 파티셔닝 파라미터
+const int alpha = 32; // 파티셔닝 파라미터
 const int lambda = 40; // 보안 수준

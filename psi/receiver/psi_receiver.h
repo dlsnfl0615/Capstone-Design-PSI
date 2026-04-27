@@ -14,7 +14,7 @@ public:
         int l, 
         int max_degree, 
         seal::Evaluator& evaluator, 
-        seal::RelinKeys& relin_keys)
+        seal::RelinKeys& relin_keys);
 
     // 송신자의 결과 암호문을 복호화하여 교집합 인덱스 추출
     vector<int> identify_intersection(

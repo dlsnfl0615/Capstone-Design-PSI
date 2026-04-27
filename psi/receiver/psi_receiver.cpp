@@ -35,7 +35,7 @@ map<uint64_t, seal::Ciphertext> PsiReceiver::generate_windowed_powers(
             // 송신자가 찾기 쉽도록 맵에 저장 (지수 -> 암호문)
             windowed_powers[exponent] = move(power);
             
-            cout << "Receiver: y^" << exponent << " 생성 및 저장 완료" << endl;
+            cout << "Receiver: y^" << exponent << " generated." << endl;
         }
     }
 
