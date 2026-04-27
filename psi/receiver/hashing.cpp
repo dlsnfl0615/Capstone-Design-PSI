@@ -30,7 +30,7 @@ void Hashing::locate(const vector<string> data) {
         // 뻐꾸기 해싱 루프: 빈자리를 찾거나 최대 킥 횟수에 도달할 때까지 반복
         while (kicks < CUCKOO_MAX_KICK) { // CUCKOO_MAX_KICK = 500
             // 해당 슬롯이 비어있으면 바로 저장하고 종료
-            if (hash_table[loc] == 0) {
+            if (hash_table[loc] == RECEIVER_DUMMY) {
                 hash_table[loc] = packed;
                 inserted = true;
                 break;
@@ -84,15 +84,15 @@ RestoredData Hashing::restore_original_data(uint64_t packed, int loc) {
     uint64_t full_item = (x_L << 13) | (x_R & 0x1FFF);
     
     RestoredData result;
-    result.pid = std::to_string(full_item >> 10); // 실제 구현 시 0 채우기 필요
+    result.pid = std::to_string(full_item >> 10);
     result.disease = std::bitset<10>(full_item & 0x3FF).to_string();
     
     return result;
 }
 
 void Hashing::print_hash_table() {
-    for (int i = 0; i < hash_table.size(); i++) {
-        if (hash_table[i] != 0) {
+    for (int i = 0; i < hash_table.size(); i+=10) {
+        if (hash_table[i] != RECEIVER_DUMMY) {
             cout << "loc: " << i << ", val: " << hash_table[i] << endl;
         }
     }

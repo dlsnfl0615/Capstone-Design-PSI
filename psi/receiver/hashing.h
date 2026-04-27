@@ -2,7 +2,6 @@
 
 #include <vector>
 #include <map>
-#include "data_loader.h"
 #include "../parameters.h"
 #include "murmur3.h"
 
@@ -15,7 +14,7 @@ struct RestoredData {
 
 class Hashing {
 public:
-    vector<uint64_t> hash_table = vector<uint64_t>(m, 0);
+    vector<uint64_t> hash_table = vector<uint64_t>(m, RECEIVER_DUMMY); // m=8192
 
     inline uint32_t Hashing::get_hash(uint64_t val, int func_idx) {
         static const uint32_t seeds[] = {

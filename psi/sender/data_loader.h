@@ -10,7 +10,6 @@ struct ReceiverRecord {
 };
 
 // CSV 로드 함수
-std::vector<ReceiverRecord> load_receiver(const std::string& filepath);
 std::vector<std::string> load_sender(const std::string& filepath);
 
 // 미리보기 출력 함수

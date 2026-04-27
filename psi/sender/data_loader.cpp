@@ -48,57 +48,6 @@ static std::string normalize_pid(std::string pid) {
 }
 
 // -----------------------------
-// Receiver CSV 로드
-// 컬럼: personal_id(0), Disease_1~10(1~10), Status(11)
-// -----------------------------
-std::vector<ReceiverRecord> load_receiver(const std::string& filepath) {
-    std::ifstream f(filepath);
-    if (!f.is_open()) {
-        throw std::runtime_error("fail to open file: " + filepath);
-    }
-
-    std::vector<ReceiverRecord> result;
-    std::string line;
-    bool header = true;
-    int line_num = 0;
-
-    while (std::getline(f, line)) {
-        ++line_num;
-
-        if (header) {
-            header = false;
-            continue;
-        }
-
-        if (line.empty()) continue;
-
-        auto t = split(line);
-
-        if (t.size() < 12) {
-            throw std::runtime_error(
-                "Receiver " + std::to_string(line_num) + "th columns has less data "
-                "(expected: 12, real: " + std::to_string(t.size()) + ")\n"
-                "  contains: " + line
-            );
-        }
-
-        std::string pid = normalize_pid(t[0]);
-
-        std::string disease = "";
-        for (int i = 1; i <= 10; i++) {
-            disease += t[i];
-        }
-
-        std::string status = t[11];
-
-        result.push_back({ pid + disease, status });
-    }
-
-    std::cout << "[Receiver] " << result.size() << " records loaded\n";
-    return result;
-}
-
-// -----------------------------
 // Sender CSV 로드
 // 컬럼: personal_id(0), Disease_1~10(1~10)
 // -----------------------------
