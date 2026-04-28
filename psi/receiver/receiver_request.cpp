@@ -35,16 +35,21 @@ int main() {
         seal::Ciphertext encrypted_y;
         fhe.encryptor->encrypt(plain_y, encrypted_y);    // fhe 객체의 encryptor 사용
 
+        uint64_t actual_t = fhe.context->first_context_data()->parms().plain_modulus().value();
+
         // 6. 윈도잉 기법 적용
-        cout << "[Step 6] Generating windowed powers..." << endl;
+        cout << "[Step 6] Generating windowed powers (Plaintext-based)..." << endl;
         PsiReceiver psi_receiver;
+        
+        // 수정된 매개변수에 맞춰 호출
         auto windowed_powers = psi_receiver.generate_windowed_powers(
-            *fhe.context, // context 인자 추가
-            encrypted_y, 
-            l, 
-            B, 
-            *fhe.evaluator, 
-            fhe.relin_keys);
+            batched_vec,      // Step 4에서 생성된 평문 벡터 [cite: 13]
+            l,                // parameters.h의 윈도잉 파라미터 [cite: 22]
+            B,                // parameters.h의 최대 차수 [cite: 22]
+            *fhe.batch_encoder, // fhe 객체의 엔코더 
+            *fhe.encryptor,     // fhe 객체의 인크립터 
+            actual_t          // 실제 평문법 값
+        );
 
         cout << "\n[Success] Receiver side testing complete." << endl;
         cout << "Generated " << windowed_powers.size() << " windowed powers." << endl;

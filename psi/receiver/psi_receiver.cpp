@@ -1,13 +1,25 @@
 #include "psi_receiver.h"
 #include "../parameters.h"
 
-// 평문상에서의 모듈러 거듭제곱 함수 (t가 45비트이므로 __int128 사용 필수)
+// 64비트 범위 내에서 (a * b) % m 오버플로우 방지 곱셈 함수 
+uint64_t safe_mul_mod(uint64_t a, uint64_t b, uint64_t m) {
+    uint64_t res = 0;
+    a %= m;
+    while (b > 0) {
+        if (b % 2 == 1) res = (res + a) % m;
+        a = (a + a) % m;
+        b /= 2;
+    }
+    return res;
+}
+
+// 오버플로우 방지 거듭제곱 함수 
 uint64_t power_mod(uint64_t base, uint64_t exp, uint64_t mod) {
     uint64_t res = 1;
     base %= mod;
     while (exp > 0) {
-        if (exp % 2 == 1) res = (static_cast<unsigned __int128>(res) * base) % mod;
-        base = (static_cast<unsigned __int128>(base) * base) % mod;
+        if (exp % 2 == 1) res = safe_mul_mod(res, base, mod);
+        base = safe_mul_mod(base, base, mod);
         exp /= 2;
     }
     return res;
@@ -30,21 +42,21 @@ std::map<uint64_t, seal::Ciphertext> PsiReceiver::generate_windowed_powers(
             uint64_t exponent = static_cast<uint64_t>(i) * (1ULL << (l * j));
             if (exponent > static_cast<uint64_t>(max_degree)) break;
 
-            // 1. 평문 상태에서 모든 슬롯에 대해 거듭제곱 계산
+            // 평문 상태에서 거듭제곱 계산 후 개별 암호화하여 노이즈 절약 
             std::vector<uint64_t> power_vec(original_batched_data.size());
             for (size_t s = 0; s < original_batched_data.size(); s++) {
                 power_vec[s] = power_mod(original_batched_data[s], exponent, plain_modulus);
             }
 
-            // 2. 계산된 평문 벡터를 인코딩 및 암호화
             seal::Plaintext plain_power;
             encoder.encode(power_vec, plain_power);
             
             seal::Ciphertext encrypted_power;
             encryptor.encrypt(plain_power, encrypted_power);
 
+            // [최적화 제외] mod_switch_to_next_inplace(encrypted_power, evaluator); // 검증을 위해 주석 처리
+
             windowed_powers[exponent] = std::move(encrypted_power);
-            std::cout << "Receiver: y^" << exponent << " encrypted (Fresh Noise Budget)." << std::endl;
         }
     }
     return windowed_powers;
