@@ -97,32 +97,68 @@ void PsiSender::compute_coefficients(seal::BatchEncoder& encoder, uint64_t plain
     cout << "Sender: Coefficient calculation and batching complete." << endl;
 }
 
+void PsiSender::reconstruct_all_powers(seal::Evaluator& evaluator, seal::RelinKeys& relin_keys) {
+    int d = static_cast<int>(ceil(static_cast<double>(B) / alpha));
+    int base = (1 << l);
+
+    // 1. 수신자가 보낸 기저 암호문들을 캐시에 먼저 복사함
+    all_powers = received_powers;
+
+    cout << "Sender: Reconstructing powers up to d = " << d << "..." << endl;
+
+    for (int k = 1; k <= d; k++) {
+        // 이미 존재하거나 수신자가 보낸 기저인 경우 건너뜀
+        if (all_powers.find(k) != all_powers.end()) continue;
+
+        seal::Ciphertext combined;
+        bool first = true;
+        int temp_k = k;
+        int j = 0;
+
+        // 지수 k를 2^l 진법의 합으로 분해하여 곱셈 수행 [cite: 337]
+        while (temp_k > 0) {
+            int i = temp_k % base;
+            if (i > 0) {
+                uint64_t part_exp = static_cast<uint64_t>(i) * (1ULL << (l * j));
+                if (first) {
+                    combined = all_powers[part_exp];
+                    first = false;
+                } else {
+                    // 암호문 간 곱셈 및 릴리니어라이제이션 수행 [cite: 180]
+                    evaluator.multiply_inplace(combined, all_powers[part_exp]);
+                    evaluator.relinearize_inplace(combined, relin_keys);
+                }
+            }
+            temp_k /= base;
+            j++;
+        }
+        all_powers[k] = combined; // 재구성된 지수 저장 
+    }
+}
+
 void PsiSender::evaluate_polynomials(seal::Evaluator& evaluator, seal::RelinKeys& relin_keys) {
     int d = static_cast<int>(ceil(static_cast<double>(B) / alpha));
+    
+    // [최적화] 파티션 연산 시작 전 모든 지수를 단 한 번만 재구성함 
+    reconstruct_all_powers(evaluator, relin_keys);
+
     evaluation_results.assign(alpha, seal::Ciphertext());
 
-    cout << "Sender: Evaluating polynomials homomorphically..." << endl;
-
     for (int k = 0; k < alpha; k++) {
-        // 1. 상수항 (a_0) 처리
-        // a_0는 y^0이므로 암호문 곱셈 없이 평문 덧셈으로 시작함
         seal::Ciphertext current_res;
-        evaluator.multiply_plain(received_powers[1], batched_coeffs[k][1], current_res); // a_1 * y^1
+        // a_1 * y^1 계산
+        evaluator.multiply_plain(all_powers[1], batched_coeffs[k][1], current_res);
 
-        // 2. 나머지 차수 (a_j * y^j) 처리
         for (int j = 2; j <= d; j++) {
             seal::Ciphertext temp;
-            // a_j * y^j (Plain-Ciphertext Multiplication)
-            evaluator.multiply_plain(received_powers[j], batched_coeffs[k][j], temp);
-            // 누적 합
+            // 재구성된 모든 지수(all_powers)를 사용하여 다항식 평가 [cite: 482, 484]
+            evaluator.multiply_plain(all_powers[j], batched_coeffs[k][j], temp);
             evaluator.add_inplace(current_res, temp);
         }
 
-        // 3. 마지막에 상수항 a_0 더하기
+        // 상수항 a_0 더하기
         evaluator.add_plain_inplace(current_res, batched_coeffs[k][0]);
-        
-        evaluation_results[k] = move(current_res);
-        cout << "Sender: Partition " << k << " evaluation complete." << endl;
+        evaluation_results[k] = std::move(current_res);
     }
 }
 

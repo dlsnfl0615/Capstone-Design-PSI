@@ -11,13 +11,13 @@ class PsiReceiver {
 public:
     vector<uint64_t> exponents;
 
-    map<uint64_t, seal::Ciphertext> generate_windowed_powers(
-        const seal::SEALContext& context, 
-        const seal::Ciphertext& encrypted_table, 
+    std::map<uint64_t, seal::Ciphertext> generate_windowed_powers(
+        const std::vector<uint64_t>& original_batched_data, 
         int l, 
         int max_degree, 
-        seal::Evaluator& evaluator, 
-        seal::RelinKeys& relin_keys);
+        seal::BatchEncoder& encoder,
+        seal::Encryptor& encryptor,
+        uint64_t plain_modulus);
 
     // 수정: 송신자로부터 받은 alpha개의 응답 암호문을 모두 처리함
     vector<int> identify_intersection(

@@ -21,7 +21,7 @@ int main() {
         // 3. Microsoft SEAL 환경 설정 (FHESetup 클래스 활용)
         cout << "[Step 3] Setting up Microsoft SEAL..." << endl;
         FHESetup fhe;
-        fhe.setup(n, 44); // parameters.h의 n 사용
+        fhe.setup(n, t); // parameters.h의 n 사용
 
         // 4. 배칭 (SIMD 슬롯 배치)
         cout << "[Step 4] Batching hash table into slots..." << endl;

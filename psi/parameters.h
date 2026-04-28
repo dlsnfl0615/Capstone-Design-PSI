@@ -13,7 +13,7 @@ const uint64_t RECEIVER_DUMMY = (1ULL << sigma);
 const uint64_t SENDER_DUMMY = ((1ULL << (sigma + 1)) - 1);
 
 const int n = 32768; // 다항식 차수
-const int t = 44; // 평문 계수
+const int t = 45; // 평문 계수
 // const int q 자동으로 생성됨
 
 const int l = 3; // 윈도잉 파라미터

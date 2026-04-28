@@ -10,7 +10,7 @@ using namespace std;
 int main() {
     // 1. 환경 설정 (1단계와 동일한 n, t 사용)
     FHESetup fhe;
-    fhe.setup_for_response(n, 44, "secret_key.bin"); // 비밀키 로드 함수 필요
+    fhe.setup_for_response(n, t, "secret_key.bin"); // 비밀키 로드 함수 필요
 
     // 2. 해시 테이블 로드 (인덱스 복구용)
     Hashing hashing;
