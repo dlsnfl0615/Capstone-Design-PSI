@@ -24,10 +24,28 @@ int main() {
     auto responses = psi_receiver.load_responses("response.bin", *fhe.context);
     auto intersection_indices = psi_receiver.identify_intersection(responses, *fhe.decryptor, *fhe.batch_encoder);
 
+    // receiver_result.cpp 내 교집합 확인 로직 수정 제안
+    for (size_t i = 0; i < responses.size(); i++) {
+        seal::Plaintext plain;
+        fhe.decryptor->decrypt(responses[i], plain);
+        vector<uint64_t> decoded;
+        fhe.batch_encoder->decode(plain, decoded);
+
+        for (size_t slot = 0; slot < decoded.size(); slot++) {
+            // 0이 발견되면 해당 슬롯에 교집합이 존재한다는 뜻
+            if (decoded[slot] == 0) {
+                cout << "Intersection found! Response: " << i << ", Slot: " << slot << endl;
+            }
+        }
+    }
+
     // 4. 최종 결과 출력
+    
+
+    ofstream result("result.csv");
     for (int idx : intersection_indices) {
         RestoredData res = hashing.restore_original_data(hashing.hash_table[idx], idx);
-        cout << "Found Intersection - PID: " << res.pid << ", Disease: " << res.disease << endl;
+        result << res.pid + res.disease << endl;
     }
 
     cout << intersection_indices.size() << endl;

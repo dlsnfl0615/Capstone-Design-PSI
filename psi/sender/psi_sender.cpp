@@ -1,5 +1,17 @@
 #include "psi_sender.h"
 
+// 64비트 범위 내에서 (a * b) % m 오버플로우 방지 곱셈 함수 
+uint64_t safe_mul_mod(uint64_t a, uint64_t b, uint64_t m) {
+    uint64_t res = 0;
+    a %= m;
+    while (b > 0) {
+        if (b % 2 == 1) res = (res + a) % m;
+        a = (a + a) % m;
+        b /= 2;
+    }
+    return res;
+}
+
 void PsiSender::load_receiver_powers(const string& filename, seal::SEALContext& context) {
     ifstream in(filename, ios::binary);
     if (!in.is_open()) throw runtime_error("Cannot open receiver's power file: " + filename);
@@ -49,52 +61,36 @@ void PsiSender::partition_bins(const vector<vector<uint64_t>>& hash_table) {
 void PsiSender::compute_coefficients(seal::BatchEncoder& encoder, uint64_t plain_modulus) {
     int d = static_cast<int>(ceil(static_cast<double>(B) / alpha));
     size_t slot_count = encoder.slot_count();
-    
-    // 결과 저장 공간 초기화: [alpha 파티션][d + 1 차수]
     batched_coeffs.assign(alpha, vector<seal::Plaintext>(d + 1));
 
-    cout << "Sender: Computing polynomial coefficients..." << endl;
-
     for (int k = 0; k < alpha; k++) {
-        // 각 차수(0 ~ d)별로 m개의 슬롯 데이터를 임시 저장할 벡터들
+        // [수정] 0번 차수(상수항)를 1로 초기화하여 사용하지 않는 슬롯이 0이 되지 않게 함
         vector<vector<uint64_t>> all_coeffs_by_degree(d + 1, vector<uint64_t>(slot_count, 0));
+        fill(all_coeffs_by_degree[0].begin(), all_coeffs_by_degree[0].end(), 1); 
 
         for (int i = 0; i < m; i++) {
-            // 1. 현재 빈의 아이템들로부터 다항식 (y - x1)(y - x2)...(y - xd) 계산
-            // 초기 상태: P(y) = 1 (0차항 계수가 1인 상태)
             vector<uint64_t> current_poly = { 1 };
-
             for (int j = 0; j < d; j++) {
                 uint64_t root = partitioned_tables[k][i][j];
-                
-                // 더미 아이템인 경우 (y - 1) 등을 곱하는 대신 결과에 영향 없는 값 처리 가능
-                // 여기서는 논문 방식대로 모든 루트를 사용하여 d차 다항식을 완성함
-                
                 vector<uint64_t> next_poly(current_poly.size() + 1, 0);
                 for (size_t p = 0; p < current_poly.size(); p++) {
-                    // y를 곱함: (y^p * y)
                     next_poly[p + 1] = (next_poly[p + 1] + current_poly[p]) % plain_modulus;
-                    
-                    // -root를 곱함: (y^p * -root)
                     uint64_t neg_root = (plain_modulus - (root % plain_modulus)) % plain_modulus;
-                    uint64_t term = (current_poly[p] * neg_root) % plain_modulus;
+                    
+                    // [필독] 오버플로우 방지를 위해 safe_mul_mod를 반드시 사용해야 함
+                    uint64_t term = safe_mul_mod(current_poly[p], neg_root, plain_modulus); 
                     next_poly[p] = (next_poly[p] + term) % plain_modulus;
                 }
                 current_poly = next_poly;
             }
-
-            // 2. 계산된 계수들을 차수별 벡터의 해당 빈 위치(i)에 저장
             for (int deg = 0; deg <= d; deg++) {
                 all_coeffs_by_degree[deg][i] = current_poly[deg];
             }
         }
-
-        // 3. 각 차수별 벡터를 SEAL Plaintext로 인코딩 (SIMD 배칭)
         for (int deg = 0; deg <= d; deg++) {
             encoder.encode(all_coeffs_by_degree[deg], batched_coeffs[k][deg]);
         }
     }
-    cout << "Sender: Coefficient calculation and batching complete." << endl;
 }
 
 void PsiSender::reconstruct_all_powers(seal::Evaluator& evaluator, seal::RelinKeys& relin_keys) {

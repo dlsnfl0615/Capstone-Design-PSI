@@ -17,7 +17,7 @@ int main() {
         // FHESetup을 통해 수신자의 공개키와 릴리니어라이제이션 키 로드
         FHESetup fhe;
         // 주의: 실행 경로에 public_key.bin, relin_keys.bin 파일이 있어야 합니다.
-        fhe.setup_sender(n, 44, "public_key.bin", "relin_keys.bin");
+        fhe.setup_sender(n, t, "public_key.bin", "relin_keys.bin");
 
         // PsiSender를 통해 수신자가 보낸 거듭제곱 암호문(windowed powers) 로드
         PsiSender psi_sender;
