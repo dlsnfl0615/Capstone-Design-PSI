@@ -28,13 +28,13 @@ vector<int> Windowing::get_exponents() {
     return result;
 }
 
-vector<Ciphertext> Windowing::receiver_windowing(
+map<int, Ciphertext> Windowing::receiver_windowing(
     BatchEncoder& batch_encoder,
     Encryptor& encryptor,
     const uint64_t plain_modulus,
     const vector<int> exponents,
     const vector<uint64_t> hash_table) {
-    vector<Ciphertext> result;
+    map<int, Ciphertext> result;
 
     for (int e : exponents) {
         // 평문 공간에 담을 벡터 준비 (차수 n=32768)
@@ -67,7 +67,7 @@ vector<Ciphertext> Windowing::receiver_windowing(
         Ciphertext encrypted_power;
         encryptor.encrypt(plain_power, encrypted_power);
 
-        result.push_back(encrypted_power);
+        result.insert({e, encrypted_power});
         cout << "  - Generated encrypted ciphertext for exponent: " << e << endl;
     }
 

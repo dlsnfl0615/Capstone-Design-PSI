@@ -75,7 +75,89 @@ vector<vector<vector<uint64_t>>> SenderEvaluate::extract_all_coefficients(
             }
         }
         coeff_tables.push_back(partition_coeffs);
-        cout << "[Sender] Partition " << p << " coefficients extracted." << endl;
+        // cout << "[Sender] Partition " << p << " coefficients extracted." << endl;
     }
     return coeff_tables;
+}
+
+map<int, Ciphertext> SenderEvaluate::make_all_powers(
+    const map<int, Ciphertext> received_powers,
+    Evaluator& evaluator,
+    RelinKeys& relin_keys) {
+    map<int, Ciphertext> all_powers;
+    int d = static_cast<int>(ceil(static_cast<double>(B) / alpha));
+    int base = (1 << l);
+
+    all_powers = received_powers; // 수신자가 보낸 기저 복사 [cite: 24]
+
+    for (int k = 1; k <= d; k++) {
+        if (all_powers.find(k) != all_powers.end()) continue;
+
+        Ciphertext combined;
+        bool first = true;
+        int temp_k = k;
+        int j = 0;
+
+        // 지수 k를 윈도우 기저의 합으로 분해하여 동형 곱셈 수행 [cite: 24]
+        while (temp_k > 0) {
+            int i = temp_k % base;
+            if (i > 0) {
+                int part_exp = static_cast<int>(i) * (1ULL << (l * j));
+                if (first) {
+                    combined = all_powers[part_exp];
+                    first = false;
+                } else {
+                    evaluator.multiply_inplace(combined, all_powers[part_exp]);
+                    evaluator.relinearize_inplace(combined, relin_keys);
+                }
+            }
+            temp_k /= base;
+            j++;
+        }
+        all_powers[k] = move(combined);
+    }
+
+    return all_powers;
+}
+
+vector<Ciphertext> SenderEvaluate::intersect(
+    const map<int, Ciphertext> all_powers,
+    const vector<vector<vector<uint64_t>>> coeffs,
+    BatchEncoder& batch_encoder,
+    Evaluator& evaluator,
+    SEALContext& context) {
+    vector<Ciphertext> result;
+    for (int partition_idx = 0; partition_idx < coeffs.size(); partition_idx++) {
+        Ciphertext partition_sum;
+        bool is_first_term = true;
+
+        for (int row = 0; row < coeffs[partition_idx].size(); row++) {
+            vector<uint64_t> row_vector(m, 1); // coeffs[partition_idx][row].size() == m. 계수 벡터 열 길이는 m임
+
+            for (int col = 0; col < coeffs[partition_idx][row].size(); col++) {
+                row_vector[col] = coeffs[partition_idx][row][col];
+            }
+
+            Plaintext plain_coeff;
+            batch_encoder.encode(row_vector, plain_coeff);
+
+            Ciphertext temp_product;
+            evaluator.multiply_plain(all_powers.at(row), plain_coeff, temp_product);
+
+            if (is_first_term) {
+                partition_sum = temp_product;
+                is_first_term = false;
+            } else {
+                evaluator.add_inplace(partition_sum, temp_product); //[cite: 1]
+            }
+        }
+
+        while (context.get_context_data(partition_sum.parms_id())->chain_index() > 0) {
+            evaluator.mod_switch_to_next_inplace(partition_sum);
+        }
+
+        result.push_back(partition_sum);
+    }
+
+    return result;
 }

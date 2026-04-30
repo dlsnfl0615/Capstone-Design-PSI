@@ -17,7 +17,7 @@ const int t = 44; // plain modulus 비트 길이. 실제 값으로 사용하려�
 // const int q 자동으로 생성됨
 
 const int l = 3; // 윈도잉 파라미터
-const int alpha = 32; // 파티셔닝 파라미터
+const int alpha = 8; // 파티셔닝 파라미터
 const int lambda = 40; // 보안 수준
 
 const int random = 4365234;
