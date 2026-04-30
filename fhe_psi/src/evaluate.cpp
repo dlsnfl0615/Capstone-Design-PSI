@@ -1,23 +1,24 @@
 #include "evaluate.h"
 
 vector<vector<vector<uint64_t>>> SenderEvaluate::partitioning(const vector<vector<uint64_t>> hash_table) {
-    vector<vector<vector<uint64_t>>> partitions(alpha);
-    // 정확한 B_prime 계산 (double 캐스팅 필수)
-    int B_prime = static_cast<int>(ceil(static_cast<double>(B) / alpha));
+    
+    int B_prime = static_cast<int>(ceil(static_cast<double>(B) / alpha)); 
+    vector<vector<vector<uint64_t>>> partitions(alpha, vector<vector<uint64_t>>(B_prime, vector<uint64_t>(m, SENDER_DUMMY))); 
 
-    for (int p = 0; p < alpha; ++p) {
-        // 각 파티션은 m개의 빈을 가짐
-        partitions[p].resize(m, vector<uint64_t>(B_prime, SENDER_DUMMY));
-        
-        for (int col = 0; col < m; ++col) {
-            for (int row = 0; row < B_prime; ++row) {
-                int original_row = p * B_prime + row;
-                if (original_row < B) {
-                    partitions[p][col][row] = hash_table[col][original_row];
+    for (int p = 0; p < alpha; p++) {
+        for (int row = 0; row < B_prime; row++) {
+            int original_row = p * B_prime + row;
+            if (original_row < B) {
+                for (int col = 0; col < m; col++) {
+                    // 원본의 c번째 빈, original_row번째 슬롯의 값을 복사함[cite: 1]
+                    partitions[p][row][col] = hash_table[col][original_row]; 
                 }
             }
         }
     }
+
+    cout << "partition num: " << partitions.size() << ", row: " << partitions[0].size() << ", col: " << partitions[0][0].size() << endl;
+
     return partitions;
 }
 
@@ -60,7 +61,7 @@ vector<vector<vector<uint64_t>>> SenderEvaluate::extract_all_coefficients(
             vector<uint64_t> roots;
             for (int row = 0; row < B_prime; row++) {
                 // 수정된 인덱스: [p][bin][row]
-                roots.push_back(partitions[p][col][row]); 
+                roots.push_back(partitions[p][row][col]); 
             }
 
             vector<uint64_t> bin_coeffs = compute_bin_coefficients(roots, plain_modulus);

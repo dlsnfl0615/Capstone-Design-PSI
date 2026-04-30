@@ -62,8 +62,11 @@ int main() {
 
     SenderEvaluate sender_evaluator;
     auto partitioned = sender_evaluator.partitioning(sender_hashing.hash_table);
+    cout << "asdf\n";
     auto coeffs = sender_evaluator.extract_all_coefficients(partitioned, plain_modulus);
+    cout << "asdf\n";
     map<int, Ciphertext> all_powers = sender_evaluator.make_all_powers(encrypted_powers, evaluator, relin_keys);
+    cout << "asdf\n";
 
     vector<uint64_t> constant_one(n, 1);
     Plaintext plain_one;
