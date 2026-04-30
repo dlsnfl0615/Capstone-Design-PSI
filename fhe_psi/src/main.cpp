@@ -24,6 +24,7 @@ int main() {
 
     SEALContext context(parms);
     uint64_t plain_modulus = context.first_context_data()->parms().plain_modulus().value();
+    cout << "plain_modulus: " << plain_modulus << endl;
 
     // 2. 키 생성 및 객체 초기화
     KeyGenerator keygen(context);
@@ -40,16 +41,12 @@ int main() {
 
     auto receiver_data = load_receiver("data/receiver.csv");
     auto sender_data = load_sender("data/sender.csv");
-
+    
     ReceiverHashing receiver_hashing;
     receiver_hashing.locate(receiver_data);
 
     Windowing windowing;
     vector<int> exponents = windowing.get_exponents();
-    cout << "[windowing]" << endl;
-    for (auto elem : exponents) {
-        cout << elem << " ";
-    }
     cout << endl;
     map<int, Ciphertext> encrypted_powers = windowing.receiver_windowing(
         batch_encoder,
@@ -57,16 +54,16 @@ int main() {
         plain_modulus,
         exponents,
         receiver_hashing.hash_table);
+        
+
     SenderHashing sender_hashing;
     sender_hashing.locate(sender_data);
 
     SenderEvaluate sender_evaluator;
     auto partitioned = sender_evaluator.partitioning(sender_hashing.hash_table);
-    cout << "asdf\n";
     auto coeffs = sender_evaluator.extract_all_coefficients(partitioned, plain_modulus);
-    cout << "asdf\n";
+    
     map<int, Ciphertext> all_powers = sender_evaluator.make_all_powers(encrypted_powers, evaluator, relin_keys);
-    cout << "asdf\n";
 
     vector<uint64_t> constant_one(n, 1);
     Plaintext plain_one;
@@ -74,27 +71,32 @@ int main() {
     Ciphertext encrypted_one;
     encryptor.encrypt(plain_one, encrypted_one);
     all_powers[0] = encrypted_one;
+    
 
     // 각 파티션 별로 다항식 전개한 결과 저장
-    vector<Ciphertext> producted = sender_evaluator.intersect(all_powers, coeffs, batch_encoder, evaluator, context);
+    vector<Ciphertext> producted = sender_evaluator.product(all_powers, coeffs, batch_encoder, evaluator, context);
+    
     cout << "\n--- Receiver: Final Intersection Check ---" << endl;
 
     // 복호화된 교집합 패킹 값들을 저장할 셋 (중복 제거)
     set<uint64_t> intersection_packed_values;
 
+    int count = 0;
     for (size_t p = 0; p < producted.size(); p++) {
-        // 1. 암호문 복호화 및 디코딩 수행[cite: 14]
+        // 암호문 복호화 및 디코딩 수행
         Plaintext plain_result;
         decryptor.decrypt(producted[p], plain_result);
         
         vector<uint64_t> decoded_slots;
         batch_encoder.decode(plain_result, decoded_slots);
 
-        // 2. 각 슬롯을 검사하여 0인 위치의 패킹된 값을 수집함
+        // 각 슬롯을 검사하여 0인 위치의 패킹된 값을 수집함
         for (int i = 0; i < m; i++) {
-            // 수학적으로 P(y) = 0 이면 교집합임[cite: 1]
+            // 수학적으로 P(y) = 0 이면 교집합임
+
             if (decoded_slots[i] == 0) {
                 uint64_t packed_val = receiver_hashing.hash_table[i];
+                count++;
 
                 // 수신자의 더미 데이터가 아닌 실제 값인 경우에만 추가함
                 if (packed_val != RECEIVER_DUMMY) {
@@ -104,7 +106,7 @@ int main() {
         }
     }
 
-    cout << "set size: " << intersection_packed_values.size() << endl;
+    cout << "count: " << count << endl;
 
     // 3. 원본 데이터를 순회하며 교집합 여부를 대조하여 출력함
     int found_count = 0;
@@ -120,7 +122,7 @@ int main() {
         uint64_t x_L = full_item >> 13;
 
         bool is_intersected = false;
-        // h개의 가능한 해시 인덱스 중 하나라도 셋에 존재하면 교집합임[cite: 1, 11]
+        // h개의 가능한 해시 인덱스 중 하나라도 셋에 존재하면 교집합임
         for (int i = 0; i < h; i++) {
             uint64_t packed = (x_L << 2) | (static_cast<uint64_t>(i));
             if (intersection_packed_values.count(packed)) {

@@ -34,30 +34,20 @@ map<int, Ciphertext> Windowing::receiver_windowing(
     const uint64_t plain_modulus,
     const vector<int> exponents,
     const vector<uint64_t> hash_table) {
+
     map<int, Ciphertext> result;
 
     for (int e : exponents) {
-        // 평문 공간에 담을 벡터 준비 (차수 n=32768)
         vector<uint64_t> pod_powers(n, 0); 
 
         for (size_t k = 0; k < m; k++) {
-            uint64_t val = hash_table[k]; // 해시 테이블에서 패킹된 값 추출
-
+            uint64_t val = hash_table[k]; 
+            
             if (val == RECEIVER_DUMMY) {
-                // 더미 데이터일 경우 연산 생략하고 더미 값 유지
                 pod_powers[k] = RECEIVER_DUMMY; 
             } else {
-                // 평문 상태에서 거듭제곱 계산: (val^e) mod t
-                // t=44이므로 평문 공간 내에서 연산이 이루어짐
-                uint64_t res = 1;
-                uint64_t base = val % plain_modulus;
-                int temp_e = e;
-                while (temp_e > 0) {
-                    if (temp_e % 2 == 1) res = (res * base) % plain_modulus;
-                    base = (base * base) % plain_modulus;
-                    temp_e /= 2;
-                }
-                pod_powers[k] = res; // 계산된 슬롯 값 저장
+                // [수정된 부분] 오버플로우 방지 거듭제곱 함수 적용함
+                pod_powers[k] = power_mod(val, e, plain_modulus); 
             }
         }
 

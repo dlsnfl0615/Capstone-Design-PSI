@@ -1,9 +1,10 @@
 #pragma once
 
 #include <stdint.h>
+#include <iostream>
 
-const int Nx = 5535;
-const int Ny = 10;
+// const int Nx = 65538;
+// const int Ny = 5535;
 const int m = 8192; // 해시 테이블의 전체 빈 (Bin) 개수. 바깥 벡터 길이
 const int h = 4; // 해시 함수 개수
 const int B = 74; // sender 빈 당 할당되는 일차원 배열의 길이
@@ -21,3 +22,4 @@ const int alpha = 8; // 파티셔닝 파라미터
 const int lambda = 40; // 보안 수준
 
 const int random = 4365234;
+const int B_prime = static_cast<int>(ceil(static_cast<double>(B) / alpha));

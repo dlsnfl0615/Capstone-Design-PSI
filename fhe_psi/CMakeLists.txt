@@ -21,6 +21,7 @@ add_executable(${EXE_NAME}
     src/sender_hashing.cpp
     src/evaluate.cpp
     src/modulus_switching.cpp
+    src/mod.cpp
     external/murmur3.cpp
     external/murmur3.h
 )
