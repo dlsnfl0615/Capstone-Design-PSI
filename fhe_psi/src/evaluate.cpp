@@ -1,22 +1,23 @@
 #include "evaluate.h"
 
 vector<vector<vector<uint64_t>>> SenderEvaluate::partitioning(const vector<vector<uint64_t>> hash_table) {
-    vector<vector<vector<uint64_t>>> partitions;
-    vector<vector<uint64_t>> temp = hash_table;
-    int partition_len = ceil(B / alpha);
-    
-    if (temp.size() < partition_len * alpha) {
-        temp.resize(partition_len * alpha, vector<uint64_t>(m, SENDER_DUMMY));
-    }
+    vector<vector<vector<uint64_t>>> partitions(alpha);
+    // 정확한 B_prime 계산 (double 캐스팅 필수)
+    int B_prime = static_cast<int>(ceil(static_cast<double>(B) / alpha));
 
-    for (int i = 0; i < alpha; ++i) {
-        auto start = temp.begin() + (i * partition_len);
-        auto end = start + partition_len;
+    for (int p = 0; p < alpha; ++p) {
+        // 각 파티션은 m개의 빈을 가짐
+        partitions[p].resize(m, vector<uint64_t>(B_prime, SENDER_DUMMY));
         
-        // 각 블록은 10x8192 크기를 가짐
-        partitions.emplace_back(start, end);
+        for (int col = 0; col < m; ++col) {
+            for (int row = 0; row < B_prime; ++row) {
+                int original_row = p * B_prime + row;
+                if (original_row < B) {
+                    partitions[p][col][row] = hash_table[col][original_row];
+                }
+            }
+        }
     }
-
     return partitions;
 }
 
@@ -44,38 +45,32 @@ vector<uint64_t> SenderEvaluate::compute_bin_coefficients(const vector<uint64_t>
     return coeffs;
 }
 
-// 2. 3차원 파티션 배열을 순회하며 계수만 추출함
-// 입력: partitioned[alpha][B_prime][m][cite: 21]
-// 출력: coeff_tables[alpha][B_prime + 1][m] (배칭에 최적화된 구조)[cite: 1]
 vector<vector<vector<uint64_t>>> SenderEvaluate::extract_all_coefficients(
     const vector<vector<vector<uint64_t>>>& partitions, 
-    uint64_t plain_modulus
-) {
-    int B_prime = B / alpha; // 각 파티션의 행(아이템) 개수[cite: 11, 24]
+    uint64_t plain_modulus) {
+        
+    int B_prime = static_cast<int>(ceil(static_cast<double>(B) / alpha));
     vector<vector<vector<uint64_t>>> coeff_tables;
 
     for (int p = 0; p < alpha; p++) {
-        // [차수][열] 구조의 테이블 생성 (배칭 시 행 단위로 읽기 위함)[cite: 1]
+        // partition_coeffs[차수][빈] 구조
         vector<vector<uint64_t>> partition_coeffs(B_prime + 1, vector<uint64_t>(m, 0));
 
         for (int col = 0; col < m; col++) {
-            // 해당 열(Bin)의 모든 행 데이터를 근(Roots)으로 수집함[cite: 1]
             vector<uint64_t> roots;
             for (int row = 0; row < B_prime; row++) {
-                roots.push_back(partitions[p][row][col]);
+                // 수정된 인덱스: [p][bin][row]
+                roots.push_back(partitions[p][col][row]); 
             }
 
-            // 다항식 전개 수행[cite: 1]
             vector<uint64_t> bin_coeffs = compute_bin_coefficients(roots, plain_modulus);
 
-            // 계산된 계수들을 차수별로 테이블에 채움[cite: 1]
             for (int d = 0; d <= B_prime; d++) {
-                // bin_coeffs[0]은 B_prime차항, bin_coeffs[B_prime]은 0차항임
+                // d차항 계수를 해당 빈(col) 위치에 저장
                 partition_coeffs[d][col] = bin_coeffs[B_prime - d];
             }
         }
         coeff_tables.push_back(partition_coeffs);
-        // cout << "[Sender] Partition " << p << " coefficients extracted." << endl;
     }
     return coeff_tables;
 }
@@ -126,6 +121,12 @@ vector<Ciphertext> SenderEvaluate::intersect(
     BatchEncoder& batch_encoder,
     Evaluator& evaluator,
     SEALContext& context) {
+
+    for (auto iter : all_powers) {
+        cout << iter.first << " ";
+    }
+    cout << endl;
+    
     vector<Ciphertext> result;
     for (int partition_idx = 0; partition_idx < coeffs.size(); partition_idx++) {
         Ciphertext partition_sum;
@@ -142,6 +143,10 @@ vector<Ciphertext> SenderEvaluate::intersect(
             batch_encoder.encode(row_vector, plain_coeff);
 
             Ciphertext temp_product;
+            if (all_powers.find(row) == all_powers.end()) {
+                cerr << "[Error] Degree " << row << " is missing in all_powers map!" << endl;
+                exit(1); // 원인을 알 수 있게 에러 메시지 출력 후 종료함
+            }
             evaluator.multiply_plain(all_powers.at(row), plain_coeff, temp_product);
 
             if (is_first_term) {
