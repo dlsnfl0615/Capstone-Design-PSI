@@ -6,6 +6,7 @@
 #include <map>
 #include "parameters.h"
 #include "seal/seal.h"
+#include "mod.h"
 
 using namespace std;
 using namespace seal;

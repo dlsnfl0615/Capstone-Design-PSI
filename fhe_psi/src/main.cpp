@@ -3,6 +3,7 @@
 #include <vector>
 #include <map>
 #include <set>
+#include <chrono>
 #include "parameters.h"
 #include "data_loader.h"
 #include "receiver_hashing.h"
@@ -12,8 +13,11 @@
 
 using namespace std;
 using namespace seal;
+using Clock = chrono::high_resolution_clock;
+using Ms    = chrono::milliseconds;
 
 int main() {
+    auto total_start = Clock::now();
     // 1. 파라미터 설정: BFV 스킴 사용
     EncryptionParameters parms(scheme_type::bfv);
     size_t poly_modulus_degree = n;
@@ -72,10 +76,11 @@ int main() {
     encryptor.encrypt(plain_one, encrypted_one);
     all_powers[0] = encrypted_one;
     
-
+    auto psi_start = Clock::now();
     // 각 파티션 별로 다항식 전개한 결과 저장
     vector<Ciphertext> producted = sender_evaluator.product(all_powers, coeffs, batch_encoder, evaluator, context);
     
+
     cout << "\n--- Receiver: Final Intersection Check ---" << endl;
 
     // 복호화된 교집합 패킹 값들을 저장할 셋 (중복 제거)
@@ -139,8 +144,13 @@ int main() {
             // cout << "  [X] No Match: " << pid_str << endl;
         }
     }
-
+    auto psi_end = Clock::now();
+    auto total_end = Clock::now();
+    
     cout << "\nTotal Intersections: " << found_count << " / " << receiver_data.size() << endl;
+    auto total_time = chrono::duration_cast<Ms>(total_end - total_start).count();
+    auto total_psi = chrono::duration_cast<Ms>(psi_end - psi_start).count();
 
+    cout << "total time: " << total_time << ", total psi: " << total_psi << endl;
     return 0;
 }
