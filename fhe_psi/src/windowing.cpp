@@ -4,7 +4,7 @@ vector<int> Windowing::get_exponents() {
     vector<int> result;
 
     int exponent_max = B_prime;
-    int j_max = static_cast<int>(floor(log2(ceil(static_cast<double>(B)/alpha)) / l));
+    int j_max = static_cast<int>(floor(log2(ceil(B_prime)) / l));
     int i_max = (1 << l) - 1;
 
     cout << "[windowing] j_max: " << j_max << ", i_max: " << i_max << endl;
