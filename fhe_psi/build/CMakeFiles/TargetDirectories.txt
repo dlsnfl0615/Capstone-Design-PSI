@@ -1,0 +1,3 @@
+C:/Capstone-Design-PSI/fhe_psi/build/CMakeFiles/windowing.dir
+C:/Capstone-Design-PSI/fhe_psi/build/CMakeFiles/edit_cache.dir
+C:/Capstone-Design-PSI/fhe_psi/build/CMakeFiles/rebuild_cache.dir
