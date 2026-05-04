@@ -1,7 +1,0 @@
-{
-	"InstallScripts" : 
-	[
-		"C:/Capstone-Design-PSI/fhe_psi/build/cmake_install.cmake"
-	],
-	"Parallel" : false
-}
