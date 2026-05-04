@@ -8,7 +8,7 @@
 const int m = 8192; // 해시 테이블의 전체 빈 (Bin) 개수. 바깥 벡터 길이
 const int h = 4; // 해시 함수 개수
 const int B = 74; // sender 빈 당 할당되는 일차원 배열의 길이
-const uint64_t sigma = 43; // 비트화했을 때의 최대 길이. *
+const uint64_t sigma = 43; // 비트화했을 때의 최대 길이. sigma_max = 2 log_2(Nx+Ny) + lambda - 1
 const int CUCKOO_MAX_KICK = 500;
 const uint64_t RECEIVER_DUMMY = (1ULL << sigma);
 const uint64_t SENDER_DUMMY = ((1ULL << (sigma + 1)) - 1);

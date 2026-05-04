@@ -5,6 +5,7 @@
 #include <string>
 #include <bitset>
 #include <map>
+#include <cmath>
 #include "parameters.h"
 #include "murmur3.h"
 

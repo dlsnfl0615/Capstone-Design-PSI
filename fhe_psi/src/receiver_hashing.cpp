@@ -11,7 +11,7 @@ void ReceiverHashing::locate(const vector<string> data) {
 
         // 순열 기반 해싱을 위한 비트 분리
         uint64_t x_R = full_item & 0x1FFF; // 하위 13비트 (log2 8192)
-        uint64_t x_L = full_item >> 13;   // 상위 41비트
+        uint64_t x_L = full_item >> static_cast<int>(log2(m));   // 상위 41비트
         
         // 뻐꾸기 해싱 초기 설정
         int hash_idx = 0; // 0번 해시 함수부터 시작 (hashing.h의 0-based index 기준)
