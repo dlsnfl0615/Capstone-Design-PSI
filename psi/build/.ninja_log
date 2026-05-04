@@ -1,9 +1,0 @@
-# ninja log v6
-17	517	7987023003539860	CMakeFiles/psi.dir/receiver/receiver.cpp.obj	edbd615b1af76c29
-6	636	7987023003429877	CMakeFiles/psi.dir/receiver/data_loader.cpp.obj	e608614616714dfd
-3	416	7987065005499859	CMakeFiles/psi.dir/receiver/hashing.cpp.obj	87a0bf904e664163
-416	872	7987065009625900	psi.exe	859b0003e1424988
-15	431	7987068403699166	CMakeFiles/psi.dir/receiver/receiver.cpp.obj	edbd615b1af76c29
-12	436	7987068403659144	CMakeFiles/psi.dir/receiver/hashing.cpp.obj	87a0bf904e664163
-6	525	7987068403599148	CMakeFiles/psi.dir/receiver/data_loader.cpp.obj	e608614616714dfd
-526	1142	7987068408804965	psi.exe	859b0003e1424988
