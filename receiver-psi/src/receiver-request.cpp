@@ -4,12 +4,11 @@
 #include <map>
 #include <set>
 #include <chrono>
+#include <fstream>
 #include "parameters.h"
 #include "data_loader.h"
-#include "receiver_hashing.h"
-#include "sender_hashing.h"
+#include "hashing.h"
 #include "windowing.h"
-#include "evaluate.h"
 
 using namespace std;
 using namespace seal;
@@ -61,6 +60,30 @@ int main() {
         receiver_hashing.hash_table);
         
     // [receiver request] sender로 EncryptionParameters 객체, 윈도잉 값, 키 보내기
+    ofstream parms_out("../data/parms.bin", ios::binary);
+    parms.save(parms_out);
+    parms_out.close();
+
+    ofstream pk_out("../data/pulic_key.bin", ios::binary);
+    public_key.save(pk_out);
+    pk_out.close();
+
+    ofstream rk_out("../data/relin_key.bin", ios::binary);
+    relin_keys.save(rk_out);
+    rk_out.close();
+
+    std::ofstream ofs("../data/powers.bin", ios::binary);
+    size_t map_size = encrypted_powers.size();
+    ofs.write(reinterpret_cast<const char*>(&map_size), sizeof(size_t));
+    for (auto &kv : encrypted_powers) {
+        // key (int) 저장
+        int key = kv.first;
+        ofs.write(reinterpret_cast<const char*>(&key), sizeof(int));
+        
+        // value (Ciphertext) 저장
+        kv.second.save(ofs); 
+    }
+    ofs.close();
 
     return 0;
 }
