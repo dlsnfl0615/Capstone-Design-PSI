@@ -16,7 +16,7 @@ using Ms = chrono::milliseconds;
 
 int main() {
     // receiver 원본 데이터 다시 로드
-    auto receiver_data = load_receiver("/data/receiver.csv");
+    auto receiver_data = load_receiver("data/receiver.csv");
 
     // parms 로드
     EncryptionParameters parms;
@@ -142,7 +142,7 @@ int main() {
         }
 
         if (is_intersected) {
-            cout << "  [O] Found Intersection: PID(" << pid_str << ") Disease(" << disease_str << ")" << endl;
+            // cout << "  [O] Found Intersection: PID(" << pid_str << ") Disease(" << disease_str << ")" << endl;
             found_count++;
         }
     }
