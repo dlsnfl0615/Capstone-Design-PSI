@@ -16,7 +16,7 @@ using Clock = chrono::high_resolution_clock;
 using Ms = chrono::milliseconds;
 
 int main() {
-    // [receiver request] 파라미터 설정
+    // 파라미터 설정
     EncryptionParameters parms(scheme_type::bfv);
     size_t poly_modulus_degree = n;
     parms.set_poly_modulus_degree(poly_modulus_degree);
@@ -27,7 +27,7 @@ int main() {
     uint64_t plain_modulus = context.first_context_data()->parms().plain_modulus().value();
     cout << "plain_modulus: " << plain_modulus << endl;
 
-    // [receiver request] 키 생성 및 객체 초기화
+    // 키 생성 및 객체 초기화
     KeyGenerator keygen(context);
     SecretKey secret_key = keygen.secret_key();
     PublicKey public_key;
@@ -40,15 +40,14 @@ int main() {
     Decryptor decryptor(context, secret_key);
     BatchEncoder batch_encoder(context);
 
-    // [receiver request] 데이터 로드
+    // 데이터 로드
     auto receiver_data = load_receiver("data/receiver.csv");
-    auto sender_data = load_sender("data/sender.csv");
     
-    // [receiver request] 해싱
+    // 해싱
     ReceiverHashing receiver_hashing;
     receiver_hashing.locate(receiver_data);
 
-    // [receiver request] 윈도잉
+    // 윈도잉
     Windowing windowing;
     vector<int> exponents = windowing.get_exponents();
     cout << endl;
@@ -59,20 +58,35 @@ int main() {
         exponents,
         receiver_hashing.hash_table);
         
-    // [receiver request] sender로 EncryptionParameters 객체, 윈도잉 값, 키 보내기
+    // parms 저장
     ofstream parms_out("../data/parms.bin", ios::binary);
     parms.save(parms_out);
     parms_out.close();
 
-    ofstream pk_out("../data/pulic_key.bin", ios::binary);
+    // 공개키 저장
+    ofstream pk_out("../data/public_key.bin", ios::binary);
     public_key.save(pk_out);
     pk_out.close();
 
+    // 비밀키 저장
+    ofstream sk_out("../data/secret_key.bin", ios::binary);
+    secret_key.save(sk_out);
+    sk_out.close();
+
+    // relin 키 저장
     ofstream rk_out("../data/relin_key.bin", ios::binary);
     relin_keys.save(rk_out);
     rk_out.close();
 
-    std::ofstream ofs("../data/powers.bin", ios::binary);
+    // 해시 테이블 저장
+    ofstream hash_out("../data/receiver_hash.bin", ios::binary);
+    size_t table_size = receiver_hashing.hash_table.size();
+    hash_out.write(reinterpret_cast<const char*>(&table_size), sizeof(size_t));
+    hash_out.write(reinterpret_cast<const char*>(receiver_hashing.hash_table.data()), table_size * sizeof(uint64_t));
+    hash_out.close();
+
+    // 윈도잉 결과 저장
+    ofstream ofs("../data/powers.bin", ios::binary);
     size_t map_size = encrypted_powers.size();
     ofs.write(reinterpret_cast<const char*>(&map_size), sizeof(size_t));
     for (auto &kv : encrypted_powers) {

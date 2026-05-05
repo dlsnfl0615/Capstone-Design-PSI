@@ -4,12 +4,10 @@
 #include <map>
 #include <set>
 #include <chrono>
+#include <fstream>
 #include "parameters.h"
 #include "data_loader.h"
-#include "receiver_hashing.h"
-#include "sender_hashing.h"
-#include "windowing.h"
-#include "evaluate.h"
+#include "hashing.h"
 
 using namespace std;
 using namespace seal;
@@ -17,10 +15,79 @@ using Clock = chrono::high_resolution_clock;
 using Ms = chrono::milliseconds;
 
 int main() {
-    
+    // receiver 원본 데이터 다시 로드
+    auto receiver_data = load_receiver("/data/receiver.csv");
+
+    // parms 로드
+    EncryptionParameters parms;
+    ifstream parms_in("../data/parms.bin", ios::binary);
+    if (!parms_in.is_open()) {
+        cerr << "Error: parms.bin 파일을 찾을 수 없습니다." << endl;
+        return 1;
+    }
+    parms.load(parms_in);
+    parms_in.close();
+
+    // request와 같은 context 생성
+    SEALContext context(parms);
+
+    // 공개키 로드
+    PublicKey public_key;
+    ifstream pk_in("../data/public_key.bin", ios::binary);
+    if (pk_in.is_open()) {
+        public_key.load(context, pk_in);
+        pk_in.close();
+    }
+
+    // relin 키 로드
+    RelinKeys relin_keys;
+    ifstream rk_in("../data/relin_key.bin", ios::binary);
+    if (rk_in.is_open()) {
+        relin_keys.load(context, rk_in);
+        rk_in.close();
+    }
+
+    // 비밀키 로드
+    SecretKey secret_key;
+    ifstream sk_in("../data/secret_key.bin", ios::binary);
+    if (sk_in.is_open()) {
+        secret_key.load(context, sk_in);
+        sk_in.close();
+    }
+
+    // receiver 해시 테이블 로드
+    vector<uint64_t> hash_table;
+    ifstream hash_in("../data/receiver_hash.bin", ios::binary);
+    if (hash_in.is_open()) {
+        size_t table_size;
+        hash_in.read(reinterpret_cast<char*>(&table_size), sizeof(size_t));
+        hash_table.resize(table_size);
+        hash_in.read(reinterpret_cast<char*>(hash_table.data()), table_size * sizeof(uint64_t));
+        hash_in.close();
+    }
+
+    // 복호화 객체, 배칭 객체 생성
+    Decryptor decryptor(context, secret_key);
+    BatchEncoder batch_encoder(context);
+
+    // sender가 보내준 다항식 연산 결과 로드
+    vector<Ciphertext> producted;
+    ifstream res_in("../data/result.bin", ios::binary);
+    if (res_in.is_open()) {
+        size_t result_size;
+        res_in.read(reinterpret_cast<char*>(&result_size), sizeof(size_t));
+
+        for (size_t i = 0; i < result_size; i++) {
+            Ciphertext ct;
+            ct.load(context, res_in);
+            producted.push_back(move(ct));
+        }
+        res_in.close();
+    }
+
     cout << "\n--- Receiver: Final Intersection Check ---" << endl;
 
-    // [receiver result] 교집합 결과 확인
+    // 교집합 결과 확인
     // 복호화된 교집합 패킹 값들을 저장할 셋 (중복 제거)
     set<uint64_t> intersection_packed_values;
 
@@ -38,7 +105,7 @@ int main() {
             // 수학적으로 P(y) = 0 이면 교집합임
 
             if (decoded_slots[i] == 0) {
-                uint64_t packed_val = receiver_hashing.hash_table[i];
+                uint64_t packed_val = hash_table[i];
                 count++;
 
                 // 수신자의 더미 데이터가 아닌 실제 값인 경우에만 추가함
@@ -77,9 +144,6 @@ int main() {
         if (is_intersected) {
             cout << "  [O] Found Intersection: PID(" << pid_str << ") Disease(" << disease_str << ")" << endl;
             found_count++;
-        } else {
-            // 필요 시 교집합이 없는 데이터도 출력 가능함
-            // cout << "  [X] No Match: " << pid_str << endl;
         }
     }
     
