@@ -2,3 +2,24 @@
 .codex/
 .idea/
 cmake-build-debug/
+
+# vscode
+build/
+bin/
+out/
+*.o
+*.obj
+*.exe
+*.out
+CMakeCache.txt
+CMakeFiles/
+CMakeScripts/
+cmake_install.cmake
+install_manifest.txt
+compile_commands.json
+.vscode/
+.idea/
+*.user
+*.csv
+*.log
+error-*.json

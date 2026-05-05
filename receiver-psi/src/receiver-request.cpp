@@ -17,7 +17,6 @@ using Clock = chrono::high_resolution_clock;
 using Ms = chrono::milliseconds;
 
 int main() {
-    auto total_start = Clock::now();
     // [receiver request] 파라미터 설정
     EncryptionParameters parms(scheme_type::bfv);
     size_t poly_modulus_degree = n;
@@ -63,6 +62,5 @@ int main() {
         
     // [receiver request] sender로 EncryptionParameters 객체, 윈도잉 값, 키 보내기
 
-    
     return 0;
 }

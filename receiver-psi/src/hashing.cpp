@@ -1,4 +1,4 @@
-#include "receiver_hashing.h"
+#include "hashing.h"
 
 void ReceiverHashing::locate(const vector<string> data) {
     for (const auto& record : data) {
