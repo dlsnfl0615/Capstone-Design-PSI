@@ -1,4 +1,4 @@
-#include "sender_hashing.h"
+#include "hashing.h"
 #include <iostream>
 #include <bitset>
 

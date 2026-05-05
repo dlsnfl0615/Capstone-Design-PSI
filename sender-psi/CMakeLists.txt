@@ -14,16 +14,13 @@ find_package(OpenMP)
 
 # 실행 파일 생성
 add_executable(${EXE_NAME}
-    src/main.cpp
     src/data_loader.cpp
-    src/windowing.cpp
-    src/receiver_hashing.cpp
-    src/sender_hashing.cpp
+    src/hashing.cpp
     src/evaluate.cpp
     src/modulus_switching.cpp
+    src/sender-main.cpp
     src/mod.cpp
     external/murmur3.cpp
-    external/murmur3.h
 )
 
 # 컴파일 옵션 (MSVC 전용 utf-8 설정)
