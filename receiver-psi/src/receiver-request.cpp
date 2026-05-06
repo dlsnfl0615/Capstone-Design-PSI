@@ -16,7 +16,7 @@ using Clock = chrono::high_resolution_clock;
 using Ms = chrono::milliseconds;
 
 int main() {
-    // 파라미터 설정
+    cout << "[setup] Receiver SEAL setting..";
     EncryptionParameters parms(scheme_type::bfv);
     size_t poly_modulus_degree = n;
     parms.set_poly_modulus_degree(poly_modulus_degree);
@@ -25,7 +25,6 @@ int main() {
 
     SEALContext context(parms);
     uint64_t plain_modulus = context.first_context_data()->parms().plain_modulus().value();
-    cout << "plain_modulus: " << plain_modulus << endl;
 
     // 키 생성 및 객체 초기화
     KeyGenerator keygen(context);
@@ -39,6 +38,7 @@ int main() {
     Evaluator evaluator(context);
     Decryptor decryptor(context, secret_key);
     BatchEncoder batch_encoder(context);
+    cout << "completed\n\n";
 
     // 데이터 로드
     auto receiver_data = load_receiver("data/receiver.csv");
@@ -50,7 +50,6 @@ int main() {
     // 윈도잉
     Windowing windowing;
     vector<int> exponents = windowing.get_exponents();
-    cout << endl;
     map<int, Ciphertext> encrypted_powers = windowing.receiver_windowing(
         batch_encoder,
         encryptor,
@@ -98,6 +97,8 @@ int main() {
         kv.second.save(ofs); 
     }
     ofs.close();
+
+    cout << "Receiver Request completed." << endl;
 
     return 0;
 }

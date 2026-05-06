@@ -15,6 +15,7 @@ using Clock = chrono::high_resolution_clock;
 using Ms = chrono::milliseconds;
 
 int main() {
+    cout << "[load] SEAL objects loading..";
     // receiver 원본 데이터 다시 로드
     auto receiver_data = load_receiver("data/receiver.csv");
 
@@ -84,8 +85,9 @@ int main() {
         }
         res_in.close();
     }
+    cout << "completed.\n\n";
 
-    cout << "\n--- Receiver: Final Intersection Check ---" << endl;
+    cout << "Final intersection checking..";
 
     // 교집합 결과 확인
     // 복호화된 교집합 패킹 값들을 저장할 셋 (중복 제거)
@@ -115,6 +117,8 @@ int main() {
             }
         }
     }
+    cout << "completed.\n\n";
+    
     cout << "count: " << count << endl;
 
     // [receiver result] 원본 데이터와 대조하여 어떤 데이터가 교집합인지
