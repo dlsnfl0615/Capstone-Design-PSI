@@ -17,7 +17,6 @@ add_executable(${EXE_NAME}
     src/data_loader.cpp
     src/hashing.cpp
     src/evaluate.cpp
-    src/modulus_switching.cpp
     src/sender-main.cpp
     src/mod.cpp
     external/murmur3.cpp

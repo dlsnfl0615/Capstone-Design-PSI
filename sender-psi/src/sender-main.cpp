@@ -92,6 +92,11 @@ int main() {
     
     // 다항식 연산
     vector<Ciphertext> producted = sender_evaluator.product(all_powers, coeffs, batch_encoder, evaluator, context);
+
+    // 모듈러스 스위칭
+    for (Ciphertext& polynomial : producted) {
+        evaluator.mod_switch_to_inplace(polynomial, context.last_parms_id());
+    }
     
     // 다항식 연산 결과 저장
     ofstream result_out("../data/result.bin", ios::binary);
@@ -101,6 +106,8 @@ int main() {
         ct.save(result_out); //
     }
     result_out.close();
+
+    cout << "Sender: Result generated." << endl;
 
     return 0;
 }

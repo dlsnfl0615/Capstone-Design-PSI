@@ -11,6 +11,7 @@ out/
 *.obj
 *.exe
 *.out
+*.bin
 CMakeCache.txt
 CMakeFiles/
 CMakeScripts/
