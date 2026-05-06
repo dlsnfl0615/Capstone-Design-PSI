@@ -16,8 +16,7 @@ using Clock = chrono::high_resolution_clock;
 using Ms = chrono::milliseconds;
 
 int main() {
-    auto total_start = Clock::now();
-
+    cout << "[load]SEAL objects loading..";
     // receiver가 보내준 값 가져오기
     EncryptionParameters parms;
     ifstream parms_in("../data/parms.bin", ios::binary);
@@ -69,6 +68,7 @@ int main() {
     BatchEncoder batch_encoder(context);
     Encryptor encryptor(context, public_key);
     uint64_t plain_modulus = context.first_context_data()->parms().plain_modulus().value();
+    cout << "completed" << "\n\n";
 
     auto sender_data = load_sender("data/sender.csv");
 
@@ -77,6 +77,7 @@ int main() {
     sender_hashing.locate(sender_data);
 
     // 파티셔닝 및 계수 연산
+    cout << "[partitioning]\n";
     SenderEvaluate sender_evaluator;
     auto partitioned = sender_evaluator.partitioning(sender_hashing.hash_table);
     auto coeffs = sender_evaluator.extract_all_coefficients(partitioned, plain_modulus);
@@ -107,7 +108,7 @@ int main() {
     }
     result_out.close();
 
-    cout << "Sender: Result generated." << endl;
+    cout << "Result generated." << endl;
 
     return 0;
 }

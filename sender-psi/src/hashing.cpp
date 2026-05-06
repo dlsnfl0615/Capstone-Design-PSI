@@ -40,5 +40,5 @@ void SenderHashing::locate(const vector<string> data) {
             }
         }
     }
-    cout << "Sender: Simple Hashing complete. Data distributed into " << m << " bins." << endl;
+    cout << "[hashing]Sender simple Hashing complete. Data distributed into " << m << " bins.\n\n";
 }

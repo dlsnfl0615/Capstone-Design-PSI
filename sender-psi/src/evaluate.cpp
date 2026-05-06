@@ -18,7 +18,7 @@ vector<vector<vector<uint64_t>>> SenderEvaluate::partitioning(const vector<vecto
     return partitions;
 }
 
-// 1. 단일 열(Bin)의 근들을 사용하여 다항식 계수를 계산함
+// 단일 열(Bin)의 근들을 사용하여 다항식 계수를 계산함
 vector<uint64_t> SenderEvaluate::compute_bin_coeffs(const vector<uint64_t>& roots, uint64_t plain_modulus) {
     int deg = roots.size(); 
     vector<uint64_t> coeffs(deg + 1, 0);
@@ -35,7 +35,7 @@ vector<uint64_t> SenderEvaluate::compute_bin_coeffs(const vector<uint64_t>& root
         }
     }
     
-    // 난수 r을 곱하여 최종 계수를 난수화함 (보안성 확보)
+    // 난수 r을 곱하여 최종 계수를 난수화함
     uint64_t r = random % plain_modulus; 
     if (r == 0) r = 1; // 난수가 0이 되는 것을 방지함
 
@@ -92,6 +92,9 @@ map<int, Ciphertext> SenderEvaluate::make_all_powers(
         int temp_k = k;
         int j = 0;
 
+        cout << "degree to combine: " << k << ", ";
+        int count = 0;
+
         // 지수 k를 윈도우 기저의 합으로 분해하여 동형 곱셈 수행
         while (temp_k > 0) {
             int i = temp_k % base;
@@ -103,13 +106,17 @@ map<int, Ciphertext> SenderEvaluate::make_all_powers(
                 } else {
                     evaluator.multiply_inplace(combined, all_powers[part_exp]);
                     evaluator.relinearize_inplace(combined, relin_keys);
+                    count++;
                 }
             }
             temp_k /= base;
             j++;
         }
+
+        cout << "Multiplication times: " << count << endl;
         all_powers[k] = move(combined);
     }
+    cout << endl;
 
     return all_powers;
 }
