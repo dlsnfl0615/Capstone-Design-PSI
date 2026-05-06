@@ -115,13 +115,12 @@ int main() {
             }
         }
     }
-
     cout << "count: " << count << endl;
 
     // [receiver result] 원본 데이터와 대조하여 어떤 데이터가 교집합인지
+    ofstream intersection_out("../data/intersections.csv");
     int found_count = 0;
-    cout << "[Intersection Results]" << endl;
-    
+    cout << "Receiver: Intersection Results is saved in \"intersections.csv\"" << endl;
     for (const auto& record : receiver_data) {
         // 원본 레코드를 다시 패킹하여 비교 대상으로 만듦 (hashing 로직과 동일해야 함)
         string pid_str = record.substr(0, 13);
@@ -142,7 +141,7 @@ int main() {
         }
 
         if (is_intersected) {
-            // cout << "  [O] Found Intersection: PID(" << pid_str << ") Disease(" << disease_str << ")" << endl;
+            intersection_out << pid_str << "," << disease_str << endl;
             found_count++;
         }
     }
