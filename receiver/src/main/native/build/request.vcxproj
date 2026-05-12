@@ -1,0 +1,444 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="18.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <PreferredToolArchitecture>x64</PreferredToolArchitecture>
+  </PropertyGroup>
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="MinSizeRel|x64">
+      <Configuration>MinSizeRel</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="RelWithDebInfo|x64">
+      <Configuration>RelWithDebInfo</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{1458EAA3-84F1-3388-AA66-E8D72D32E8DF}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <VcpkgEnabled>false</VcpkgEnabled>
+    <WindowsTargetPlatformVersion>10.0.26100.0</WindowsTargetPlatformVersion>
+    <Platform>x64</Platform>
+    <ProjectName>request</ProjectName>
+    <VCProjectUpgraderObjectName>NoUpgrade</VCProjectUpgraderObjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v145</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v145</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v145</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v145</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets">
+    <Import Project="do_not_import_user.props" Condition="exists('do_not_import_user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.20506.1</_ProjectFileVersion>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Capstone-Receiver\Capstone-Design-PSI\receiver\src\main\native\build\Debug\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">request.dir\Debug\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">request</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.dll</TargetExt>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</LinkIncremental>
+    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</GenerateManifest>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\Capstone-Receiver\Capstone-Design-PSI\receiver\src\main\native\build\Release\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">request.dir\Release\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">request</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.dll</TargetExt>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkIncremental>
+    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</GenerateManifest>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">C:\Capstone-Receiver\Capstone-Design-PSI\receiver\src\main\native\build\MinSizeRel\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">request.dir\MinSizeRel\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">request</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">.dll</TargetExt>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">false</LinkIncremental>
+    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">true</GenerateManifest>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">C:\Capstone-Receiver\Capstone-Design-PSI\receiver\src\main\native\build\RelWithDebInfo\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">request.dir\RelWithDebInfo\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">request</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">.dll</TargetExt>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">true</LinkIncremental>
+    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">true</GenerateManifest>
+  </PropertyGroup>
+  <PropertyGroup />
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>C:\Capstone-Receiver\Capstone-Design-PSI\receiver\src\main\native\src;C:\Capstone-Receiver\Capstone-Design-PSI\receiver\src\main\native\external;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /external:I "C:/vcpkg/installed/x64-windows/include/SEAL-4.1" /external:I "C:/vcpkg/installed/x64-windows/include" /utf-8</AdditionalOptions>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <BufferSecurityCheck></BufferSecurityCheck>
+      <CallingConvention></CallingConvention>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <ExternalWarningLevel>TurnOffAllWarnings</ExternalWarningLevel>
+      <FloatingPointModel></FloatingPointModel>
+      <ForceConformanceInForLoopScope></ForceConformanceInForLoopScope>
+      <InlineFunctionExpansion>Disabled</InlineFunctionExpansion>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <MinimalRebuild></MinimalRebuild>
+      <Optimization>Disabled</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RemoveUnreferencedCodeData></RemoveUnreferencedCodeData>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <SupportJustMyCode></SupportJustMyCode>
+      <TreatWChar_tAsBuiltInType></TreatWChar_tAsBuiltInType>
+      <UseFullPaths>false</UseFullPaths>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;CMAKE_INTDIR="Debug";request_EXPORTS</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <ScanSourceForModuleDependencies>false</ScanSourceForModuleDependencies>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_DEBUG;_WINDOWS;CMAKE_INTDIR=\"Debug\";request_EXPORTS</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\Capstone-Receiver\Capstone-Design-PSI\receiver\src\main\native\src;C:\Capstone-Receiver\Capstone-Design-PSI\receiver\src\main\native\external;C:\vcpkg\installed\x64-windows\include\SEAL-4.1;C:\vcpkg\installed\x64-windows\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>C:\Capstone-Receiver\Capstone-Design-PSI\receiver\src\main\native\src;C:\Capstone-Receiver\Capstone-Design-PSI\receiver\src\main\native\external;C:\vcpkg\installed\x64-windows\include\SEAL-4.1;C:\vcpkg\installed\x64-windows\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <PostBuildEvent>
+      <Message></Message>
+      <Command>setlocal
+C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -noprofile -executionpolicy Bypass -file C:/vcpkg/scripts/buildsystems/msbuild/applocal.ps1 -targetBinary C:/Capstone-Receiver/Capstone-Design-PSI/receiver/src/main/native/build/Debug/request.dll -installedDir C:/vcpkg/installed/x64-windows/debug/bin -OutVariable out
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+    </PostBuildEvent>
+    <Link>
+      <AdditionalDependencies>C:\vcpkg\installed\x64-windows\debug\lib\seal-4.1.lib;C:\vcpkg\installed\x64-windows\debug\lib\zlibd.lib;C:\vcpkg\installed\x64-windows\debug\lib\zstd.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
+      <DataExecutionPrevention></DataExecutionPrevention>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <ImageHasSafeExceptionHandlers></ImageHasSafeExceptionHandlers>
+      <ImportLibrary>C:/Capstone-Receiver/Capstone-Design-PSI/receiver/src/main/native/build/Debug/request.lib</ImportLibrary>
+      <LinkErrorReporting></LinkErrorReporting>
+      <ProgramDataBaseFile>C:/Capstone-Receiver/Capstone-Design-PSI/receiver/src/main/native/build/Debug/request.pdb</ProgramDataBaseFile>
+      <RandomizedBaseAddress></RandomizedBaseAddress>
+      <SubSystem>Console</SubSystem>
+    </Link>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>C:\Capstone-Receiver\Capstone-Design-PSI\receiver\src\main\native\src;C:\Capstone-Receiver\Capstone-Design-PSI\receiver\src\main\native\external;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /external:I "C:/vcpkg/installed/x64-windows/include/SEAL-4.1" /external:I "C:/vcpkg/installed/x64-windows/include" /utf-8</AdditionalOptions>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
+      <BufferSecurityCheck></BufferSecurityCheck>
+      <CallingConvention></CallingConvention>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <ExternalWarningLevel>TurnOffAllWarnings</ExternalWarningLevel>
+      <FloatingPointModel></FloatingPointModel>
+      <ForceConformanceInForLoopScope></ForceConformanceInForLoopScope>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <MinimalRebuild></MinimalRebuild>
+      <Optimization>MaxSpeed</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RemoveUnreferencedCodeData></RemoveUnreferencedCodeData>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <SupportJustMyCode></SupportJustMyCode>
+      <TreatWChar_tAsBuiltInType></TreatWChar_tAsBuiltInType>
+      <UseFullPaths>false</UseFullPaths>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;CMAKE_INTDIR="Release";request_EXPORTS</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <DebugInformationFormat>
+      </DebugInformationFormat>
+      <ScanSourceForModuleDependencies>false</ScanSourceForModuleDependencies>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;CMAKE_INTDIR=\"Release\";request_EXPORTS</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\Capstone-Receiver\Capstone-Design-PSI\receiver\src\main\native\src;C:\Capstone-Receiver\Capstone-Design-PSI\receiver\src\main\native\external;C:\vcpkg\installed\x64-windows\include\SEAL-4.1;C:\vcpkg\installed\x64-windows\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>C:\Capstone-Receiver\Capstone-Design-PSI\receiver\src\main\native\src;C:\Capstone-Receiver\Capstone-Design-PSI\receiver\src\main\native\external;C:\vcpkg\installed\x64-windows\include\SEAL-4.1;C:\vcpkg\installed\x64-windows\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <PostBuildEvent>
+      <Message></Message>
+      <Command>setlocal
+C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -noprofile -executionpolicy Bypass -file C:/vcpkg/scripts/buildsystems/msbuild/applocal.ps1 -targetBinary C:/Capstone-Receiver/Capstone-Design-PSI/receiver/src/main/native/build/Release/request.dll -installedDir C:/vcpkg/installed/x64-windows/bin -OutVariable out
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+    </PostBuildEvent>
+    <Link>
+      <AdditionalDependencies>C:\vcpkg\installed\x64-windows\lib\seal-4.1.lib;C:\vcpkg\installed\x64-windows\lib\zlib.lib;C:\vcpkg\installed\x64-windows\lib\zstd.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
+      <DataExecutionPrevention></DataExecutionPrevention>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <ImageHasSafeExceptionHandlers></ImageHasSafeExceptionHandlers>
+      <ImportLibrary>C:/Capstone-Receiver/Capstone-Design-PSI/receiver/src/main/native/build/Release/request.lib</ImportLibrary>
+      <LinkErrorReporting></LinkErrorReporting>
+      <ProgramDataBaseFile>C:/Capstone-Receiver/Capstone-Design-PSI/receiver/src/main/native/build/Release/request.pdb</ProgramDataBaseFile>
+      <RandomizedBaseAddress></RandomizedBaseAddress>
+      <SubSystem>Console</SubSystem>
+    </Link>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>C:\Capstone-Receiver\Capstone-Design-PSI\receiver\src\main\native\src;C:\Capstone-Receiver\Capstone-Design-PSI\receiver\src\main\native\external;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /external:I "C:/vcpkg/installed/x64-windows/include/SEAL-4.1" /external:I "C:/vcpkg/installed/x64-windows/include" /utf-8</AdditionalOptions>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
+      <BufferSecurityCheck></BufferSecurityCheck>
+      <CallingConvention></CallingConvention>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <ExternalWarningLevel>TurnOffAllWarnings</ExternalWarningLevel>
+      <FloatingPointModel></FloatingPointModel>
+      <ForceConformanceInForLoopScope></ForceConformanceInForLoopScope>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <MinimalRebuild></MinimalRebuild>
+      <Optimization>MinSpace</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RemoveUnreferencedCodeData></RemoveUnreferencedCodeData>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <SupportJustMyCode></SupportJustMyCode>
+      <TreatWChar_tAsBuiltInType></TreatWChar_tAsBuiltInType>
+      <UseFullPaths>false</UseFullPaths>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;CMAKE_INTDIR="MinSizeRel";request_EXPORTS</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <DebugInformationFormat>
+      </DebugInformationFormat>
+      <ScanSourceForModuleDependencies>false</ScanSourceForModuleDependencies>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;CMAKE_INTDIR=\"MinSizeRel\";request_EXPORTS</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\Capstone-Receiver\Capstone-Design-PSI\receiver\src\main\native\src;C:\Capstone-Receiver\Capstone-Design-PSI\receiver\src\main\native\external;C:\vcpkg\installed\x64-windows\include\SEAL-4.1;C:\vcpkg\installed\x64-windows\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>C:\Capstone-Receiver\Capstone-Design-PSI\receiver\src\main\native\src;C:\Capstone-Receiver\Capstone-Design-PSI\receiver\src\main\native\external;C:\vcpkg\installed\x64-windows\include\SEAL-4.1;C:\vcpkg\installed\x64-windows\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <PostBuildEvent>
+      <Message></Message>
+      <Command>setlocal
+C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -noprofile -executionpolicy Bypass -file C:/vcpkg/scripts/buildsystems/msbuild/applocal.ps1 -targetBinary C:/Capstone-Receiver/Capstone-Design-PSI/receiver/src/main/native/build/MinSizeRel/request.dll -installedDir C:/vcpkg/installed/x64-windows/bin -OutVariable out
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+    </PostBuildEvent>
+    <Link>
+      <AdditionalDependencies>C:\vcpkg\installed\x64-windows\lib\seal-4.1.lib;C:\vcpkg\installed\x64-windows\lib\zlib.lib;C:\vcpkg\installed\x64-windows\lib\zstd.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
+      <DataExecutionPrevention></DataExecutionPrevention>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <ImageHasSafeExceptionHandlers></ImageHasSafeExceptionHandlers>
+      <ImportLibrary>C:/Capstone-Receiver/Capstone-Design-PSI/receiver/src/main/native/build/MinSizeRel/request.lib</ImportLibrary>
+      <LinkErrorReporting></LinkErrorReporting>
+      <ProgramDataBaseFile>C:/Capstone-Receiver/Capstone-Design-PSI/receiver/src/main/native/build/MinSizeRel/request.pdb</ProgramDataBaseFile>
+      <RandomizedBaseAddress></RandomizedBaseAddress>
+      <SubSystem>Console</SubSystem>
+    </Link>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>C:\Capstone-Receiver\Capstone-Design-PSI\receiver\src\main\native\src;C:\Capstone-Receiver\Capstone-Design-PSI\receiver\src\main\native\external;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /external:I "C:/vcpkg/installed/x64-windows/include/SEAL-4.1" /external:I "C:/vcpkg/installed/x64-windows/include" /utf-8</AdditionalOptions>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
+      <BufferSecurityCheck></BufferSecurityCheck>
+      <CallingConvention></CallingConvention>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <ExternalWarningLevel>TurnOffAllWarnings</ExternalWarningLevel>
+      <FloatingPointModel></FloatingPointModel>
+      <ForceConformanceInForLoopScope></ForceConformanceInForLoopScope>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <MinimalRebuild></MinimalRebuild>
+      <Optimization>MaxSpeed</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RemoveUnreferencedCodeData></RemoveUnreferencedCodeData>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <SupportJustMyCode></SupportJustMyCode>
+      <TreatWChar_tAsBuiltInType></TreatWChar_tAsBuiltInType>
+      <UseFullPaths>false</UseFullPaths>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;CMAKE_INTDIR="RelWithDebInfo";request_EXPORTS</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <ScanSourceForModuleDependencies>false</ScanSourceForModuleDependencies>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;CMAKE_INTDIR=\"RelWithDebInfo\";request_EXPORTS</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\Capstone-Receiver\Capstone-Design-PSI\receiver\src\main\native\src;C:\Capstone-Receiver\Capstone-Design-PSI\receiver\src\main\native\external;C:\vcpkg\installed\x64-windows\include\SEAL-4.1;C:\vcpkg\installed\x64-windows\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>C:\Capstone-Receiver\Capstone-Design-PSI\receiver\src\main\native\src;C:\Capstone-Receiver\Capstone-Design-PSI\receiver\src\main\native\external;C:\vcpkg\installed\x64-windows\include\SEAL-4.1;C:\vcpkg\installed\x64-windows\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <PostBuildEvent>
+      <Message></Message>
+      <Command>setlocal
+C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -noprofile -executionpolicy Bypass -file C:/vcpkg/scripts/buildsystems/msbuild/applocal.ps1 -targetBinary C:/Capstone-Receiver/Capstone-Design-PSI/receiver/src/main/native/build/RelWithDebInfo/request.dll -installedDir C:/vcpkg/installed/x64-windows/bin -OutVariable out
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+    </PostBuildEvent>
+    <Link>
+      <AdditionalDependencies>C:\vcpkg\installed\x64-windows\lib\seal-4.1.lib;C:\vcpkg\installed\x64-windows\lib\zlib.lib;C:\vcpkg\installed\x64-windows\lib\zstd.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
+      <DataExecutionPrevention></DataExecutionPrevention>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <ImageHasSafeExceptionHandlers></ImageHasSafeExceptionHandlers>
+      <ImportLibrary>C:/Capstone-Receiver/Capstone-Design-PSI/receiver/src/main/native/build/RelWithDebInfo/request.lib</ImportLibrary>
+      <LinkErrorReporting></LinkErrorReporting>
+      <ProgramDataBaseFile>C:/Capstone-Receiver/Capstone-Design-PSI/receiver/src/main/native/build/RelWithDebInfo/request.pdb</ProgramDataBaseFile>
+      <RandomizedBaseAddress></RandomizedBaseAddress>
+      <SubSystem>Console</SubSystem>
+    </Link>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Capstone-Receiver\Capstone-Design-PSI\receiver\src\main\native\CMakeLists.txt">
+      <UseUtf8Encoding>Always</UseUtf8Encoding>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Building Custom Rule C:/Capstone-Receiver/Capstone-Design-PSI/receiver/src/main/native/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
+C:\msys64\ucrt64\bin\cmake.exe -SC:/Capstone-Receiver/Capstone-Design-PSI/receiver/src/main/native -BC:/Capstone-Receiver/Capstone-Design-PSI/receiver/src/main/native/build --check-stamp-file C:/Capstone-Receiver/Capstone-Design-PSI/receiver/src/main/native/build/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Capstone-Receiver\Capstone-Design-PSI\receiver\src\main\native\build\CMakeFiles\4.3.1\CMakeCXXCompiler.cmake;C:\Capstone-Receiver\Capstone-Design-PSI\receiver\src\main\native\build\CMakeFiles\4.3.1\CMakeRCCompiler.cmake;C:\Capstone-Receiver\Capstone-Design-PSI\receiver\src\main\native\build\CMakeFiles\4.3.1\CMakeSystem.cmake;C:\msys64\ucrt64\share\cmake\Modules\CMakeCXXCompiler.cmake.in;C:\msys64\ucrt64\share\cmake\Modules\CMakeCXXCompilerABI.cpp;C:\msys64\ucrt64\share\cmake\Modules\CMakeCXXInformation.cmake;C:\msys64\ucrt64\share\cmake\Modules\CMakeCommonLanguageInclude.cmake;C:\msys64\ucrt64\share\cmake\Modules\CMakeCompilerIdDetection.cmake;C:\msys64\ucrt64\share\cmake\Modules\CMakeDependentOption.cmake;C:\msys64\ucrt64\share\cmake\Modules\CMakeDetermineCXXCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\CMakeDetermineCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\CMakeDetermineCompilerABI.cmake;C:\msys64\ucrt64\share\cmake\Modules\CMakeDetermineCompilerId.cmake;C:\msys64\ucrt64\share\cmake\Modules\CMakeDetermineCompilerSupport.cmake;C:\msys64\ucrt64\share\cmake\Modules\CMakeDetermineRCCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\CMakeDetermineSystem.cmake;C:\msys64\ucrt64\share\cmake\Modules\CMakeFindBinUtils.cmake;C:\msys64\ucrt64\share\cmake\Modules\CMakeFindDependencyMacro.cmake;C:\msys64\ucrt64\share\cmake\Modules\CMakeGenericSystem.cmake;C:\msys64\ucrt64\share\cmake\Modules\CMakeInitializeConfigs.cmake;C:\msys64\ucrt64\share\cmake\Modules\CMakeLanguageInformation.cmake;C:\msys64\ucrt64\share\cmake\Modules\CMakeParseImplicitIncludeInfo.cmake;C:\msys64\ucrt64\share\cmake\Modules\CMakeParseImplicitLinkInfo.cmake;C:\msys64\ucrt64\share\cmake\Modules\CMakeParseLibraryArchitecture.cmake;C:\msys64\ucrt64\share\cmake\Modules\CMakeRCCompiler.cmake.in;C:\msys64\ucrt64\share\cmake\Modules\CMakeRCInformation.cmake;C:\msys64\ucrt64\share\cmake\Modules\CMakeSystem.cmake.in;C:\msys64\ucrt64\share\cmake\Modules\CMakeSystemSpecificInformation.cmake;C:\msys64\ucrt64\share\cmake\Modules\CMakeSystemSpecificInitialize.cmake;C:\msys64\ucrt64\share\cmake\Modules\CMakeTestCXXCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\CMakeTestCompilerCommon.cmake;C:\msys64\ucrt64\share\cmake\Modules\CMakeTestRCCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\CheckCXXSourceCompiles.cmake;C:\msys64\ucrt64\share\cmake\Modules\CheckIncludeFileCXX.cmake;C:\msys64\ucrt64\share\cmake\Modules\CheckLibraryExists.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\ADSP-DetermineCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\ARMCC-DetermineCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\ARMClang-DetermineCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\AppleClang-DetermineCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\Borland-DetermineCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\CMakeCommonCompilerMacros.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\Clang-DetermineCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\Clang-DetermineCompilerInternal.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\Compaq-CXX-DetermineCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\Cray-DetermineCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\CrayClang-DetermineCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\Diab-DetermineCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\Embarcadero-DetermineCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\Fujitsu-DetermineCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\FujitsuClang-DetermineCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\GHS-DetermineCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\GNU-CXX-DetermineCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\HP-CXX-DetermineCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\IAR-DetermineCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\IBMCPP-CXX-DetermineVersionInternal.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\IBMClang-CXX-DetermineCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\Intel-DetermineCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\IntelLLVM-DetermineCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\LCC-CXX-DetermineCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\MSVC-CXX.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\MSVC-DetermineCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\MSVC.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\NVHPC-DetermineCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\NVIDIA-DetermineCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\OpenWatcom-DetermineCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\OrangeC-DetermineCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\PGI-DetermineCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\PathScale-DetermineCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\Renesas-DetermineCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\SCO-DetermineCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\SunPro-CXX-DetermineCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\TI-DetermineCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\TIClang-DetermineCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\Tasking-DetermineCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\VisualAge-CXX-DetermineCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\Watcom-DetermineCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\XL-CXX-DetermineCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\XLClang-CXX-DetermineCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\zOS-CXX-DetermineCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\CompilerId\VS-10.vcxproj.in;C:\msys64\ucrt64\share\cmake\Modules\FindPackageHandleStandardArgs.cmake;C:\msys64\ucrt64\share\cmake\Modules\FindPackageMessage.cmake;C:\msys64\ucrt64\share\cmake\Modules\FindThreads.cmake;C:\msys64\ucrt64\share\cmake\Modules\FindZLIB.cmake;C:\msys64\ucrt64\share\cmake\Modules\Internal\CMakeCXXLinkerInformation.cmake;C:\msys64\ucrt64\share\cmake\Modules\Internal\CMakeCommonLinkerInformation.cmake;C:\msys64\ucrt64\share\cmake\Modules\Internal\CMakeDetermineLinkerId.cmake;C:\msys64\ucrt64\share\cmake\Modules\Internal\CMakeInspectCXXLinker.cmake;C:\msys64\ucrt64\share\cmake\Modules\Internal\CheckSourceCompiles.cmake;C:\msys64\ucrt64\share\cmake\Modules\Internal\FeatureTesting.cmake;C:\msys64\ucrt64\share\cmake\Modules\Linker\MSVC-CXX.cmake;C:\msys64\ucrt64\share\cmake\Modules\Linker\MSVC.cmake;C:\msys64\ucrt64\share\cmake\Modules\Platform\Linker\Windows-MSVC-CXX.cmake;C:\msys64\ucrt64\share\cmake\Modules\Platform\Linker\Windows-MSVC.cmake;C:\msys64\ucrt64\share\cmake\Modules\Platform\Windows-Determine-CXX.cmake;C:\msys64\ucrt64\share\cmake\Modules\Platform\Windows-Initialize.cmake;C:\msys64\ucrt64\share\cmake\Modules\Platform\Windows-MSVC-CXX.cmake;C:\msys64\ucrt64\share\cmake\Modules\Platform\Windows-MSVC.cmake;C:\msys64\ucrt64\share\cmake\Modules\Platform\Windows.cmake;C:\msys64\ucrt64\share\cmake\Modules\Platform\WindowsPaths.cmake;C:\msys64\ucrt64\share\cmake\Modules\SelectLibraryConfigurations.cmake;C:\vcpkg\installed\x64-windows\share\Microsoft.GSL\Microsoft.GSLConfig.cmake;C:\vcpkg\installed\x64-windows\share\Microsoft.GSL\Microsoft.GSLConfigVersion.cmake;C:\vcpkg\installed\x64-windows\share\seal\SEALConfig.cmake;C:\vcpkg\installed\x64-windows\share\seal\SEALConfigVersion.cmake;C:\vcpkg\installed\x64-windows\share\seal\SEALTargets-debug.cmake;C:\vcpkg\installed\x64-windows\share\seal\SEALTargets-release.cmake;C:\vcpkg\installed\x64-windows\share\seal\SEALTargets.cmake;C:\vcpkg\installed\x64-windows\share\zlib\vcpkg-cmake-wrapper.cmake;C:\vcpkg\installed\x64-windows\share\zstd\zstdConfig.cmake;C:\vcpkg\installed\x64-windows\share\zstd\zstdConfigVersion.cmake;C:\vcpkg\installed\x64-windows\share\zstd\zstdTargets-debug.cmake;C:\vcpkg\installed\x64-windows\share\zstd\zstdTargets-release.cmake;C:\vcpkg\installed\x64-windows\share\zstd\zstdTargets.cmake;C:\vcpkg\scripts\buildsystems\vcpkg.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Capstone-Receiver\Capstone-Design-PSI\receiver\src\main\native\build\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Building Custom Rule C:/Capstone-Receiver/Capstone-Design-PSI/receiver/src/main/native/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">setlocal
+C:\msys64\ucrt64\bin\cmake.exe -SC:/Capstone-Receiver/Capstone-Design-PSI/receiver/src/main/native -BC:/Capstone-Receiver/Capstone-Design-PSI/receiver/src/main/native/build --check-stamp-file C:/Capstone-Receiver/Capstone-Design-PSI/receiver/src/main/native/build/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\Capstone-Receiver\Capstone-Design-PSI\receiver\src\main\native\build\CMakeFiles\4.3.1\CMakeCXXCompiler.cmake;C:\Capstone-Receiver\Capstone-Design-PSI\receiver\src\main\native\build\CMakeFiles\4.3.1\CMakeRCCompiler.cmake;C:\Capstone-Receiver\Capstone-Design-PSI\receiver\src\main\native\build\CMakeFiles\4.3.1\CMakeSystem.cmake;C:\msys64\ucrt64\share\cmake\Modules\CMakeCXXCompiler.cmake.in;C:\msys64\ucrt64\share\cmake\Modules\CMakeCXXCompilerABI.cpp;C:\msys64\ucrt64\share\cmake\Modules\CMakeCXXInformation.cmake;C:\msys64\ucrt64\share\cmake\Modules\CMakeCommonLanguageInclude.cmake;C:\msys64\ucrt64\share\cmake\Modules\CMakeCompilerIdDetection.cmake;C:\msys64\ucrt64\share\cmake\Modules\CMakeDependentOption.cmake;C:\msys64\ucrt64\share\cmake\Modules\CMakeDetermineCXXCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\CMakeDetermineCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\CMakeDetermineCompilerABI.cmake;C:\msys64\ucrt64\share\cmake\Modules\CMakeDetermineCompilerId.cmake;C:\msys64\ucrt64\share\cmake\Modules\CMakeDetermineCompilerSupport.cmake;C:\msys64\ucrt64\share\cmake\Modules\CMakeDetermineRCCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\CMakeDetermineSystem.cmake;C:\msys64\ucrt64\share\cmake\Modules\CMakeFindBinUtils.cmake;C:\msys64\ucrt64\share\cmake\Modules\CMakeFindDependencyMacro.cmake;C:\msys64\ucrt64\share\cmake\Modules\CMakeGenericSystem.cmake;C:\msys64\ucrt64\share\cmake\Modules\CMakeInitializeConfigs.cmake;C:\msys64\ucrt64\share\cmake\Modules\CMakeLanguageInformation.cmake;C:\msys64\ucrt64\share\cmake\Modules\CMakeParseImplicitIncludeInfo.cmake;C:\msys64\ucrt64\share\cmake\Modules\CMakeParseImplicitLinkInfo.cmake;C:\msys64\ucrt64\share\cmake\Modules\CMakeParseLibraryArchitecture.cmake;C:\msys64\ucrt64\share\cmake\Modules\CMakeRCCompiler.cmake.in;C:\msys64\ucrt64\share\cmake\Modules\CMakeRCInformation.cmake;C:\msys64\ucrt64\share\cmake\Modules\CMakeSystem.cmake.in;C:\msys64\ucrt64\share\cmake\Modules\CMakeSystemSpecificInformation.cmake;C:\msys64\ucrt64\share\cmake\Modules\CMakeSystemSpecificInitialize.cmake;C:\msys64\ucrt64\share\cmake\Modules\CMakeTestCXXCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\CMakeTestCompilerCommon.cmake;C:\msys64\ucrt64\share\cmake\Modules\CMakeTestRCCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\CheckCXXSourceCompiles.cmake;C:\msys64\ucrt64\share\cmake\Modules\CheckIncludeFileCXX.cmake;C:\msys64\ucrt64\share\cmake\Modules\CheckLibraryExists.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\ADSP-DetermineCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\ARMCC-DetermineCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\ARMClang-DetermineCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\AppleClang-DetermineCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\Borland-DetermineCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\CMakeCommonCompilerMacros.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\Clang-DetermineCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\Clang-DetermineCompilerInternal.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\Compaq-CXX-DetermineCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\Cray-DetermineCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\CrayClang-DetermineCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\Diab-DetermineCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\Embarcadero-DetermineCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\Fujitsu-DetermineCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\FujitsuClang-DetermineCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\GHS-DetermineCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\GNU-CXX-DetermineCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\HP-CXX-DetermineCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\IAR-DetermineCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\IBMCPP-CXX-DetermineVersionInternal.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\IBMClang-CXX-DetermineCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\Intel-DetermineCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\IntelLLVM-DetermineCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\LCC-CXX-DetermineCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\MSVC-CXX.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\MSVC-DetermineCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\MSVC.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\NVHPC-DetermineCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\NVIDIA-DetermineCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\OpenWatcom-DetermineCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\OrangeC-DetermineCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\PGI-DetermineCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\PathScale-DetermineCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\Renesas-DetermineCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\SCO-DetermineCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\SunPro-CXX-DetermineCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\TI-DetermineCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\TIClang-DetermineCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\Tasking-DetermineCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\VisualAge-CXX-DetermineCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\Watcom-DetermineCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\XL-CXX-DetermineCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\XLClang-CXX-DetermineCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\zOS-CXX-DetermineCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\CompilerId\VS-10.vcxproj.in;C:\msys64\ucrt64\share\cmake\Modules\FindPackageHandleStandardArgs.cmake;C:\msys64\ucrt64\share\cmake\Modules\FindPackageMessage.cmake;C:\msys64\ucrt64\share\cmake\Modules\FindThreads.cmake;C:\msys64\ucrt64\share\cmake\Modules\FindZLIB.cmake;C:\msys64\ucrt64\share\cmake\Modules\Internal\CMakeCXXLinkerInformation.cmake;C:\msys64\ucrt64\share\cmake\Modules\Internal\CMakeCommonLinkerInformation.cmake;C:\msys64\ucrt64\share\cmake\Modules\Internal\CMakeDetermineLinkerId.cmake;C:\msys64\ucrt64\share\cmake\Modules\Internal\CMakeInspectCXXLinker.cmake;C:\msys64\ucrt64\share\cmake\Modules\Internal\CheckSourceCompiles.cmake;C:\msys64\ucrt64\share\cmake\Modules\Internal\FeatureTesting.cmake;C:\msys64\ucrt64\share\cmake\Modules\Linker\MSVC-CXX.cmake;C:\msys64\ucrt64\share\cmake\Modules\Linker\MSVC.cmake;C:\msys64\ucrt64\share\cmake\Modules\Platform\Linker\Windows-MSVC-CXX.cmake;C:\msys64\ucrt64\share\cmake\Modules\Platform\Linker\Windows-MSVC.cmake;C:\msys64\ucrt64\share\cmake\Modules\Platform\Windows-Determine-CXX.cmake;C:\msys64\ucrt64\share\cmake\Modules\Platform\Windows-Initialize.cmake;C:\msys64\ucrt64\share\cmake\Modules\Platform\Windows-MSVC-CXX.cmake;C:\msys64\ucrt64\share\cmake\Modules\Platform\Windows-MSVC.cmake;C:\msys64\ucrt64\share\cmake\Modules\Platform\Windows.cmake;C:\msys64\ucrt64\share\cmake\Modules\Platform\WindowsPaths.cmake;C:\msys64\ucrt64\share\cmake\Modules\SelectLibraryConfigurations.cmake;C:\vcpkg\installed\x64-windows\share\Microsoft.GSL\Microsoft.GSLConfig.cmake;C:\vcpkg\installed\x64-windows\share\Microsoft.GSL\Microsoft.GSLConfigVersion.cmake;C:\vcpkg\installed\x64-windows\share\seal\SEALConfig.cmake;C:\vcpkg\installed\x64-windows\share\seal\SEALConfigVersion.cmake;C:\vcpkg\installed\x64-windows\share\seal\SEALTargets-debug.cmake;C:\vcpkg\installed\x64-windows\share\seal\SEALTargets-release.cmake;C:\vcpkg\installed\x64-windows\share\seal\SEALTargets.cmake;C:\vcpkg\installed\x64-windows\share\zlib\vcpkg-cmake-wrapper.cmake;C:\vcpkg\installed\x64-windows\share\zstd\zstdConfig.cmake;C:\vcpkg\installed\x64-windows\share\zstd\zstdConfigVersion.cmake;C:\vcpkg\installed\x64-windows\share\zstd\zstdTargets-debug.cmake;C:\vcpkg\installed\x64-windows\share\zstd\zstdTargets-release.cmake;C:\vcpkg\installed\x64-windows\share\zstd\zstdTargets.cmake;C:\vcpkg\scripts\buildsystems\vcpkg.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\Capstone-Receiver\Capstone-Design-PSI\receiver\src\main\native\build\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">Building Custom Rule C:/Capstone-Receiver/Capstone-Design-PSI/receiver/src/main/native/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">setlocal
+C:\msys64\ucrt64\bin\cmake.exe -SC:/Capstone-Receiver/Capstone-Design-PSI/receiver/src/main/native -BC:/Capstone-Receiver/Capstone-Design-PSI/receiver/src/main/native/build --check-stamp-file C:/Capstone-Receiver/Capstone-Design-PSI/receiver/src/main/native/build/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">C:\Capstone-Receiver\Capstone-Design-PSI\receiver\src\main\native\build\CMakeFiles\4.3.1\CMakeCXXCompiler.cmake;C:\Capstone-Receiver\Capstone-Design-PSI\receiver\src\main\native\build\CMakeFiles\4.3.1\CMakeRCCompiler.cmake;C:\Capstone-Receiver\Capstone-Design-PSI\receiver\src\main\native\build\CMakeFiles\4.3.1\CMakeSystem.cmake;C:\msys64\ucrt64\share\cmake\Modules\CMakeCXXCompiler.cmake.in;C:\msys64\ucrt64\share\cmake\Modules\CMakeCXXCompilerABI.cpp;C:\msys64\ucrt64\share\cmake\Modules\CMakeCXXInformation.cmake;C:\msys64\ucrt64\share\cmake\Modules\CMakeCommonLanguageInclude.cmake;C:\msys64\ucrt64\share\cmake\Modules\CMakeCompilerIdDetection.cmake;C:\msys64\ucrt64\share\cmake\Modules\CMakeDependentOption.cmake;C:\msys64\ucrt64\share\cmake\Modules\CMakeDetermineCXXCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\CMakeDetermineCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\CMakeDetermineCompilerABI.cmake;C:\msys64\ucrt64\share\cmake\Modules\CMakeDetermineCompilerId.cmake;C:\msys64\ucrt64\share\cmake\Modules\CMakeDetermineCompilerSupport.cmake;C:\msys64\ucrt64\share\cmake\Modules\CMakeDetermineRCCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\CMakeDetermineSystem.cmake;C:\msys64\ucrt64\share\cmake\Modules\CMakeFindBinUtils.cmake;C:\msys64\ucrt64\share\cmake\Modules\CMakeFindDependencyMacro.cmake;C:\msys64\ucrt64\share\cmake\Modules\CMakeGenericSystem.cmake;C:\msys64\ucrt64\share\cmake\Modules\CMakeInitializeConfigs.cmake;C:\msys64\ucrt64\share\cmake\Modules\CMakeLanguageInformation.cmake;C:\msys64\ucrt64\share\cmake\Modules\CMakeParseImplicitIncludeInfo.cmake;C:\msys64\ucrt64\share\cmake\Modules\CMakeParseImplicitLinkInfo.cmake;C:\msys64\ucrt64\share\cmake\Modules\CMakeParseLibraryArchitecture.cmake;C:\msys64\ucrt64\share\cmake\Modules\CMakeRCCompiler.cmake.in;C:\msys64\ucrt64\share\cmake\Modules\CMakeRCInformation.cmake;C:\msys64\ucrt64\share\cmake\Modules\CMakeSystem.cmake.in;C:\msys64\ucrt64\share\cmake\Modules\CMakeSystemSpecificInformation.cmake;C:\msys64\ucrt64\share\cmake\Modules\CMakeSystemSpecificInitialize.cmake;C:\msys64\ucrt64\share\cmake\Modules\CMakeTestCXXCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\CMakeTestCompilerCommon.cmake;C:\msys64\ucrt64\share\cmake\Modules\CMakeTestRCCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\CheckCXXSourceCompiles.cmake;C:\msys64\ucrt64\share\cmake\Modules\CheckIncludeFileCXX.cmake;C:\msys64\ucrt64\share\cmake\Modules\CheckLibraryExists.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\ADSP-DetermineCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\ARMCC-DetermineCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\ARMClang-DetermineCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\AppleClang-DetermineCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\Borland-DetermineCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\CMakeCommonCompilerMacros.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\Clang-DetermineCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\Clang-DetermineCompilerInternal.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\Compaq-CXX-DetermineCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\Cray-DetermineCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\CrayClang-DetermineCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\Diab-DetermineCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\Embarcadero-DetermineCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\Fujitsu-DetermineCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\FujitsuClang-DetermineCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\GHS-DetermineCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\GNU-CXX-DetermineCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\HP-CXX-DetermineCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\IAR-DetermineCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\IBMCPP-CXX-DetermineVersionInternal.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\IBMClang-CXX-DetermineCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\Intel-DetermineCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\IntelLLVM-DetermineCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\LCC-CXX-DetermineCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\MSVC-CXX.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\MSVC-DetermineCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\MSVC.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\NVHPC-DetermineCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\NVIDIA-DetermineCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\OpenWatcom-DetermineCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\OrangeC-DetermineCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\PGI-DetermineCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\PathScale-DetermineCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\Renesas-DetermineCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\SCO-DetermineCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\SunPro-CXX-DetermineCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\TI-DetermineCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\TIClang-DetermineCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\Tasking-DetermineCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\VisualAge-CXX-DetermineCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\Watcom-DetermineCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\XL-CXX-DetermineCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\XLClang-CXX-DetermineCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\zOS-CXX-DetermineCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\CompilerId\VS-10.vcxproj.in;C:\msys64\ucrt64\share\cmake\Modules\FindPackageHandleStandardArgs.cmake;C:\msys64\ucrt64\share\cmake\Modules\FindPackageMessage.cmake;C:\msys64\ucrt64\share\cmake\Modules\FindThreads.cmake;C:\msys64\ucrt64\share\cmake\Modules\FindZLIB.cmake;C:\msys64\ucrt64\share\cmake\Modules\Internal\CMakeCXXLinkerInformation.cmake;C:\msys64\ucrt64\share\cmake\Modules\Internal\CMakeCommonLinkerInformation.cmake;C:\msys64\ucrt64\share\cmake\Modules\Internal\CMakeDetermineLinkerId.cmake;C:\msys64\ucrt64\share\cmake\Modules\Internal\CMakeInspectCXXLinker.cmake;C:\msys64\ucrt64\share\cmake\Modules\Internal\CheckSourceCompiles.cmake;C:\msys64\ucrt64\share\cmake\Modules\Internal\FeatureTesting.cmake;C:\msys64\ucrt64\share\cmake\Modules\Linker\MSVC-CXX.cmake;C:\msys64\ucrt64\share\cmake\Modules\Linker\MSVC.cmake;C:\msys64\ucrt64\share\cmake\Modules\Platform\Linker\Windows-MSVC-CXX.cmake;C:\msys64\ucrt64\share\cmake\Modules\Platform\Linker\Windows-MSVC.cmake;C:\msys64\ucrt64\share\cmake\Modules\Platform\Windows-Determine-CXX.cmake;C:\msys64\ucrt64\share\cmake\Modules\Platform\Windows-Initialize.cmake;C:\msys64\ucrt64\share\cmake\Modules\Platform\Windows-MSVC-CXX.cmake;C:\msys64\ucrt64\share\cmake\Modules\Platform\Windows-MSVC.cmake;C:\msys64\ucrt64\share\cmake\Modules\Platform\Windows.cmake;C:\msys64\ucrt64\share\cmake\Modules\Platform\WindowsPaths.cmake;C:\msys64\ucrt64\share\cmake\Modules\SelectLibraryConfigurations.cmake;C:\vcpkg\installed\x64-windows\share\Microsoft.GSL\Microsoft.GSLConfig.cmake;C:\vcpkg\installed\x64-windows\share\Microsoft.GSL\Microsoft.GSLConfigVersion.cmake;C:\vcpkg\installed\x64-windows\share\seal\SEALConfig.cmake;C:\vcpkg\installed\x64-windows\share\seal\SEALConfigVersion.cmake;C:\vcpkg\installed\x64-windows\share\seal\SEALTargets-debug.cmake;C:\vcpkg\installed\x64-windows\share\seal\SEALTargets-release.cmake;C:\vcpkg\installed\x64-windows\share\seal\SEALTargets.cmake;C:\vcpkg\installed\x64-windows\share\zlib\vcpkg-cmake-wrapper.cmake;C:\vcpkg\installed\x64-windows\share\zstd\zstdConfig.cmake;C:\vcpkg\installed\x64-windows\share\zstd\zstdConfigVersion.cmake;C:\vcpkg\installed\x64-windows\share\zstd\zstdTargets-debug.cmake;C:\vcpkg\installed\x64-windows\share\zstd\zstdTargets-release.cmake;C:\vcpkg\installed\x64-windows\share\zstd\zstdTargets.cmake;C:\vcpkg\scripts\buildsystems\vcpkg.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">C:\Capstone-Receiver\Capstone-Design-PSI\receiver\src\main\native\build\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">Building Custom Rule C:/Capstone-Receiver/Capstone-Design-PSI/receiver/src/main/native/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">setlocal
+C:\msys64\ucrt64\bin\cmake.exe -SC:/Capstone-Receiver/Capstone-Design-PSI/receiver/src/main/native -BC:/Capstone-Receiver/Capstone-Design-PSI/receiver/src/main/native/build --check-stamp-file C:/Capstone-Receiver/Capstone-Design-PSI/receiver/src/main/native/build/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">C:\Capstone-Receiver\Capstone-Design-PSI\receiver\src\main\native\build\CMakeFiles\4.3.1\CMakeCXXCompiler.cmake;C:\Capstone-Receiver\Capstone-Design-PSI\receiver\src\main\native\build\CMakeFiles\4.3.1\CMakeRCCompiler.cmake;C:\Capstone-Receiver\Capstone-Design-PSI\receiver\src\main\native\build\CMakeFiles\4.3.1\CMakeSystem.cmake;C:\msys64\ucrt64\share\cmake\Modules\CMakeCXXCompiler.cmake.in;C:\msys64\ucrt64\share\cmake\Modules\CMakeCXXCompilerABI.cpp;C:\msys64\ucrt64\share\cmake\Modules\CMakeCXXInformation.cmake;C:\msys64\ucrt64\share\cmake\Modules\CMakeCommonLanguageInclude.cmake;C:\msys64\ucrt64\share\cmake\Modules\CMakeCompilerIdDetection.cmake;C:\msys64\ucrt64\share\cmake\Modules\CMakeDependentOption.cmake;C:\msys64\ucrt64\share\cmake\Modules\CMakeDetermineCXXCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\CMakeDetermineCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\CMakeDetermineCompilerABI.cmake;C:\msys64\ucrt64\share\cmake\Modules\CMakeDetermineCompilerId.cmake;C:\msys64\ucrt64\share\cmake\Modules\CMakeDetermineCompilerSupport.cmake;C:\msys64\ucrt64\share\cmake\Modules\CMakeDetermineRCCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\CMakeDetermineSystem.cmake;C:\msys64\ucrt64\share\cmake\Modules\CMakeFindBinUtils.cmake;C:\msys64\ucrt64\share\cmake\Modules\CMakeFindDependencyMacro.cmake;C:\msys64\ucrt64\share\cmake\Modules\CMakeGenericSystem.cmake;C:\msys64\ucrt64\share\cmake\Modules\CMakeInitializeConfigs.cmake;C:\msys64\ucrt64\share\cmake\Modules\CMakeLanguageInformation.cmake;C:\msys64\ucrt64\share\cmake\Modules\CMakeParseImplicitIncludeInfo.cmake;C:\msys64\ucrt64\share\cmake\Modules\CMakeParseImplicitLinkInfo.cmake;C:\msys64\ucrt64\share\cmake\Modules\CMakeParseLibraryArchitecture.cmake;C:\msys64\ucrt64\share\cmake\Modules\CMakeRCCompiler.cmake.in;C:\msys64\ucrt64\share\cmake\Modules\CMakeRCInformation.cmake;C:\msys64\ucrt64\share\cmake\Modules\CMakeSystem.cmake.in;C:\msys64\ucrt64\share\cmake\Modules\CMakeSystemSpecificInformation.cmake;C:\msys64\ucrt64\share\cmake\Modules\CMakeSystemSpecificInitialize.cmake;C:\msys64\ucrt64\share\cmake\Modules\CMakeTestCXXCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\CMakeTestCompilerCommon.cmake;C:\msys64\ucrt64\share\cmake\Modules\CMakeTestRCCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\CheckCXXSourceCompiles.cmake;C:\msys64\ucrt64\share\cmake\Modules\CheckIncludeFileCXX.cmake;C:\msys64\ucrt64\share\cmake\Modules\CheckLibraryExists.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\ADSP-DetermineCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\ARMCC-DetermineCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\ARMClang-DetermineCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\AppleClang-DetermineCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\Borland-DetermineCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\CMakeCommonCompilerMacros.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\Clang-DetermineCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\Clang-DetermineCompilerInternal.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\Compaq-CXX-DetermineCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\Cray-DetermineCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\CrayClang-DetermineCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\Diab-DetermineCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\Embarcadero-DetermineCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\Fujitsu-DetermineCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\FujitsuClang-DetermineCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\GHS-DetermineCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\GNU-CXX-DetermineCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\HP-CXX-DetermineCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\IAR-DetermineCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\IBMCPP-CXX-DetermineVersionInternal.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\IBMClang-CXX-DetermineCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\Intel-DetermineCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\IntelLLVM-DetermineCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\LCC-CXX-DetermineCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\MSVC-CXX.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\MSVC-DetermineCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\MSVC.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\NVHPC-DetermineCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\NVIDIA-DetermineCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\OpenWatcom-DetermineCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\OrangeC-DetermineCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\PGI-DetermineCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\PathScale-DetermineCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\Renesas-DetermineCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\SCO-DetermineCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\SunPro-CXX-DetermineCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\TI-DetermineCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\TIClang-DetermineCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\Tasking-DetermineCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\VisualAge-CXX-DetermineCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\Watcom-DetermineCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\XL-CXX-DetermineCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\XLClang-CXX-DetermineCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\Compiler\zOS-CXX-DetermineCompiler.cmake;C:\msys64\ucrt64\share\cmake\Modules\CompilerId\VS-10.vcxproj.in;C:\msys64\ucrt64\share\cmake\Modules\FindPackageHandleStandardArgs.cmake;C:\msys64\ucrt64\share\cmake\Modules\FindPackageMessage.cmake;C:\msys64\ucrt64\share\cmake\Modules\FindThreads.cmake;C:\msys64\ucrt64\share\cmake\Modules\FindZLIB.cmake;C:\msys64\ucrt64\share\cmake\Modules\Internal\CMakeCXXLinkerInformation.cmake;C:\msys64\ucrt64\share\cmake\Modules\Internal\CMakeCommonLinkerInformation.cmake;C:\msys64\ucrt64\share\cmake\Modules\Internal\CMakeDetermineLinkerId.cmake;C:\msys64\ucrt64\share\cmake\Modules\Internal\CMakeInspectCXXLinker.cmake;C:\msys64\ucrt64\share\cmake\Modules\Internal\CheckSourceCompiles.cmake;C:\msys64\ucrt64\share\cmake\Modules\Internal\FeatureTesting.cmake;C:\msys64\ucrt64\share\cmake\Modules\Linker\MSVC-CXX.cmake;C:\msys64\ucrt64\share\cmake\Modules\Linker\MSVC.cmake;C:\msys64\ucrt64\share\cmake\Modules\Platform\Linker\Windows-MSVC-CXX.cmake;C:\msys64\ucrt64\share\cmake\Modules\Platform\Linker\Windows-MSVC.cmake;C:\msys64\ucrt64\share\cmake\Modules\Platform\Windows-Determine-CXX.cmake;C:\msys64\ucrt64\share\cmake\Modules\Platform\Windows-Initialize.cmake;C:\msys64\ucrt64\share\cmake\Modules\Platform\Windows-MSVC-CXX.cmake;C:\msys64\ucrt64\share\cmake\Modules\Platform\Windows-MSVC.cmake;C:\msys64\ucrt64\share\cmake\Modules\Platform\Windows.cmake;C:\msys64\ucrt64\share\cmake\Modules\Platform\WindowsPaths.cmake;C:\msys64\ucrt64\share\cmake\Modules\SelectLibraryConfigurations.cmake;C:\vcpkg\installed\x64-windows\share\Microsoft.GSL\Microsoft.GSLConfig.cmake;C:\vcpkg\installed\x64-windows\share\Microsoft.GSL\Microsoft.GSLConfigVersion.cmake;C:\vcpkg\installed\x64-windows\share\seal\SEALConfig.cmake;C:\vcpkg\installed\x64-windows\share\seal\SEALConfigVersion.cmake;C:\vcpkg\installed\x64-windows\share\seal\SEALTargets-debug.cmake;C:\vcpkg\installed\x64-windows\share\seal\SEALTargets-release.cmake;C:\vcpkg\installed\x64-windows\share\seal\SEALTargets.cmake;C:\vcpkg\installed\x64-windows\share\zlib\vcpkg-cmake-wrapper.cmake;C:\vcpkg\installed\x64-windows\share\zstd\zstdConfig.cmake;C:\vcpkg\installed\x64-windows\share\zstd\zstdConfigVersion.cmake;C:\vcpkg\installed\x64-windows\share\zstd\zstdTargets-debug.cmake;C:\vcpkg\installed\x64-windows\share\zstd\zstdTargets-release.cmake;C:\vcpkg\installed\x64-windows\share\zstd\zstdTargets.cmake;C:\vcpkg\scripts\buildsystems\vcpkg.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">C:\Capstone-Receiver\Capstone-Design-PSI\receiver\src\main\native\build\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">false</LinkObjects>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="C:\Capstone-Receiver\Capstone-Design-PSI\receiver\src\main\native\src\data_loader.cpp" />
+    <ClCompile Include="C:\Capstone-Receiver\Capstone-Design-PSI\receiver\src\main\native\src\windowing.cpp" />
+    <ClCompile Include="C:\Capstone-Receiver\Capstone-Design-PSI\receiver\src\main\native\src\hashing.cpp" />
+    <ClCompile Include="C:\Capstone-Receiver\Capstone-Design-PSI\receiver\src\main\native\src\mod.cpp" />
+    <ClCompile Include="C:\Capstone-Receiver\Capstone-Design-PSI\receiver\src\main\native\src\receiver-request.cpp" />
+    <ClCompile Include="C:\Capstone-Receiver\Capstone-Design-PSI\receiver\src\main\native\external\murmur3.cpp" />
+  </ItemGroup>
+  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="C:\Capstone-Receiver\Capstone-Design-PSI\receiver\src\main\native\build\ZERO_CHECK.vcxproj">
+      <Project>{200BECB4-BFE9-3691-8F0A-321A0D5ED738}</Project>
+      <Name>ZERO_CHECK</Name>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
