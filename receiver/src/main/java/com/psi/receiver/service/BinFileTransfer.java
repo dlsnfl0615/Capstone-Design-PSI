@@ -38,13 +38,17 @@ public class BinFileTransfer {
             }
         });
 
+        long start = System.nanoTime();
         webClient.post()
                 .uri("/api/files/upload")
                 .contentType(MediaType.MULTIPART_FORM_DATA)
                 .body(BodyInserters.fromMultipartData(builder.build()))
                 .retrieve()
                 .bodyToMono(String.class)
-                .doOnSuccess(response -> System.out.println("전송 성공: " + response))
+                .doOnSuccess(response -> {
+                    double elapsed = (System.nanoTime() - start) / 1_000_000.0;
+                    System.out.printf("전송 성공: %s (%.3f ms)%n", response, elapsed);
+                })
                 .doOnError(error -> System.err.println("전송 실패: " + error.getMessage()))
                 .subscribe();
     }
