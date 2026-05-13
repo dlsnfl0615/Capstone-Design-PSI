@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>Bin File Transfer</title>
+</head>
+<body>
+    <button onclick="sendFiles()">전송</button>
+    <button onclick="checkIntersection()">교집합 찾기</button>
+
+    <script>
+        function sendFiles() {
+            fetch('/api/send', { method: 'POST' })
+                .then(res => res.text())
+                .then(msg => alert(msg))
+                .catch(err => alert('전송 실패: ' + err));
+        }
+        function checkIntersection() {
+            fetch('/api/check', { method: 'POST' })
+                .then(res => res.text())
+                .then(msg => alert(msg))
+                .catch(err => alert('전송 실패: ' + err));
+        }
+    </script>
+</body>
+</html>

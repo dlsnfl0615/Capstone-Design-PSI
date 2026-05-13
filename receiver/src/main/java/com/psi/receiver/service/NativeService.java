@@ -11,7 +11,11 @@ import java.nio.file.Paths;
 public class NativeService {
     private static final Path LIB_PATH =
             Paths.get("src/main/native/build/Release/receiver-psi.dll").toAbsolutePath();
-
+    static {
+        // zstd.dll은 Windows DLL 탐색 경로에 없으므로 sender-psi.dll 로딩 전에 먼저 로드
+        Path zstdPath = Paths.get("src/main/native/build/Release/zstd.dll").toAbsolutePath();
+        System.load(zstdPath.toString());
+    }
     public int callNative(String functionName) {
         System.out.println("callNative");
         try (Arena arena = Arena.ofConfined()) {
