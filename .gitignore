@@ -23,4 +23,5 @@ compile_commands.json
 *.user
 *.csv
 *.log
+*.tlog
 error-*.json

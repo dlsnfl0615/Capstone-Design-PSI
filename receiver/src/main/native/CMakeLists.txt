@@ -35,7 +35,3 @@ target_include_directories(${LIB_NAME} PRIVATE
 
 # 라이브러리 연결
 target_link_libraries(${LIB_NAME} PRIVATE SEAL::seal)
-
-# 데이터 폴더를 빌드 디렉토리로 복사
-# 라이브러리가 로드되어 실행될 때 상대 경로로 파일을 찾을 수 있게 함
-file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/data DESTINATION ${CMAKE_CURRENT_BINARY_DIR})

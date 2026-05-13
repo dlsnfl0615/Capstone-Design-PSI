@@ -9,19 +9,34 @@ import java.nio.file.Paths;
 
 @Service
 public class NativeService {
-    public void callNative(String functionName, String inputPath, String outputPath) {
-        Path libPath = Paths.get("src/main/native/build/Release/request.dll").toAbsolutePath(); // receiver-request.cpp의 파일명
-        System.load(libPath.toString()); // c++ 로드
+    private static final Path LIB_PATH =
+            Paths.get("src/main/native/build/Release/receiver-psi.dll").toAbsolutePath();
 
-        Linker linker = Linker.nativeLinker();
-        SymbolLookup lookup = SymbolLookup.loaderLookup(); // 심볼 룩업 인스턴스 생성
+    public int callNative(String functionName) {
+        System.out.println("callNative");
+        try (Arena arena = Arena.ofConfined()) {
+            SymbolLookup lookup = SymbolLookup.libraryLookup(LIB_PATH, arena);
+            Linker linker = Linker.nativeLinker();
 
-        // C++ 함수 찾기. receiver-request.cpp의 request 함수 찾음.
-        MemorySegment funcSegment = lookup.find("request").orElseThrow(() -> new RuntimeException("함수 탐색 실패"));
+            MemorySegment funcSegment = lookup.find(functionName)
+                    .orElseThrow(() -> new RuntimeException("함수 탐색 실패: " + functionName));
 
-        MethodHandle readFileHandle = linker.downcallHandle(
-                funcSegment,
-                FunctionDescriptor.ofVoid(ValueLayout.ADDRESS)
-        );
+            MethodHandle handle = linker.downcallHandle(
+                    funcSegment,
+                    FunctionDescriptor.of(ValueLayout.JAVA_INT)
+            );
+
+            return (int) handle.invoke();
+        } catch (Throwable e) {
+            throw new RuntimeException("네이티브 함수 실행 실패: " + functionName, e);
+        }
+    }
+
+    public int request() {
+        return callNative("request");
+    }
+
+    public int result() {
+        return callNative("result");
     }
 }
