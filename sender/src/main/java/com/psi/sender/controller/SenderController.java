@@ -4,6 +4,7 @@ import com.psi.sender.service.BinFileTransfer;
 import com.psi.sender.service.NativeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
@@ -15,6 +16,7 @@ import java.nio.file.Paths;
 import java.util.List;
 
 @RestController
+@RequestMapping("/api")
 @RequiredArgsConstructor
 public class SenderController {
     private static final Path STORAGE_DIR = Paths.get("storage").toAbsolutePath();
@@ -22,7 +24,7 @@ public class SenderController {
     private final NativeService nativeService;
     private final BinFileTransfer binFileTransfer;
 
-    @PostMapping("/api/files/upload")
+    @PostMapping("/files/upload")
     public String load(@RequestPart("binFiles") List<MultipartFile> binFiles) throws IOException {
         Files.createDirectories(STORAGE_DIR);
 
@@ -35,10 +37,16 @@ public class SenderController {
             file.transferTo(dest);
         }
 
+        return "수신 완료";
+    }
+
+    @PostMapping("/product")
+    public String product() {
         int result = nativeService.intersect();
 
         binFileTransfer.sendBinFile(STORAGE_DIR.resolve(RESULT));
 
         return "교집합 연산 완료. 반환 코드: " + result;
     }
+
 }
