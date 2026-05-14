@@ -18,8 +18,8 @@ public class NativeService {
         System.load(zlib1Path.toString());
     }
 
-    public int callNative(String functionName) {
-        System.out.println("callNative");
+    public int callNative(String functionName, String storageDir, String senderCsv) {
+        System.out.println("callNative: " + functionName + " storageDir=" + storageDir + " senderCsv=" + senderCsv);
 
         try (Arena arena = Arena.ofConfined()) {
             SymbolLookup lookup = SymbolLookup.libraryLookup(LIB_PATH, arena);
@@ -30,16 +30,19 @@ public class NativeService {
 
             MethodHandle handle = linker.downcallHandle(
                     funcSegment,
-                    FunctionDescriptor.of(ValueLayout.JAVA_INT)
+                    FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS)
             );
 
-            return (int) handle.invoke();
+            MemorySegment storageDirSeg = arena.allocateFrom(storageDir);
+            MemorySegment senderCsvSeg = arena.allocateFrom(senderCsv);
+
+            return (int) handle.invokeExact(storageDirSeg, senderCsvSeg);
         } catch (Throwable e) {
             throw new RuntimeException("네이티브 함수 실행 실패: " + functionName, e);
         }
     }
 
-    public int intersect() {
-        return callNative("intersect");
+    public int intersect(String storageDir, String senderCsv) {
+        return callNative("intersect", storageDir, senderCsv);
     }
 }

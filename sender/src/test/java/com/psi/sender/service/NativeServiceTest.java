@@ -9,6 +9,8 @@ class NativeServiceTest {
 
     @Test
     void 빌드_테스트() {
-        nativeService.intersect();
+        String storageDir = java.nio.file.Paths.get("storage").toAbsolutePath().toString();
+        String senderCsv = java.nio.file.Paths.get("storage/sender.csv").toAbsolutePath().toString();
+        nativeService.intersect(storageDir, senderCsv);
     }
 }

@@ -22,6 +22,7 @@ public class SenderController {
     private static final Path STORAGE_DIR = Paths.get("storage").toAbsolutePath();
     private static final Path RESULT = Paths.get("storage/result.bin").toAbsolutePath();
     private static final Path CPP_TIMING = Paths.get("storage/cpp_timing.json").toAbsolutePath();
+    private static final Path SENDER_CSV = Paths.get("storage/sender_2^24.csv").toAbsolutePath();
     private final NativeService nativeService;
     private final FileTransfer fileTransfer;
 
@@ -43,7 +44,7 @@ public class SenderController {
 
     @PostMapping("/product")
     public String product() throws IOException {
-        int result = nativeService.intersect();
+        int result = nativeService.intersect(STORAGE_DIR.toString(), SENDER_CSV.toString());
 
         long transferNs = fileTransfer.sendBinFile(STORAGE_DIR.resolve(RESULT));
         double transferMs = transferNs / 1000000.0;

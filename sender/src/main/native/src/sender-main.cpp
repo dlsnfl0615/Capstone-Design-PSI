@@ -21,14 +21,15 @@ extern "C" {
 #ifdef _WIN32
 __declspec(dllexport) // 윈도우 환경 DLL 내보내기
 #endif
-int intersect() {
+int intersect(const char* storage_dir, const char* sender_csv) {
+    string sd(storage_dir);
     cout << "[load]SEAL objects loading..";
     // receiver가 보내준 값 가져오기
 
     auto t_load_start = Clock::now();
 
     EncryptionParameters parms;
-    ifstream parms_in("storage/parms.bin", ios::binary);
+    ifstream parms_in(sd + "/parms.bin", ios::binary);
     if (!parms_in.is_open()) {
         cerr << "Error: parms.bin 파일을 찾을 수 없습니다." << endl;
         return 1;
@@ -39,21 +40,21 @@ int intersect() {
     SEALContext context(parms);
 
     PublicKey public_key;
-    ifstream pk_in("storage/public_key.bin", ios::binary);
+    ifstream pk_in(sd + "/public_key.bin", ios::binary);
     if (pk_in.is_open()) {
         public_key.load(context, pk_in);
         pk_in.close();
     }
 
     RelinKeys relin_keys;
-    ifstream rk_in("storage/relin_key.bin", ios::binary);
+    ifstream rk_in(sd + "/relin_key.bin", ios::binary);
     if (rk_in.is_open()) {
         relin_keys.load(context, rk_in);
         rk_in.close();
     }
 
     map<int, Ciphertext> encrypted_powers;
-    ifstream ofs_in("storage/powers.bin", ios::binary);
+    ifstream ofs_in(sd + "/powers.bin", ios::binary);
     if (ofs_in.is_open()) {
         size_t map_size;
         // 맵의 크기 먼저 읽기
@@ -78,7 +79,7 @@ int intersect() {
     Encryptor encryptor(context, public_key);
     uint64_t plain_modulus = context.first_context_data()->parms().plain_modulus().value();
 
-    auto sender_data = load_sender("storage/sender.csv");
+    auto sender_data = load_sender(sender_csv);
 
     auto t_load_end = Clock::now();
     cout << "completed" << "\n\n";
@@ -119,24 +120,13 @@ int intersect() {
     auto t_modulus_switching_end = Clock::now();
     
     // 다항식 연산 결과 저장
-    ofstream result_out("storage/result.bin", ios::binary);
+    ofstream result_out(sd + "/result.bin", ios::binary);
     size_t result_size = producted.size();
     result_out.write(reinterpret_cast<const char*>(&result_size), sizeof(size_t));
     for (const auto& ct : producted) {
         ct.save(result_out); //
     }
     result_out.close();
-
-    /* double loadMs = chrono::duration<double, milli>(t_load_end - t_load_start).count();
-    double decryptMs = chrono::duration<double, milli>(t_decrypt_end - t_decrypt_start).count();
-    double intersectMs = chrono::duration<double, milli>(t_intersect_end - t_intersect_start).count();
-
-    ofstream timing_out("storage/cpp_timing.json");
-    timing_out << fixed << setprecision(3)
-               << "{\"loadMs\":" << loadMs
-               << ",\"decryptMs\":" << decryptMs
-               << ",\"intersectMs\":" << intersectMs << "}";
-    timing_out.close(); */
 
     // C++ 단계별 소요 시간 저장
     double loadMs = chrono::duration<double, milli>(t_load_end - t_load_start).count();
@@ -145,7 +135,7 @@ int intersect() {
     double productMs = chrono::duration<double, milli>(t_product_end - t_product_start).count();
     double modulusMs = chrono::duration<double, milli>(t_modulus_switching_end - t_modulus_switching_start).count();
 
-    ofstream timing_out("storage/cpp_timing.json");
+    ofstream timing_out(sd + "/cpp_timing.json");
     timing_out << fixed << setprecision(3)
                << "{\"loadMs\":" << loadMs
                << ",\"hashingMs\":" << hashingMs
