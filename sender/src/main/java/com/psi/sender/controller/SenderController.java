@@ -1,6 +1,6 @@
 package com.psi.sender.controller;
 
-import com.psi.sender.service.BinFileTransfer;
+import com.psi.sender.service.FileTransfer;
 import com.psi.sender.service.NativeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -21,8 +21,9 @@ import java.util.List;
 public class SenderController {
     private static final Path STORAGE_DIR = Paths.get("storage").toAbsolutePath();
     private static final Path RESULT = Paths.get("storage/result.bin").toAbsolutePath();
+    private static final Path CPP_TIMING = Paths.get("storage/cpp_timing.json").toAbsolutePath();
     private final NativeService nativeService;
-    private final BinFileTransfer binFileTransfer;
+    private final FileTransfer fileTransfer;
 
     @PostMapping("/files/upload")
     public String load(@RequestPart("binFiles") List<MultipartFile> binFiles) throws IOException {
@@ -41,12 +42,22 @@ public class SenderController {
     }
 
     @PostMapping("/product")
-    public String product() {
+    public String product() throws IOException {
         int result = nativeService.intersect();
 
-        binFileTransfer.sendBinFile(STORAGE_DIR.resolve(RESULT));
+        long transferNs = fileTransfer.sendBinFile(STORAGE_DIR.resolve(RESULT));
+        double transferMs = transferNs / 1000000.0;
+
+        String json = Files.readString(CPP_TIMING);
+        String updated = json.substring(0, json.lastIndexOf('}'))
+                + String.format(",\"transferMs\":%.3f}", transferMs);
+        Files.writeString(CPP_TIMING, updated);
 
         return "교집합 연산 완료. 반환 코드: " + result;
     }
 
+    @PostMapping("/timing")
+    public void sendTiming() {
+        fileTransfer.sendJsonFile(CPP_TIMING);
+    }
 }

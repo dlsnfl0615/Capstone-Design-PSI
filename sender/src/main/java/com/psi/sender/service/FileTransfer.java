@@ -1,26 +1,28 @@
 package com.psi.sender.service;
 
 import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.MultipartBodyBuilder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
 @Service
-public class BinFileTransfer {
+public class FileTransfer {
     private static final String SENDER_URL = "http://localhost:8080";
     private final WebClient webClient;
 
-    public BinFileTransfer() {
+    public FileTransfer() {
         this.webClient = WebClient.builder().baseUrl(SENDER_URL).build();
     }
 
-    public void sendBinFile(Path filePath) {
+    public long sendBinFile(Path filePath) {
         byte[] bytes;
         try {
             bytes = Files.readAllBytes(filePath);
@@ -43,11 +45,20 @@ public class BinFileTransfer {
                 .body(BodyInserters.fromMultipartData(builder.build()))
                 .retrieve()
                 .bodyToMono(String.class)
-                .doOnSuccess(response -> {
-                    double elapsed = (System.nanoTime() - start) / 1_000_000.0;
-                    System.out.printf("전송 성공: %s (%.3f ms)%n", response, elapsed);
-                })
+                .doOnSuccess(response -> System.out.println("전송 성공: " + response))
                 .doOnError(error -> System.err.println("전송 실패: " + error.getMessage()))
-                .subscribe();
+                .block();
+
+        return System.nanoTime() - start;
+    }
+
+    public void sendJsonFile(Path filePath) {
+        webClient.post()
+                .uri("api/files/sender-timing")
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(BodyInserters.fromResource(new FileSystemResource(filePath))) // 리소스 삽입함
+                .retrieve()
+                .bodyToMono(String.class)
+                .block();
     }
 }
