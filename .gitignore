@@ -21,6 +21,5 @@ compile_commands.json
 .vscode/
 .idea/
 *.user
-*.csv
 *.log
 error-*.json

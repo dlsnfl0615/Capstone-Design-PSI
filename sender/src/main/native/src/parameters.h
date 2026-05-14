@@ -13,12 +13,12 @@ const int CUCKOO_MAX_KICK = 500;
 const uint64_t RECEIVER_DUMMY = (1ULL << sigma);
 const uint64_t SENDER_DUMMY = ((1ULL << (sigma + 1)) - 1);
 
-const int n = 32768; // 다항식 차수. *
+const int n = 16384; // 다항식 차수. *
 const int t = 44; // plain modulus 비트 길이. 실제 값으로 사용하려면 2^t로 사용해야 함
 // const int q 자동으로 생성됨. *
 
-const int l = 3; // 윈도잉 파라미터
-const int alpha = 8; // 파티셔닝 파라미터 8이면 l을 3. 16이면 l을 2. 32면 1
+const int l = 1; // 윈도잉 파라미터
+const int alpha = 16; // 파티셔닝 파라미터 8이면 l을 3. 16이면 l을 2. 32면 1
 const int lambda = 40; // 보안 수준
 
 const int random = 4365234; // 일단 아무거나
