@@ -19,18 +19,19 @@ extern "C" {
 #ifdef _WIN32
 __declspec(dllexport) // 윈도우 환경 DLL 내보내기
 #endif
-int result() {
+int result(const char* storage_dir, const char* receiver_csv) {
+    string sd(storage_dir);
     cout << "[load] SEAL objects loading..";
 
     // 로드 시간 측정 시작
     auto t_load_start = Clock::now();
 
     // receiver 원본 데이터 다시 로드
-    auto receiver_data = load_receiver("storage/receiver.csv");
+    auto receiver_data = load_receiver(receiver_csv);
 
     // parms 로드
     EncryptionParameters parms;
-    ifstream parms_in("storage/parms.bin", ios::binary);
+    ifstream parms_in(sd + "/parms.bin", ios::binary);
     if (!parms_in.is_open()) {
         cerr << "Error: parms.bin 파일을 찾을 수 없습니다." << endl;
         return 1;
@@ -43,7 +44,7 @@ int result() {
 
     // 공개키 로드
     PublicKey public_key;
-    ifstream pk_in("storage/public_key.bin", ios::binary);
+    ifstream pk_in(sd + "/public_key.bin", ios::binary);
     if (pk_in.is_open()) {
         public_key.load(context, pk_in);
         pk_in.close();
@@ -51,7 +52,7 @@ int result() {
 
     // relin 키 로드
     RelinKeys relin_keys;
-    ifstream rk_in("storage/relin_key.bin", ios::binary);
+    ifstream rk_in(sd + "/relin_key.bin", ios::binary);
     if (rk_in.is_open()) {
         relin_keys.load(context, rk_in);
         rk_in.close();
@@ -59,7 +60,7 @@ int result() {
 
     // 비밀키 로드
     SecretKey secret_key;
-    ifstream sk_in("storage/secret_key.bin", ios::binary);
+    ifstream sk_in(sd + "/secret_key.bin", ios::binary);
     if (sk_in.is_open()) {
         secret_key.load(context, sk_in);
         sk_in.close();
@@ -67,7 +68,7 @@ int result() {
 
     // receiver 해시 테이블 로드
     vector<uint64_t> hash_table;
-    ifstream hash_in("storage/receiver_hash.bin", ios::binary);
+    ifstream hash_in(sd + "/receiver_hash.bin", ios::binary);
     if (hash_in.is_open()) {
         size_t table_size;
         hash_in.read(reinterpret_cast<char*>(&table_size), sizeof(size_t));
@@ -82,7 +83,7 @@ int result() {
 
     // sender가 보내준 다항식 연산 결과 로드
     vector<Ciphertext> producted;
-    ifstream res_in("storage/result.bin", ios::binary);
+    ifstream res_in(sd + "/result.bin", ios::binary);
     if (res_in.is_open()) {
         size_t result_size;
         res_in.read(reinterpret_cast<char*>(&result_size), sizeof(size_t));
@@ -140,7 +141,7 @@ int result() {
     auto t_intersect_start = Clock::now();
 
     // [receiver result] 원본 데이터와 대조하여 어떤 데이터가 교집합인지
-    ofstream intersection_out("storage/intersections.csv");
+    ofstream intersection_out(sd + "/intersections.csv");
     int found_count = 0;
     cout << "Receiver: Intersection Results is saved in \"intersections.csv\"" << endl;
     for (const auto& record : receiver_data) {
@@ -175,7 +176,7 @@ int result() {
     double decryptMs = chrono::duration<double, milli>(t_decrypt_end - t_decrypt_start).count();
     double intersectMs = chrono::duration<double, milli>(t_intersect_end - t_intersect_start).count();
 
-    ofstream timing_out("storage/cpp_timing.json");
+    ofstream timing_out(sd + "/cpp_timing.json");
     timing_out << fixed << setprecision(3)
                << "{\"loadMs\":" << loadMs
                << ",\"decryptMs\":" << decryptMs

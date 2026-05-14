@@ -15,8 +15,6 @@ import java.util.Map;
 public class NativeService {
     private static final Path LIB_PATH =
             Paths.get("src/main/native/build/Release/receiver-psi.dll").toAbsolutePath();
-    private static final Path CPP_TIMING_PATH =
-            Paths.get("storage/cpp_timing.json").toAbsolutePath();
 
     static {
         // zstd.dll은 Windows DLL 탐색 경로에 없으므로 sender-psi.dll 로딩 전에 먼저 로드
@@ -26,8 +24,8 @@ public class NativeService {
         System.load(zlib1Path.toString());
     }
 
-    private int callNative(String functionName) {
-        System.out.println("callNative: " + functionName);
+    private int callNative(String functionName, String storageDir, String receiverCsv) {
+        System.out.println("callNative: " + functionName + " storageDir=" + storageDir + " receiverCsv=" + receiverCsv);
         try (Arena arena = Arena.ofConfined()) {
             SymbolLookup lookup = SymbolLookup.libraryLookup(LIB_PATH, arena);
             Linker linker = Linker.nativeLinker();
@@ -37,23 +35,26 @@ public class NativeService {
 
             MethodHandle handle = linker.downcallHandle(
                     funcSegment,
-                    FunctionDescriptor.of(ValueLayout.JAVA_INT)
+                    FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS)
             );
 
-            return (int) handle.invoke();
+            MemorySegment storageDirSeg = arena.allocateFrom(storageDir);
+            MemorySegment receiverCsvSeg = arena.allocateFrom(receiverCsv);
+
+            return (int) handle.invokeExact(storageDirSeg, receiverCsvSeg);
         } catch (Throwable e) {
             throw new RuntimeException("네이티브 함수 실행 실패: " + functionName, e);
         }
     }
 
     /**
-     * C++이 기록한 storage/cpp_timing.json을 읽어 Map으로 반환.
+     * C++이 기록한 cpp_timing.json을 읽어 Map으로 반환.
      * 형식: {"key1":123.456,"key2":78.9,...}
      */
-    private Map<String, Double> readCppTiming() {
+    private Map<String, Double> readCppTiming(String storageDir) {
+        Path timingPath = Paths.get(storageDir).resolve("cpp_timing.json");
         try {
-            String json = Files.readString(CPP_TIMING_PATH).trim();
-            // 중괄호 제거 후 "key":value 쌍 파싱
+            String json = Files.readString(timingPath).trim();
             json = json.substring(1, json.length() - 1);
             Map<String, Double> map = new HashMap<>();
             for (String pair : json.split(",")) {
@@ -68,19 +69,19 @@ public class NativeService {
         }
     }
 
-    public Map<String, Double> request() {
-        int code = callNative("request");
+    public Map<String, Double> request(String storageDir, String receiverCsvPath) {
+        int code = callNative("request", storageDir, receiverCsvPath);
         if (code != 0) {
             throw new RuntimeException("request() 실패 (반환값: " + code + ")");
         }
-        return readCppTiming();
+        return readCppTiming(storageDir);
     }
 
-    public Map<String, Double> result() {
-        int code = callNative("result");
+    public Map<String, Double> result(String storageDir, String receiverCsvPath) {
+        int code = callNative("result", storageDir, receiverCsvPath);
         if (code != 0) {
             throw new RuntimeException("result() 실패 (반환값: " + code + ")");
         }
-        return readCppTiming();
+        return readCppTiming(storageDir);
     }
 }

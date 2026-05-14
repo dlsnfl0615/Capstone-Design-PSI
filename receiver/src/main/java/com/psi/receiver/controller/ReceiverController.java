@@ -29,13 +29,14 @@ public class ReceiverController {
     private static final Path RELIN_KEY   = Paths.get("storage/relin_key.bin").toAbsolutePath();
     private static final Path SECRET_KEY  = Paths.get("storage/secret_key.bin").toAbsolutePath();
     private static final Path STORAGE_DIR       = Paths.get("storage").toAbsolutePath();
+    private static final Path RECEIVER_CSV      = Paths.get("storage/receiver_5535.csv").toAbsolutePath();
     private static final Path TIMING_JSON       = Paths.get("storage/timing.json").toAbsolutePath();
     private static final Path SENDER_TIMING_JSON = Paths.get("storage/sender_timing.json").toAbsolutePath();
 
     /** Phase 1: 암호화 요청 생성 (keygen + hashing + windowing) */
     @PostMapping("/process")
     public String request() {
-        Map<String, Double> t = nativeService.request();
+        Map<String, Double> t = nativeService.request(STORAGE_DIR.toString(), RECEIVER_CSV.toString());
         time.setKeygenMs(t.get("keygenMs"));
         time.setHashingMs(t.get("hashingMs"));
         time.setWindowingMs(t.get("windowingMs"));
@@ -77,7 +78,7 @@ public class ReceiverController {
     /** Phase 3: 복호화 및 교집합 검증, 최종 timing.json 저장 */
     @PostMapping("/check")
     public String check() throws IOException {
-        Map<String, Double> t = nativeService.result();
+        Map<String, Double> t = nativeService.result(STORAGE_DIR.toString(), RECEIVER_CSV.toString());
         time.setLoadMs(t.get("loadMs"));
         time.setDecryptMs(t.get("decryptMs"));
         time.setIntersectMs(t.get("intersectMs"));

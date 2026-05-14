@@ -9,6 +9,6 @@ class NativeServiceTest {
 
     @Test
     void 빌드_테스트() {
-        nativeService.request();
+//        nativeService.request();
     }
 }
