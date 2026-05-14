@@ -5,10 +5,17 @@
     <title>Bin File Transfer</title>
 </head>
 <body>
+    <button onclick="preprocess()">해싱 및 윈도잉</button>
     <button onclick="sendFiles()">전송</button>
     <button onclick="checkIntersection()">교집합 찾기</button>
 
     <script>
+        function preprocess() {
+            fetch('/api/process', { method: 'POST' })
+                .then(res => res.text())
+                .then(msg => alert(msg))
+                .catch(err => alert('전송 실패: ' + err));
+        }
         function sendFiles() {
             fetch('/api/send', { method: 'POST' })
                 .then(res => res.text())

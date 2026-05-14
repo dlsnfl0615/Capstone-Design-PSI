@@ -5,6 +5,7 @@
 #include <set>
 #include <chrono>
 #include <fstream>
+#include <iomanip>
 #include "parameters.h"
 #include "data_loader.h"
 #include "hashing.h"
@@ -20,6 +21,10 @@ __declspec(dllexport) // 윈도우 환경 DLL 내보내기
 #endif
 int result() {
     cout << "[load] SEAL objects loading..";
+
+    // 로드 시간 측정 시작
+    auto t_load_start = Clock::now();
+
     // receiver 원본 데이터 다시 로드
     auto receiver_data = load_receiver("storage/receiver.csv");
 
@@ -91,7 +96,12 @@ int result() {
     }
     cout << "completed.\n\n";
 
+    auto t_load_end = Clock::now();
+
     cout << "Final intersection checking..";
+
+    // 복호화 시간 측정 시작
+    auto t_decrypt_start = Clock::now();
 
     // 교집합 결과 확인
     // 복호화된 교집합 패킹 값들을 저장할 셋 (중복 제거)
@@ -109,7 +119,6 @@ int result() {
         // 각 슬롯을 검사하여 0인 위치의 패킹된 값을 수집함
         for (int i = 0; i < m; i++) {
             // 수학적으로 P(y) = 0 이면 교집합임
-
             if (decoded_slots[i] == 0) {
                 uint64_t packed_val = hash_table[i];
                 count++;
@@ -121,9 +130,14 @@ int result() {
             }
         }
     }
-    cout << "completed.\n\n";
 
+    auto t_decrypt_end = Clock::now();
+
+    cout << "completed.\n\n";
     cout << "count: " << count << endl;
+
+    // 교집합 원본 데이터 대조 시간 측정 시작
+    auto t_intersect_start = Clock::now();
 
     // [receiver result] 원본 데이터와 대조하여 어떤 데이터가 교집합인지
     ofstream intersection_out("storage/intersections.csv");
@@ -153,6 +167,20 @@ int result() {
             found_count++;
         }
     }
+
+    auto t_intersect_end = Clock::now();
+
+    // C++ 단계별 소요 시간 저장
+    double loadMs = chrono::duration<double, milli>(t_load_end - t_load_start).count();
+    double decryptMs = chrono::duration<double, milli>(t_decrypt_end - t_decrypt_start).count();
+    double intersectMs = chrono::duration<double, milli>(t_intersect_end - t_intersect_start).count();
+
+    ofstream timing_out("storage/cpp_timing.json");
+    timing_out << fixed << setprecision(3)
+               << "{\"loadMs\":" << loadMs
+               << ",\"decryptMs\":" << decryptMs
+               << ",\"intersectMs\":" << intersectMs << "}";
+    timing_out.close();
 
     return 0;
 }
