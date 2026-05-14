@@ -1,5 +1,6 @@
 package com.psi.receiver.controller;
 
+import com.psi.receiver.domain.Time;
 import com.psi.receiver.service.BinFileTransfer;
 import com.psi.receiver.service.NativeService;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +23,7 @@ import java.util.List;
 public class ReceiverController {
     private final NativeService nativeService;
     private final BinFileTransfer binFileTransfer;
+    private Time time;
     private static final Path PUBLIC_KEY = Paths.get("storage/public_key.bin").toAbsolutePath();
     private static final Path POWERS = Paths.get("storage/powers.bin").toAbsolutePath();
     private static final Path PARMS = Paths.get("storage/parms.bin").toAbsolutePath();
@@ -32,7 +34,8 @@ public class ReceiverController {
 
     @PostMapping("/send")
     public String send() {
-        binFileTransfer.sendBinFiles(List.of(PUBLIC_KEY, POWERS, PARMS, HASH_TABLE, RELIN_KEY, SECRET_KEY));
+        long transferTime = binFileTransfer.sendBinFiles(List.of(PUBLIC_KEY, POWERS, PARMS, HASH_TABLE, RELIN_KEY, SECRET_KEY));
+        time.setTransferTime(transferTime / 1000000.0);
         return "전송 완료";
     }
 

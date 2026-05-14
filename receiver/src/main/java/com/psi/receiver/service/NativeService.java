@@ -16,6 +16,7 @@ public class NativeService {
         Path zstdPath = Paths.get("src/main/native/build/Release/zstd.dll").toAbsolutePath();
         System.load(zstdPath.toString());
     }
+
     public int callNative(String functionName) {
         System.out.println("callNative");
         try (Arena arena = Arena.ofConfined()) {

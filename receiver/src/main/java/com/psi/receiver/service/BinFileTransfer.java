@@ -21,7 +21,7 @@ public class BinFileTransfer {
         this.webClient = WebClient.builder().baseUrl(SENDER_URL).build();
     }
 
-    public void sendBinFiles(List<Path> filePaths) {
+    public long sendBinFiles(List<Path> filePaths) {
         MultipartBodyBuilder builder = new MultipartBodyBuilder();
 
         filePaths.forEach(path -> {
@@ -45,11 +45,9 @@ public class BinFileTransfer {
                 .body(BodyInserters.fromMultipartData(builder.build()))
                 .retrieve()
                 .bodyToMono(String.class)
-                .doOnSuccess(response -> {
-                    double elapsed = (System.nanoTime() - start) / 1_000_000.0;
-                    System.out.printf("전송 성공: %s (%.3f ms)%n", response, elapsed);
-                })
+                .doOnSuccess(response -> System.out.println("전송 성공: " + response))
                 .doOnError(error -> System.err.println("전송 실패: " + error.getMessage()))
-                .subscribe();
+                .block();
+        return System.nanoTime() - start;
     }
 }
