@@ -6,7 +6,7 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # 실행 파일 이름 설정 (반복 사용을 위해 변수로 관리)
-set(EXE_NAME windowing)
+set(EXE_NAME receiver)
 
 # 패키지 찾기
 find_package(SEAL CONFIG REQUIRED)
@@ -18,8 +18,8 @@ add_executable(${EXE_NAME}
     src/windowing.cpp
     src/hashing.cpp
     src/mod.cpp
-    src/receiver-request.cpp
-    # src/receiver-result.cpp
+    # src/receiver-request.cpp
+    src/receiver-result.cpp
     external/murmur3.cpp
 )
 

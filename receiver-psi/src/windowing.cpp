@@ -7,7 +7,7 @@ vector<int> Windowing::get_exponents() {
     int j_max = static_cast<int>(floor(log2(ceil(B_prime)) / l));
     int i_max = (1 << l) - 1;
 
-    cout << "[windowing] j_max: " << j_max << ", i_max: " << i_max << endl;
+    cout << "[windowing]" << endl;
 
     bool exit_flag = false;
     for (int j = 0; j <= j_max; j++) {

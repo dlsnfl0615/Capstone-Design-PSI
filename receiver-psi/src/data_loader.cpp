@@ -94,68 +94,11 @@ vector<string> load_receiver(const string& filepath) {
         result.push_back(pid + disease);
     }
 
-    cout << "[Receiver] " << result.size() << " records loaded\n";
+    cout << "[load] " << result.size() << " records loaded\n";
     return result;
 }
 
-std::vector<std::string> load_sender(const std::string& filepath) {
-    std::ifstream f(filepath);
-    if (!f.is_open()) {
-        throw std::runtime_error("Failed to open file: " + filepath);
-    }
 
-    std::vector<std::string> result;
-    std::string line;
-    bool header = true;
-    int line_num = 0;
-
-    while (std::getline(f, line)) {
-        ++line_num;
-
-        if (header) {
-            header = false;
-            continue;
-        }
-
-        if (line.empty()) continue;
-
-        auto t = split(line);
-
-        if (t.size() < 11) {
-            throw std::runtime_error(
-                "Sender " + std::to_string(line_num) + " not enough columns "
-                "(expected: 11, actual: " + std::to_string(t.size()) + ")\n"
-                "  content: " + line
-            );
-        }
-
-        std::string pid = normalize_pid(t[0]);
-
-        std::string disease = "";
-        for (int i = 1; i <= 10; i++) {
-            disease += t[i];
-        }
-
-        result.push_back(pid + disease);
-    }
-
-    std::cout << "[Sender]   " << result.size() << " records loaded\n";
-    return result;
-}
-
-// -----------------------------
-// 미리보기 출력
-// -----------------------------
-/* void preview_receiver(const vector<string>& data, int n) {
-    cout << "\n--- Receiver preview ---\n";
-    for (int i = 0; i < min(n, (int)data.size()); i++) {
-        cout << "  [" << i << "] " << data[i].combined
-                  << "  (" << data[i].combined.size() << " chars)"
-                  << "  status=" << data[i].status << "\n";
-    }
-} */
-
-//0330 1:27 추가 : fhe_setup 검증을 위해 csv 데이터들을 벡터로 변환하는 함수 추가
 // -----------------------------
 // combined 문자열을 uint64_t로 패킹
 // 형식: [주민번호13자리 decimal][질병10자리 binary]

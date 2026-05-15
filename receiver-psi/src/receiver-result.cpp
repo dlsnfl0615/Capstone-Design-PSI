@@ -16,6 +16,7 @@ using Ms = chrono::milliseconds;
 
 int main() {
     cout << "[load] SEAL objects loading..";
+
     // receiver 원본 데이터 다시 로드
     auto receiver_data = load_receiver("data/receiver.csv");
 

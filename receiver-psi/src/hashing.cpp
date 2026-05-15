@@ -1,16 +1,23 @@
 #include "hashing.h"
 
-void ReceiverHashing::locate(const vector<string> data) {
+vector<uint32_t> ReceiverHashing::compress(const vector<string> data) {
+    vector<uint32_t> result;
+
+    for (const string record : data) {
+        uint32_t compressed = get_hash(record);
+        result.push_back(compressed);
+    }
+
+    return result;
+}
+
+void ReceiverHashing::locate(const vector<uint32_t> data) {
     for (const auto& record : data) {
-        string pid_str = record.substr(0, 13);
-        string disease_str = record.substr(13, 10);
-
-        uint64_t pid_val = std::stoull(pid_str); 
-        uint64_t disease_val = std::stoull(disease_str, nullptr, 2); 
-        uint64_t full_item = (pid_val << 10) | disease_val; 
-
+        uint64_t full_item = record;
+        int shift_bits = static_cast<int>(std::log2(m));
+        uint64_t mask = (1ULL << shift_bits) - 1;
         // 순열 기반 해싱을 위한 비트 분리
-        uint64_t x_R = full_item & 0x1FFF; // 하위 13비트 (log2 8192)
+        uint64_t x_R = full_item & mask; // 하위 13비트 (log2 8192)
         uint64_t x_L = full_item >> static_cast<int>(log2(m));   // 상위 41비트
         
         // 뻐꾸기 해싱 초기 설정
