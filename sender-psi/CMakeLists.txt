@@ -6,7 +6,7 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # 실행 파일 이름 설정 (반복 사용을 위해 변수로 관리)
-set(EXE_NAME windowing)
+set(EXE_NAME sender)
 
 # 패키지 찾기
 find_package(SEAL CONFIG REQUIRED)

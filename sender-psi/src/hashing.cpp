@@ -2,19 +2,27 @@
 #include <iostream>
 #include <bitset>
 
-void SenderHashing::locate(const vector<string> data) {
-    for (const auto& record : data) {
-        // 1. 데이터 파싱 (PID 13자리 + 질병코드 10비트)
-        string pid_str = record.substr(0, 13);
-        string disease_str = record.substr(13, 10);
+vector<uint32_t> SenderHashing::compress(const vector<string> data) {
+    vector<uint32_t> result;
 
-        uint64_t pid_val = std::stoull(pid_str);
-        uint64_t disease_val = std::stoull(disease_str, nullptr, 2);
-        uint64_t full_item = (pid_val << 10) | disease_val;
+    for (const string record : data) {
+        uint32_t compressed = get_hash(record);
+        result.push_back(compressed);
+    }
+
+    return result;
+}
+
+
+void SenderHashing::locate(const vector<uint32_t> data) {
+    for (const auto& record : data) {
+        uint64_t full_item = record;
+        int shift_bits = static_cast<int>(std::log2(m));
+        uint64_t mask = (1ULL << shift_bits) - 1;
 
         // 2. 순열 기반 해싱 비트 분리 (하위 13비트 x_R, 상위 41비트 x_L)
-        uint64_t x_R = full_item & 0x1FFF; 
-        uint64_t x_L = full_item >> 13;
+        uint64_t x_R = full_item & mask; 
+        uint64_t x_L = full_item >> static_cast<int>(log2(m));
 
         // 3. 단순 해싱: h개의 모든 해시 위치에 아이템 삽입
         for (int i = 0; i < h; i++) {
