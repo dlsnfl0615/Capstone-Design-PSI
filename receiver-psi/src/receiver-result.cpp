@@ -18,7 +18,7 @@ int main() {
     cout << "[load] SEAL objects loading..";
 
     // receiver 원본 데이터 다시 로드
-    auto receiver_data = load_receiver("data/receiver.csv");
+    auto receiver_data = load_receiver("data/B_receiver_5300.csv");
 
     // parms 로드
     EncryptionParameters parms;
@@ -125,15 +125,24 @@ int main() {
     // [receiver result] 원본 데이터와 대조하여 어떤 데이터가 교집합인지
     ofstream intersection_out("../data/intersections.csv");
     int found_count = 0;
+    ReceiverHashing receiver_hashing;
     cout << "Receiver: Intersection Results is saved in \"intersections.csv\"" << endl;
+    
+    size_t total_records = receiver_data.size(); // 전체 데이터 개수
+    size_t processed_records = 0; // 처리된 데이터 개수
+    size_t report_interval = total_records / 10 == 0 ? 1 : total_records / 10; // 10% 단위 설정함
+    int shift_bits = static_cast<int>(std::log2(m)); // m 기반 시프트 비트 계산함
+
     for (const auto& record : receiver_data) {
-        // 원본 레코드를 다시 패킹하여 비교 대상으로 만듦 (hashing 로직과 동일해야 함)
+        // csv 저장을 위해 원본 문자열에서 pid와 질병코드를 분리함
         string pid_str = record.substr(0, 13);
         string disease_str = record.substr(13, 10);
-        uint64_t pid_val = std::stoull(pid_str);
-        uint64_t disease_val = std::stoull(disease_str, nullptr, 2);
-        uint64_t full_item = (pid_val << 10) | disease_val;
-        uint64_t x_L = full_item >> 13;
+
+        // [핵심] compress 함수와 동일하게 원본 문자열 전체를 32비트 MurmurHash로 해싱함
+        uint32_t hashed_item = receiver_hashing.get_hash(record);
+
+        // 32비트 해싱 결과물에서 상위 비트 분리함 (locate 함수의 x_L 분리 로직과 일치)
+        uint64_t x_L = hashed_item >> shift_bits;
 
         bool is_intersected = false;
         // h개의 가능한 해시 인덱스 중 하나라도 셋에 존재하면 교집합임
@@ -148,6 +157,13 @@ int main() {
         if (is_intersected) {
             intersection_out << pid_str << "," << disease_str << endl;
             found_count++;
+        }
+
+        // 작업률 디버깅 출력함
+        processed_records++;
+        if (processed_records % report_interval == 0 || processed_records == total_records) {
+            double progress = (static_cast<double>(processed_records) / total_records) * 100.0;
+            std::cout << "[Intersection Progress] " << progress << "% (" << processed_records << "/" << total_records << ")\n";
         }
     }
     

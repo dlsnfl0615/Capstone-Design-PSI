@@ -20,7 +20,7 @@ int main() {
         cout << "[setup] Receiver SEAL setting.." << endl;
 
         // 데이터 로드
-        auto receiver_data = load_receiver("data/receiver.csv");
+        auto receiver_data = load_receiver("data/B_receiver_5300.csv");
 
         // 객체 선언
         EncryptionParameters parms(scheme_type::bfv);
