@@ -15,6 +15,10 @@ vector<uint32_t> SenderHashing::compress(const vector<string> data) {
 
 
 void SenderHashing::locate(const vector<uint32_t> data) {
+    size_t total_items = data.size(); // 전체 데이터 개수
+    size_t processed_items = 0; // 처리된 데이터 개수
+    size_t report_interval = total_items / 10 == 0 ? 1 : total_items / 10; // 10% 단위 설정함
+
     for (const auto& record : data) {
         uint64_t full_item = record;
         int shift_bits = static_cast<int>(std::log2(m));
@@ -46,6 +50,13 @@ void SenderHashing::locate(const vector<uint32_t> data) {
                 // 특정 빈이 가득 찬 경우 (B=74를 넘는 충돌 발생 시)
                 std::cerr << "[Warning] Bin " << loc << " is full! Item dropped." << std::endl;
             }
+        }
+
+        // 작업률 디버깅 출력
+        processed_items++;
+        if (processed_items % report_interval == 0 || processed_items == total_items) {
+            double progress = (static_cast<double>(processed_items) / total_items) * 100.0;
+            std::cout << "[Hashing Progress] " << progress << "% (" << processed_items << "/" << total_items << ")\n";
         }
     }
     cout << "[hashing]Sender simple Hashing complete. Data distributed into " << m << " bins.\n\n";

@@ -71,14 +71,16 @@ int main() {
         uint64_t plain_modulus = context.first_context_data()->parms().plain_modulus().value();
         cout << "completed" << "\n\n";
 
-        auto sender_data = load_sender("data/sender.csv");
+        cout << "[data load]\n\n";
+        auto sender_data = load_sender("data/B_sender_50M.csv");
 
         // 해싱
+        cout << "[hashing]\n\n";
         SenderHashing sender_hashing;
         sender_hashing.locate(sender_hashing.compress(sender_data));
 
         // 파티셔닝 및 계수 연산
-        cout << "[partitioning]\n";
+        cout << "[partitioning]\n\n";
         SenderEvaluate sender_evaluator;
         auto partitioned = sender_evaluator.partitioning(sender_hashing.hash_table);
         auto coeffs = sender_evaluator.extract_all_coefficients(partitioned, plain_modulus);
@@ -93,9 +95,11 @@ int main() {
         all_powers[0] = encrypted_one;
         
         // 다항식 연산
+        cout << "[product]\n\n";
         vector<Ciphertext> producted = sender_evaluator.product(all_powers, coeffs, batch_encoder, evaluator, context);
 
         // 모듈러스 스위칭
+        cout << "[modulus switching]\n\n";
         for (Ciphertext& polynomial : producted) {
             evaluator.mod_switch_to_inplace(polynomial, context.last_parms_id());
         }
