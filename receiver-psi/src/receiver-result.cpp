@@ -74,7 +74,7 @@ int main() {
 
     // sender가 보내준 다항식 연산 결과 로드
     vector<Ciphertext> producted;
-    ifstream res_in("../data/result.bin", ios::binary);
+    ifstream res_in("data/result.bin", ios::binary);
     if (res_in.is_open()) {
         size_t result_size;
         res_in.read(reinterpret_cast<char*>(&result_size), sizeof(size_t));
@@ -95,29 +95,56 @@ int main() {
     set<uint64_t> intersection_packed_values;
 
     int count = 0;
-    for (size_t p = 0; p < producted.size(); p++) {
-        // 암호문 복호화 및 디코딩 수행
+
+    // sender product()의 결과 순서가 다음과 같다고 가정:
+    //   partition 0, block 0
+    //   partition 0, block 1
+    //   partition 1, block 0
+    //   partition 1, block 1
+    //   ...
+    //
+    // 따라서 idx % num_blocks로 block_idx를 복원할 수 있음.
+    for (size_t idx = 0; idx < producted.size(); idx++) {
+
+        int block_idx = static_cast<int>(idx % num_blocks);
+
         Plaintext plain_result;
-        decryptor.decrypt(producted[p], plain_result);
-        
+        decryptor.decrypt(producted[idx], plain_result);
+
         vector<uint64_t> decoded_slots;
         batch_encoder.decode(plain_result, decoded_slots);
 
-        // 각 슬롯을 검사하여 0인 위치의 패킹된 값을 수집함
-        for (int i = 0; i < m; i++) {
-            // 수학적으로 P(y) = 0 이면 교집합임
+        // ciphertext 하나에는 n개 slot만 들어 있음.
+        // 따라서 여기서는 m까지 돌면 안 되고 n까지만 돌아야 함.
+        for (int slot = 0; slot < n; slot++) {
 
-            if (decoded_slots[i] == 0) {
-                uint64_t packed_val = hash_table[i];
+            // block 내부 slot 번호를 전체 receiver hash table의 bin 번호로 복원
+            //
+            // 예:
+            // block 0, slot 10 -> global_bin 10
+            // block 1, slot 10 -> global_bin 16384 + 10
+            int global_bin = block_idx * n + slot;
+
+            // 마지막 block에서 실제 bin이 없는 slot은 무시
+            if (global_bin >= m) {
+                continue;
+            }
+
+            // 수학적으로 P(y) = 0이면 해당 receiver 값이
+            // sender 다항식의 root 중 하나라는 뜻이므로 교집합 후보임.
+            if (decoded_slots[slot] == 0) {
+                uint64_t packed_val = hash_table[global_bin];
                 count++;
 
-                // 수신자의 더미 데이터가 아닌 실제 값인 경우에만 추가함
+                // dummy가 아닌 실제 receiver 값만 결과 후보에 넣음.
                 if (packed_val != RECEIVER_DUMMY) {
                     intersection_packed_values.insert(packed_val);
                 }
             }
         }
     }
+
+
     cout << "completed.\n\n";
     
     cout << "count: " << count << endl;
