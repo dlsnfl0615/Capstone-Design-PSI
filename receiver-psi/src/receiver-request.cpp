@@ -52,7 +52,7 @@ int main() {
         // 윈도잉
         Windowing windowing;
         vector<int> exponents = windowing.get_exponents();
-        map<int, Ciphertext> encrypted_powers = windowing.receiver_windowing(
+        map<int, vector<Ciphertext>> encrypted_powers = windowing.receiver_windowing(
             batch_encoder,
             encryptor,
             plain_modulus,
@@ -64,7 +64,7 @@ int main() {
         parms.save(parms_out);
         parms_out.close();
         
-        ofstream parms_out_1("C:/Capstone-Sender/Capstone-Design-PSI/sender-psi/data/parms.bin", ios::binary);
+        ofstream parms_out_1("C:/psi_0515/Capstone-Design-PSI-sender/sender-psi/data/parms.bin", ios::binary);
         parms.save(parms_out_1);
         parms_out_1.close();
 
@@ -73,7 +73,7 @@ int main() {
         public_key.save(pk_out);
         pk_out.close();
 
-        ofstream pk_out_1("C:/Capstone-Sender/Capstone-Design-PSI/sender-psi/data/public_key.bin", ios::binary);
+        ofstream pk_out_1("C:/psi_0515/Capstone-Design-PSI-sender/sender-psi/data/public_key.bin", ios::binary);
         public_key.save(pk_out_1);
         pk_out_1.close();
 
@@ -87,7 +87,7 @@ int main() {
         relin_keys.save(rk_out);
         rk_out.close();
 
-        ofstream rk_out_1("C:/Capstone-Sender/Capstone-Design-PSI/sender-psi/data/relin_key.bin", ios::binary);
+        ofstream rk_out_1("C:/psi_0515/Capstone-Design-PSI-sender/sender-psi/data/relin_key.bin", ios::binary);
         relin_keys.save(rk_out_1);
         rk_out_1.close();
 
@@ -99,29 +99,66 @@ int main() {
         hash_out.close();
 
         // 윈도잉 결과 저장
+        // 변경 이유:
+        // 기존 powers.bin 구조:
+        //   map_size
+        //   key, ciphertext
+        //   key, ciphertext
+        //   ...
+        //
+        // 변경 powers.bin 구조:
+        //   map_size
+        //   block_size
+        //   key, ciphertext_block_0, ciphertext_block_1, ...
+        //   key, ciphertext_block_0, ciphertext_block_1, ...
+        //
+        // sender가 읽을 때 exponent별로 몇 개의 block ciphertext가 있는지 알아야 하므로
+        // block_size도 함께 저장함.
         ofstream ofs("../data/powers.bin", ios::binary);
+
+        if (!ofs.is_open()) {
+            cerr << "Error: ../data/powers.bin 저장 경로를 열 수 없습니다." << endl;
+            return 1;
+        }
+
         size_t map_size = encrypted_powers.size();
+        size_t block_size = num_blocks;
+
         ofs.write(reinterpret_cast<const char*>(&map_size), sizeof(size_t));
-        for (auto &kv : encrypted_powers) {
-            // key (int) 저장
+        ofs.write(reinterpret_cast<const char*>(&block_size), sizeof(size_t));
+
+        for (auto& kv : encrypted_powers) {
             int key = kv.first;
             ofs.write(reinterpret_cast<const char*>(&key), sizeof(int));
-            
-            // value (Ciphertext) 저장
-            kv.second.save(ofs); 
+
+            for (int b = 0; b < num_blocks; b++) {
+                kv.second[b].save(ofs);
+            }
         }
+
         ofs.close();
 
-        ofstream ofs_1("C:/Capstone-Sender/Capstone-Design-PSI/sender-psi/data/powers.bin", ios::binary);
+        // sender가 실제로 읽는 powers.bin 경로로 복사 저장
+        // 지금 사용하시는 sender data 폴더 기준 경로입니다.
+        ofstream ofs_1("C:/psi_0515/Capstone-Design-PSI-sender/sender-psi/data/powers.bin", ios::binary);
+
+        if (!ofs_1.is_open()) {
+            cerr << "Error: sender 쪽 data/powers.bin 저장 경로를 열 수 없습니다." << endl;
+            return 1;
+        }
+
         ofs_1.write(reinterpret_cast<const char*>(&map_size), sizeof(size_t));
-        for (auto &kv : encrypted_powers) {
-            // key (int) 저장
+        ofs_1.write(reinterpret_cast<const char*>(&block_size), sizeof(size_t));
+
+        for (auto& kv : encrypted_powers) {
             int key = kv.first;
             ofs_1.write(reinterpret_cast<const char*>(&key), sizeof(int));
-            
-            // value (Ciphertext) 저장
-            kv.second.save(ofs_1); 
+
+            for (int b = 0; b < num_blocks; b++) {
+                kv.second[b].save(ofs_1);
+            }
         }
+
         ofs_1.close();
 
         cout << "Receiver Request completed." << endl;
