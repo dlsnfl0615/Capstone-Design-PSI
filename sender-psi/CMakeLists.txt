@@ -72,10 +72,7 @@ target_link_libraries(sender PRIVATE
         Threads::Threads
 )
 
-target_link_libraries(preprocess_sender PRIVATE
-        SEAL::seal
-        Threads::Threads
-)
+target_link_libraries(preprocess_sender PRIVATE SEAL::seal Threads::Threads)
 
 if(OpenMP_CXX_FOUND)
     target_link_libraries(sender PRIVATE OpenMP::OpenMP_CXX)
