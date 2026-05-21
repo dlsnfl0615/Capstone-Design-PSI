@@ -14,3 +14,12 @@ void save_hash_table_bin(
 vector<vector<uint64_t>> load_hash_table_bin(
     const string& filepath
 );
+
+void save_coeffs_bin(
+    const vector<vector<vector<uint64_t>>>& coeffs,
+    const string& filepath
+);
+
+vector<vector<vector<uint64_t>>> load_coeffs_bin(
+    const string& filepath
+);

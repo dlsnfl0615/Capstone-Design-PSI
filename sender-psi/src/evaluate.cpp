@@ -2,8 +2,9 @@
 #include <stdexcept>
 #include <algorithm>
 
-vector<vector<vector<uint64_t>>> SenderEvaluate::partitioning(const vector<vector<uint64_t>> hash_table) {
-    
+vector<vector<vector<uint64_t>>> SenderEvaluate::partitioning(
+    const vector<vector<uint64_t>>& hash_table
+) {
     vector<vector<vector<uint64_t>>> partitions(alpha, vector<vector<uint64_t>>(B_prime, vector<uint64_t>(m, SENDER_DUMMY))); 
 
     for (int p = 0; p < alpha; p++) {
@@ -239,8 +240,8 @@ map<int, vector<Ciphertext>> SenderEvaluate::make_all_powers(
 }
 
 vector<Ciphertext> SenderEvaluate::product(
-    const map<int, vector<Ciphertext>> all_powers,
-    const vector<vector<vector<uint64_t>>> coeffs,
+    const map<int, vector<Ciphertext>>& all_powers,
+    const vector<vector<vector<uint64_t>>>& coeffs,
     BatchEncoder& batch_encoder,
     Evaluator& evaluator,
     SEALContext& context) {

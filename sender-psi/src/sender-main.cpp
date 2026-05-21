@@ -138,48 +138,32 @@ int main() {
 
     print_time("SEAL objects and powers loading", t_load);
 
-    // 캐시 데이터 불러오기
+    // 캐시 metadata 검증 + coeffs cache 로드
 
-    auto t_cache_load = Clock::now();
+    auto t_cache_meta = Clock::now();
 
     cout << "[cache] loading sender cache metadata" << endl;
 
     SenderCacheMeta meta = load_sender_meta("../data/sender_meta.txt");
-    validate_sender_meta(meta);
+    validate_sender_meta(meta, plain_modulus);
 
-    cout << "[cache] loading cached sender hash table" << endl;
+    print_time("Sender cache metadata validation", t_cache_meta);
 
-    auto cached_hash_table = load_hash_table_bin("../data/sender_table.bin");
 
-    cout << "[cache] cached sender hash_table size = "
-         << cached_hash_table.size() << endl;
-
-    print_time("Sender cached hash table loading", t_cache_load);
-
-    // 파티셔닝 및 계수 연산
-    cout << "[partitioning]" << endl;
-    cout << "[debug] before SenderEvaluate create" << endl;
-
+    // sender_coeffs.bin 로드
     SenderEvaluate sender_evaluator;
 
-    auto t_partitioning = Clock::now();
+    auto t_coeffs_load = Clock::now();
 
-    cout << "[debug] before partitioning" << endl;
-    auto partitioned = sender_evaluator.partitioning(cached_hash_table);
-    cout << "[debug] after partitioning, partitioned size = "
-         << partitioned.size() << endl;
+    cout << "[cache] loading sender coeffs cache" << endl;
 
-    print_time("Partitioning", t_partitioning);
+    auto coeffs = load_coeffs_bin("../data/sender_coeffs.bin");
 
-    auto t_coefficients = Clock::now();
-
-    cout << "[debug] before extract_all_coefficients" << endl;
-    auto coeffs =
-        sender_evaluator.extract_all_coefficients(partitioned, plain_modulus);
-    cout << "[debug] after extract_all_coefficients, coeffs size = "
+    cout << "[cache] coeffs size = "
          << coeffs.size() << endl;
 
-    print_time("Coefficient extraction", t_coefficients);
+    print_time("Sender coeffs loading", t_coeffs_load);
+
 
     auto t_make_powers = Clock::now();
 

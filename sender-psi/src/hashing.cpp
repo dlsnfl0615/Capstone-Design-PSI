@@ -14,11 +14,11 @@ void SenderHashing::locate(const vector<string>& data) {
     }
 
     // 사용할 thread 개수 설정
-    unsigned int num_threads = 8;
+    unsigned int num_threads = 16;
 
     // hardware_concurrency()가 0을 반환하는 경우 대비
     if (num_threads == 0) {
-        num_threads = 8;
+        num_threads = 16;
     }
 
     // 데이터 개수보다 thread가 많을 필요는 없음

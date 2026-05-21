@@ -34,6 +34,8 @@ add_executable(preprocess_sender
         src/preprocess_main.cpp
         src/data_loader.cpp
         src/hashing.cpp
+        src/evaluate.cpp
+        src/mod.cpp
         src/cache_io.cpp
         src/metadata.cpp
         external/murmur3.cpp
@@ -65,8 +67,15 @@ endif()
 # =========================
 # 라이브러리 연결
 # =========================
-target_link_libraries(sender PRIVATE SEAL::seal Threads::Threads)
-target_link_libraries(preprocess_sender PRIVATE Threads::Threads)
+target_link_libraries(sender PRIVATE
+        SEAL::seal
+        Threads::Threads
+)
+
+target_link_libraries(preprocess_sender PRIVATE
+        SEAL::seal
+        Threads::Threads
+)
 
 if(OpenMP_CXX_FOUND)
     target_link_libraries(sender PRIVATE OpenMP::OpenMP_CXX)

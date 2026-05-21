@@ -20,7 +20,11 @@ static string current_time_string() {
     return ss.str();
 }
 
-SenderCacheMeta make_current_sender_meta(const string& table_file) {
+SenderCacheMeta make_current_sender_meta(
+    const string& table_file,
+    const string& coeffs_file,
+    uint64_t plain_modulus
+) {
     SenderCacheMeta meta;
 
     meta.m_value = m;
@@ -30,10 +34,15 @@ SenderCacheMeta make_current_sender_meta(const string& table_file) {
     meta.num_blocks_value = num_blocks;
     meta.alpha_value = alpha;
     meta.B_prime_value = B_prime;
+    meta.seed_value = seed;
+
     meta.sigma_value = sigma;
     meta.sender_dummy_value = SENDER_DUMMY;
     meta.receiver_dummy_value = RECEIVER_DUMMY;
+    meta.plain_modulus_value = plain_modulus;
+
     meta.table_file = table_file;
+    meta.coeffs_file = coeffs_file;
     meta.created_at = current_time_string();
 
     return meta;
@@ -56,10 +65,15 @@ void save_sender_meta(
     out << "num_blocks=" << meta.num_blocks_value << "\n";
     out << "alpha=" << meta.alpha_value << "\n";
     out << "B_prime=" << meta.B_prime_value << "\n";
+    out << "seed=" << meta.seed_value << "\n";
+
     out << "sigma=" << meta.sigma_value << "\n";
     out << "sender_dummy=" << meta.sender_dummy_value << "\n";
     out << "receiver_dummy=" << meta.receiver_dummy_value << "\n";
+    out << "plain_modulus=" << meta.plain_modulus_value << "\n";
+
     out << "table_file=" << meta.table_file << "\n";
+    out << "coeffs_file=" << meta.coeffs_file << "\n";
     out << "created_at=" << meta.created_at << "\n";
 
     out.close();
@@ -107,20 +121,27 @@ SenderCacheMeta load_sender_meta(
     meta.num_blocks_value = stoi(kv.at("num_blocks"));
     meta.alpha_value = stoi(kv.at("alpha"));
     meta.B_prime_value = stoi(kv.at("B_prime"));
+    meta.seed_value = stoi(kv.at("seed"));
+
     meta.sigma_value = stoull(kv.at("sigma"));
     meta.sender_dummy_value = stoull(kv.at("sender_dummy"));
     meta.receiver_dummy_value = stoull(kv.at("receiver_dummy"));
+    meta.plain_modulus_value = stoull(kv.at("plain_modulus"));
+
     meta.table_file = kv.at("table_file");
+    meta.coeffs_file = kv.at("coeffs_file");
     meta.created_at = kv.at("created_at");
 
     cout << "[meta] sender meta loaded: " << filepath << endl;
     cout << "[meta] cache created_at = " << meta.created_at << endl;
+    cout << "[meta] coeffs_file = " << meta.coeffs_file << endl;
 
     return meta;
 }
 
 void validate_sender_meta(
-    const SenderCacheMeta& meta
+    const SenderCacheMeta& meta,
+    uint64_t current_plain_modulus
 ) {
     if (meta.m_value != m) {
         throw runtime_error("Meta mismatch: m");
@@ -150,6 +171,10 @@ void validate_sender_meta(
         throw runtime_error("Meta mismatch: B_prime");
     }
 
+    if (meta.seed_value != seed) {
+        throw runtime_error("Meta mismatch: seed");
+    }
+
     if (meta.sigma_value != sigma) {
         throw runtime_error("Meta mismatch: sigma");
     }
@@ -160,6 +185,14 @@ void validate_sender_meta(
 
     if (meta.receiver_dummy_value != RECEIVER_DUMMY) {
         throw runtime_error("Meta mismatch: RECEIVER_DUMMY");
+    }
+
+    if (meta.plain_modulus_value != current_plain_modulus) {
+        throw runtime_error("Meta mismatch: plain_modulus");
+    }
+
+    if (meta.coeffs_file.empty()) {
+        throw runtime_error("Meta mismatch: coeffs_file is empty");
     }
 
     cout << "[meta] sender cache metadata validation passed" << endl;
