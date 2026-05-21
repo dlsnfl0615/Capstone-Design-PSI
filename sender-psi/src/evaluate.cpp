@@ -1,5 +1,6 @@
 #include "evaluate.h"
 #include <stdexcept>
+#include <algorithm>
 
 vector<vector<vector<uint64_t>>> SenderEvaluate::partitioning(const vector<vector<uint64_t>> hash_table) {
     
@@ -37,7 +38,7 @@ vector<uint64_t> SenderEvaluate::compute_bin_coeffs(const vector<uint64_t>& root
     }
     
     // 난수 r을 곱하여 최종 계수를 난수화함
-    uint64_t r = random % plain_modulus; 
+    uint64_t r = seed % plain_modulus;
     if (r == 0) r = 1; // 난수가 0이 되는 것을 방지함
 
     for (uint64_t& c : coeffs) {
@@ -49,16 +50,57 @@ vector<uint64_t> SenderEvaluate::compute_bin_coeffs(const vector<uint64_t>& root
 }
 
 vector<vector<vector<uint64_t>>> SenderEvaluate::extract_all_coefficients(
-    const vector<vector<vector<uint64_t>>>& partitions, 
+    const vector<vector<vector<uint64_t>>>& partitions,
     uint64_t plain_modulus) {
-        
+
+    cout << "[debug][coeff] function entered" << endl;
+    cout << "[debug][coeff] alpha = " << alpha
+         << ", B_prime = " << B_prime
+         << ", m = " << m << endl;
+
     vector<vector<vector<uint64_t>>> coeff_tables;
+    coeff_tables.reserve(alpha);
+
+    // 모든 row가 SENDER_DUMMY인 bin의 계수는 항상 같으므로 한 번만 계산
+    vector<uint64_t> dummy_roots(B_prime, SENDER_DUMMY);
+    vector<uint64_t> dummy_coeffs = compute_bin_coeffs(dummy_roots, plain_modulus);
 
     for (int p = 0; p < alpha; p++) {
-        vector<vector<uint64_t>> partition_coeffs(B_prime + 1, vector<uint64_t>(m, 0));
+        cout << "[debug][coeff] partition " << p << " start" << endl;
+
+        vector<vector<uint64_t>> partition_coeffs(
+            B_prime + 1,
+            vector<uint64_t>(m, 0)
+        );
+
+        // 일단 모든 col을 dummy 계수로 채움
+        for (int d = 0; d <= B_prime; d++) {
+            uint64_t default_coeff = dummy_coeffs[B_prime - d];
+            fill(partition_coeffs[d].begin(), partition_coeffs[d].end(), default_coeff);
+        }
+
+        size_t real_col_count = 0;
 
         for (int col = 0; col < m; col++) {
+            bool has_real_value = false;
+
+            for (int row = 0; row < B_prime; row++) {
+                if (partitions[p][row][col] != SENDER_DUMMY) {
+                    has_real_value = true;
+                    break;
+                }
+            }
+
+            // 전부 dummy면 이미 기본 계수로 채웠으므로 계산 생략
+            if (!has_real_value) {
+                continue;
+            }
+
+            real_col_count++;
+
             vector<uint64_t> roots;
+            roots.reserve(B_prime);
+
             for (int row = 0; row < B_prime; row++) {
                 roots.push_back(partitions[p][row][col]);
             }
@@ -66,12 +108,18 @@ vector<vector<vector<uint64_t>>> SenderEvaluate::extract_all_coefficients(
             vector<uint64_t> bin_coeffs = compute_bin_coeffs(roots, plain_modulus);
 
             for (int d = 0; d <= B_prime; d++) {
-                // d차항 계수를 해당 빈(col) 위치에 저장
                 partition_coeffs[d][col] = bin_coeffs[B_prime - d];
             }
         }
-        coeff_tables.push_back(partition_coeffs);
+
+        cout << "[debug][coeff] partition " << p
+             << " end, real cols = " << real_col_count << endl;
+
+        coeff_tables.push_back(move(partition_coeffs));
     }
+
+    cout << "[debug][coeff] function end" << endl;
+
     return coeff_tables;
 }
 
