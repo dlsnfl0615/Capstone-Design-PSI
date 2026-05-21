@@ -120,7 +120,7 @@ vector<vector<vector<uint64_t>>> SenderEvaluate::extract_all_coefficients(
         cout << "[debug][coeff] partition " << p
              << " end, real cols = " << real_col_count << endl;
 
-        #기존 push_back 대신 인덱스 p에 다이렉트로 대입 -> 스레드 안전, 순서 섞이지 x
+        // 기존 push_back 대신 인덱스 p에 다이렉트로 대입 -> 스레드 안전, 순서 섞이지 x
         coeff_tables[p] = move(partition_coeffs);
     }
 
