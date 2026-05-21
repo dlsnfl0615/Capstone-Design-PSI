@@ -69,6 +69,7 @@ vector<vector<vector<uint64_t>>> SenderEvaluate::extract_all_coefficients(
 
     // 파티션 루프 멀티스레드로 분할 처리
     #pragma omp parallel for schedule(dynamic)
+
     for (int p = 0; p < alpha; p++) {
         cout << "[debug][coeff] partition " << p << " start" << endl;
 
