@@ -2,6 +2,7 @@
 #include <chrono>
 #include <exception>
 #include <fstream>
+#include <omp.h> // OpenMP 헤더 추
 
 #include "seal/seal.h"
 
@@ -10,6 +11,7 @@
 #include "evaluate.h"
 #include "cache_io.h"
 #include "metadata.h"
+#include "parameters.h"
 
 using namespace std;
 using namespace seal;
@@ -18,7 +20,10 @@ using Clock = chrono::high_resolution_clock;
 using Ms = chrono::milliseconds;
 
 int main() {
+    omp_set_num_threads(NUM_THREADS);
+    
     cout << "[preprocess] sender preprocessing started" << endl;
+    cout << "[preprocess] acceleration multi-threading enabled: " << NUM_THREADS << " threads" << endl;
 
     auto total_start = Clock::now();
 
