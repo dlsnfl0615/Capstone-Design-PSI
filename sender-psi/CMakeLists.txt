@@ -10,7 +10,7 @@ set(SEAL_DIR "/home/2022111531/local/lib/cmake/SEAL-4.1" CACHE PATH "Path to SEA
 
 # 패키지 찾기
 find_package(SEAL CONFIG REQUIRED)
-find_package(OpenMP)
+find_package(OpenMP REQUIRED)
 find_package(Threads REQUIRED)
 
 # =========================
