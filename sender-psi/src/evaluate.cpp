@@ -1,6 +1,7 @@
 #include "evaluate.h"
 #include <stdexcept>
 #include <algorithm>
+#include <omp.h> // OpenMP 헤더 추가
 
 vector<vector<vector<uint64_t>>> SenderEvaluate::partitioning(
     const vector<vector<uint64_t>>& hash_table
@@ -59,13 +60,15 @@ vector<vector<vector<uint64_t>>> SenderEvaluate::extract_all_coefficients(
          << ", B_prime = " << B_prime
          << ", m = " << m << endl;
 
-    vector<vector<vector<uint64_t>>> coeff_tables;
+    vector<vector<vector<uint64_t>>> coeff_tables(alpha);
     coeff_tables.reserve(alpha);
 
     // 모든 row가 SENDER_DUMMY인 bin의 계수는 항상 같으므로 한 번만 계산
     vector<uint64_t> dummy_roots(B_prime, SENDER_DUMMY);
     vector<uint64_t> dummy_coeffs = compute_bin_coeffs(dummy_roots, plain_modulus);
 
+    // 파티션 루프 멀티스레드로 분할 처리
+    #pragma omp parallel for schedule(dynamic)
     for (int p = 0; p < alpha; p++) {
         cout << "[debug][coeff] partition " << p << " start" << endl;
 
@@ -116,7 +119,8 @@ vector<vector<vector<uint64_t>>> SenderEvaluate::extract_all_coefficients(
         cout << "[debug][coeff] partition " << p
              << " end, real cols = " << real_col_count << endl;
 
-        coeff_tables.push_back(move(partition_coeffs));
+        #기존 push_back 대신 인덱스 p에 다이렉트로 대입 -> 스레드 안전, 순서 섞이지 x
+        coeff_tables[p] = move(partition_coeffs);
     }
 
     cout << "[debug][coeff] function end" << endl;
