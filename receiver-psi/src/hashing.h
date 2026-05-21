@@ -28,15 +28,7 @@ public:
         MurmurHash3_x86_32(&val, sizeof(uint64_t), seeds[func_idx], &out);
         return out;
     }
-    inline uint32_t get_hash(string val) {
-        static const uint32_t seed = 0x4A3C01E2;
-        uint32_t out = 0;
-        MurmurHash3_x86_32(val.data(), static_cast<int>(val.size()), seed, &out);
-
-        return out;
-    }
-    vector<uint32_t> compress(const vector<string> data);
-    void locate(const vector<uint32_t> data);
+    void locate(const vector<string> data);
     vector<RestoredData> restore_original_data();
     void print_hash_table();
 };
