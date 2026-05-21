@@ -38,6 +38,8 @@ add_executable(preprocess_sender
         src/mod.cpp
         src/cache_io.cpp
         src/metadata.cpp
+        src/mod.cpp          
+        src/evaluate.cpp
         external/murmur3.cpp
 )
 
