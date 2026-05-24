@@ -7,7 +7,6 @@ import lombok.Setter;
 @Setter
 public class Time {
     // Phase 1 — request(): C++ 측정
-    private double keygenMs;
     private double hashingMs;
     private double windowingMs;
 

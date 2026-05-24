@@ -1,12 +1,12 @@
 #pragma once
 
 #include <iostream>
-#include <cstdint>
 #include <vector>
 #include <string>
 #include <bitset>
 #include <map>
 #include <cmath>
+#include <cstdint>
 #include "parameters.h"
 #include "murmur3.h"
 
