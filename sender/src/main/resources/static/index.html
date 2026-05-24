@@ -5,10 +5,17 @@
     <title>Bin File Transfer</title>
 </head>
 <body>
+    <button onclick="preprocess()">해싱 전처리</button>
     <button onclick="productPolynomial()">다항식 연산하기</button>
     <button onclick="sendTiming()">수행 시간 보내기</button>
 
 <script>
+    function preprocess() {
+        fetch('/api/preprocess', { method: 'POST' })
+            .then(res => res.text())
+            .then(msg => alert(msg))
+            .catch(err => alert('전송 실패: ' + err));
+    }
     function productPolynomial() {
         fetch('/api/product', { method: 'POST' })
             .then(res => res.text())
