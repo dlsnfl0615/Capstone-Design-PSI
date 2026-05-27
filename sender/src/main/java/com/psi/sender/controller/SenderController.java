@@ -50,7 +50,7 @@ public class SenderController {
             try {
                 // 1. C++ 무거운 다항식 교집합 연산 수행 (여기서 오래 걸려도 브라우저는 영향을 받지 않음)
                 int result = nativeService.intersect(STORAGE_DIR.toString(), SENDER_CSV.toString());
-                System.out.println("[Sender C++] 연산 완료. 반환 코드: " + result);
+                System.out.println("[Sender C++] Operation completed. Return code: " + result);
 
                 // 2. 가공된 result.bin 파일을 receiver로 전송
                 long transferNs = fileTransfer.sendBinFile(STORAGE_DIR.resolve(RESULT));
@@ -62,15 +62,15 @@ public class SenderController {
                     String updated = json.substring(0, json.lastIndexOf('}'))
                             + String.format(",\"transferMs\":%.3f}", transferMs);
                     Files.writeString(CPP_TIMING, updated);
-                    System.out.println("[Sender] 연산 타이밍 데이터 파일 갱신 완료");
+                    System.out.println("[Sender] Operation timing data file update complete");
                 }
 
                 // 4. 연산 타이밍이 저장된 JSON 파일을 receiver 측으로 자동 최종 전송
                 fileTransfer.sendJsonFile(CPP_TIMING);
-                System.out.println("[Sender] 최종 수행 시간 파일 전송 완료");
+                System.out.println("[Sender] Final execution time, file transfer completed");
 
             } catch (Exception e) {
-                System.err.println("[Sender Error] 백그라운드 연산 및 전송 중 에러 발생: " + e.getMessage());
+                System.err.println("[Sender Error] Error occurred during background computation and transmission: " + e.getMessage());
                 e.printStackTrace();
             }
         });

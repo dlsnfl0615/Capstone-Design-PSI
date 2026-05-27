@@ -35,10 +35,10 @@ const uint64_t RECEIVER_DUMMY = (1ULL << sigma);
 const uint64_t SENDER_DUMMY = ((1ULL << (sigma + 1)) - 1);
 // const int q 자동으로 생성됨
 const int l = 1; // 윈도잉 파라미터
-const int alpha = 256; // 파티셔닝 파라미터 8이면 l을 3. 16이면 l을 2. 32면 1
+const int alpha = 256;
 const int seed = 4365234; // 일단 아무거나
 const int B_prime = static_cast<int>(ceil(static_cast<double>(B) / alpha));
-const int NUM_THREADS = 8; // 멀티스레드 개수
+const int NUM_THREADS = 4; // 멀티스레드 개수
 
 // 해시 함수용 log2m 계산
 inline int get_log2_m() {
