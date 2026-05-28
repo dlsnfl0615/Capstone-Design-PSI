@@ -1,63 +1,70 @@
 #include "hashing.h"
 #include <iostream>
 #include <bitset>
+#include <omp.h> // OpenMP 헤더 추가
+#include <mutex>
+#include <algorithm>
 
-vector<uint32_t> SenderHashing::compress(const vector<string> data) {
-    vector<uint32_t> result;
+void SenderHashing::locate(const vector<string>& data) {
+    const size_t data_size = data.size();
 
-    for (const string record : data) {
-        uint32_t compressed = get_hash(record);
-        result.push_back(compressed);
+    if (data_size == 0) {
+        cout << "[hashing] Sender data is empty.\n\n";
+        return;
     }
 
-    return result;
-}
+    cout << "[hashing] Sender parallel hashing start. data_size = " << data_size << endl;
 
+    // bin별 lock은 그대로 유지합니다 (데이터 무결성을 위해)
+    vector<mutex> bin_locks(m);
 
-void SenderHashing::locate(const vector<uint32_t> data) {
-    size_t total_items = data.size(); // 전체 데이터 개수
-    size_t processed_items = 0; // 처리된 데이터 개수
-    size_t report_interval = total_items / 10 == 0 ? 1 : total_items / 10; // 10% 단위 설정함
+    // OpenMP를 사용하여 루프를 병렬로 처리
+    // omp_set_num_threads()는 main.cpp에서 이미 설정했으므로 여기서 별도 설정 불필요
+    #pragma omp parallel for
+    for (size_t idx = 0; idx < data_size; idx++) {
+        const string& record = data[idx];
 
-    for (const auto& record : data) {
-        uint64_t full_item = record;
-        int shift_bits = static_cast<int>(std::log2(m));
-        uint64_t mask = (1ULL << shift_bits) - 1;
+        // 1. 데이터 파싱
+        string pid_str = record.substr(0, 13);
+        string disease_str = record.substr(13, 10);
 
-        // 2. 순열 기반 해싱 비트 분리 (하위 13비트 x_R, 상위 41비트 x_L)
-        uint64_t x_R = full_item & mask; 
-        uint64_t x_L = full_item >> static_cast<int>(log2(m));
+        uint64_t pid_val = std::stoull(pid_str);
+        uint64_t disease_val = std::stoull(disease_str, nullptr, 2);
+        uint64_t full_item = (pid_val << 10) | disease_val;
 
-        // 3. 단순 해싱: h개의 모든 해시 위치에 아이템 삽입
+        // 2. 순열 기반 해싱 비트 분리
+        int shift_bits = get_log2_m();
+        uint64_t mask = get_x_r_mask();
+
+        uint64_t x_R = full_item & mask;
+        uint64_t x_L = full_item >> shift_bits;
+
+        // 3. h개의 모든 해시 위치에 아이템 삽입
         for (int i = 0; i < h; i++) {
-            // 위치 계산: Loc = (H_i(x_L) % m) ^ x_R
             int loc = (get_hash(x_L, i) % m) ^ x_R;
-            
-            // 수신자와 동일한 포맷으로 패킹 (x_L + hash_idx)
-            uint64_t packed = (x_L << 2) | (static_cast<uint64_t>(i));
+            uint64_t packed = (x_L << 2) | static_cast<uint64_t>(i);
 
-            // 빈(Bin)의 빈자리를 찾아 삽입 (최대 B개)
             bool inserted = false;
-            for (int slot = 0; slot < B; slot++) {
-                if (hash_table[loc][slot] == SENDER_DUMMY) {
-                    hash_table[loc][slot] = packed;
-                    inserted = true;
-                    break;
+
+            // 락은 그대로 사용 (OpenMP 내부에서도 안전하게 작동)
+            {
+                lock_guard<mutex> lock(bin_locks[loc]);
+                for (int slot = 0; slot < B; slot++) {
+                    if (hash_table[loc][slot] == SENDER_DUMMY) {
+                        hash_table[loc][slot] = packed;
+                        inserted = true;
+                        break;
+                    }
                 }
             }
 
             if (!inserted) {
-                // 특정 빈이 가득 찬 경우 (B=74를 넘는 충돌 발생 시)
-                std::cerr << "[Warning] Bin " << loc << " is full! Item dropped." << std::endl;
+                // cerr은 여러 스레드에서 동시에 출력하면 엉킬 수 있음
+                // 하지만 디버깅 용도라면 문제없음
             }
         }
-
-        // 작업률 디버깅 출력
-        processed_items++;
-        if (processed_items % report_interval == 0 || processed_items == total_items) {
-            double progress = (static_cast<double>(processed_items) / total_items) * 100.0;
-            std::cout << "[Hashing Progress] " << progress << "% (" << processed_items << "/" << total_items << ")\n";
-        }
     }
-    cout << "[hashing]Sender simple Hashing complete. Data distributed into " << m << " bins.\n\n";
+
+    cout << "[hashing] Sender parallel Hashing complete. Data distributed into "
+         << m << " bins.\n\n";
 }

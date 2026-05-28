@@ -9,20 +9,21 @@ import java.nio.file.Paths;
 
 @Service
 public class NativeService {
-    private static final Path LIB_PATH = Paths.get("src/main/native/build/Release/sender-psi.dll").toAbsolutePath();
-    static {
-        // zstd.dll은 Windows DLL 탐색 경로에 없으므로 sender-psi.dll 로딩 전에 먼저 로드
-        Path zstdPath = Paths.get("src/main/native/build/Release/zstd.dll").toAbsolutePath();
-        System.load(zstdPath.toString());
-        Path zlib1Path = Paths.get("src/main/native/build/Release/zlib1.dll").toAbsolutePath();
-        System.load(zlib1Path.toString());
-    }
+    Path libraryPath = Paths.get("/app/libs/libsender-psi.so");
+
+//    static {
+//        // zstd.dll은 Windows DLL 탐색 경로에 없으므로 sender-psi.dll 로딩 전에 먼저 로드
+//        Path zstdPath = Paths.get("src/main/native/build/Release/zstd.dll").toAbsolutePath();
+//        System.load(zstdPath.toString());
+//        Path zlib1Path = Paths.get("src/main/native/build/Release/zlib1.dll").toAbsolutePath();
+//        System.load(zlib1Path.toString());
+//    }
 
     public int callNative(String functionName, String storageDir, String senderCsv) {
         System.out.println("callNative: " + functionName + " storageDir=" + storageDir + " senderCsv=" + senderCsv);
 
         try (Arena arena = Arena.ofConfined()) {
-            SymbolLookup lookup = SymbolLookup.libraryLookup(LIB_PATH, arena);
+            SymbolLookup lookup = SymbolLookup.libraryLookup(libraryPath, arena);
             Linker linker = Linker.nativeLinker();
 
             MemorySegment funcSegment = lookup.find(functionName)
@@ -44,5 +45,9 @@ public class NativeService {
 
     public int intersect(String storageDir, String senderCsv) {
         return callNative("intersect", storageDir, senderCsv);
+    }
+
+    public int hashing(String storageDir, String senderCsv) {
+        return callNative("preprocess", storageDir, senderCsv);
     }
 }

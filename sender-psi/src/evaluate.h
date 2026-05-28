@@ -13,7 +13,7 @@ using namespace seal;
 class SenderEvaluate {
 public:
     vector<vector<vector<uint64_t>>> partitioning(
-        const vector<vector<uint64_t>> hash_table
+        const vector<vector<uint64_t>>& hash_table
     );
 
     vector<vector<vector<uint64_t>>> get_coeffs(
@@ -64,8 +64,8 @@ public:
     //   partition 1, block 1
     //   ...
     vector<Ciphertext> product(
-        const map<int, vector<Ciphertext>> all_powers,
-        const vector<vector<vector<uint64_t>>> coeffs,
+        const map<int, vector<Ciphertext>>& all_powers,
+        const vector<vector<vector<uint64_t>>>& coeffs,
         BatchEncoder& batch_encoder,
         Evaluator& evaluator,
         SEALContext& context

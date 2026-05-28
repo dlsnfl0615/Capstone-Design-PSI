@@ -3,10 +3,7 @@ package com.psi.sender.controller;
 import com.psi.sender.service.FileTransfer;
 import com.psi.sender.service.NativeService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestPart;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -14,15 +11,17 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 @RestController
 @RequestMapping("/api")
 @RequiredArgsConstructor
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 public class SenderController {
     private static final Path STORAGE_DIR = Paths.get("storage").toAbsolutePath();
     private static final Path RESULT = Paths.get("storage/result.bin").toAbsolutePath();
-    private static final Path CPP_TIMING = Paths.get("storage/cpp_timing.json").toAbsolutePath();
-    private static final Path SENDER_CSV = Paths.get("storage/sender_2^24.csv").toAbsolutePath();
+    private static final Path CPP_TIMING = Paths.get("storage/sender_timing.json").toAbsolutePath();
+    private static final Path SENDER_CSV = Paths.get("storage/B_sender_50M.csv").toAbsolutePath();
     private final NativeService nativeService;
     private final FileTransfer fileTransfer;
 
@@ -43,16 +42,46 @@ public class SenderController {
     }
 
     @PostMapping("/product")
-    public String product() throws IOException {
-        int result = nativeService.intersect(STORAGE_DIR.toString(), SENDER_CSV.toString());
+    public String product() {
+        System.out.println("[Sender] 다항식 연산 요청 접수됨. 백그라운드 연산 시작...");
 
-        long transferNs = fileTransfer.sendBinFile(STORAGE_DIR.resolve(RESULT));
-        double transferMs = transferNs / 1000000.0;
+        // 비동기 스레드를 생성하여 367초 동안 걸리는 C++ 연산과 전송을 백그라운드에서 실행
+        CompletableFuture.runAsync(() -> {
+            try {
+                // 1. C++ 무거운 다항식 교집합 연산 수행 (여기서 오래 걸려도 브라우저는 영향을 받지 않음)
+                int result = nativeService.intersect(STORAGE_DIR.toString(), SENDER_CSV.toString());
+                System.out.println("[Sender C++] Operation completed. Return code: " + result);
 
-        String json = Files.readString(CPP_TIMING);
-        String updated = json.substring(0, json.lastIndexOf('}'))
-                + String.format(",\"transferMs\":%.3f}", transferMs);
-        Files.writeString(CPP_TIMING, updated);
+                // 2. 가공된 result.bin 파일을 receiver로 전송
+                long transferNs = fileTransfer.sendBinFile(STORAGE_DIR.resolve(RESULT));
+                double transferMs = transferNs / 1000000.0;
+
+                // 3. cpp_timing.json 읽기 및 transferMs 추가 저장
+                if (Files.exists(CPP_TIMING)) {
+                    String json = Files.readString(CPP_TIMING).trim();
+                    String updated = json.substring(0, json.lastIndexOf('}'))
+                            + String.format(",\"transferMs\":%.3f}", transferMs);
+                    Files.writeString(CPP_TIMING, updated);
+                    System.out.println("[Sender] Operation timing data file update complete");
+                }
+
+                // 4. 연산 타이밍이 저장된 JSON 파일을 receiver 측으로 자동 최종 전송
+                fileTransfer.sendJsonFile(CPP_TIMING);
+                System.out.println("[Sender] Final execution time, file transfer completed");
+
+            } catch (Exception e) {
+                System.err.println("[Sender Error] Error occurred during background computation and transmission: " + e.getMessage());
+                e.printStackTrace();
+            }
+        });
+
+        // 백그라운드 스레드가 돌아가는 것과 관계없이, 요청을 보낸 브라우저에는 즉시 접수 메시지를 반환함
+        return "다항식 연산 및 전송 요청이 백그라운드에서 정상적으로 접수되었습니다. (약 6~7분 소요)";
+    }
+
+    @PostMapping("/preprocess")
+    public String preprocess() throws IOException {
+        int result = nativeService.hashing(STORAGE_DIR.toString(), SENDER_CSV.toString());
 
         return "교집합 연산 완료. 반환 코드: " + result;
     }

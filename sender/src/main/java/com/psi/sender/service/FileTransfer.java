@@ -15,7 +15,7 @@ import java.nio.file.Path;
 
 @Service
 public class FileTransfer {
-    private static final String SENDER_URL = "http://localhost:8080";
+    private static final String SENDER_URL = "http://43.201.96.126:8080";
     private final WebClient webClient;
 
     public FileTransfer() {
@@ -54,7 +54,7 @@ public class FileTransfer {
 
     public void sendJsonFile(Path filePath) {
         webClient.post()
-                .uri("api/files/sender-timing")
+                .uri("/api/files/sender-timing")
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(BodyInserters.fromResource(new FileSystemResource(filePath))) // 리소스 삽입함
                 .retrieve()
