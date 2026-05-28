@@ -73,20 +73,15 @@ int main() {
 
         print_time("Save sender_table.bin", t_save_table);
 
-        // 4. parms.bin 로드해서 plain_modulus 가져오기
+        // 4. sender가 receiver와 같은 방식으로 SEAL parms를 직접 생성해서 plain_modulus 가져오기
         auto t_seal = Clock::now();
 
-        cout << "[preprocess] loading SEAL parms: " << parms_path << endl;
+        cout << "[preprocess] creating local SEAL parms for plain_modulus" << endl;
 
-        EncryptionParameters parms;
-        ifstream parms_in(parms_path, ios::binary);
-
-        if (!parms_in.is_open()) {
-            throw runtime_error("Failed to open parms.bin: " + parms_path);
-        }
-
-        parms.load(parms_in);
-        parms_in.close();
+        EncryptionParameters parms(scheme_type::bfv);
+        parms.set_poly_modulus_degree(n);
+        parms.set_coeff_modulus(CoeffModulus::BFVDefault(n));
+        parms.set_plain_modulus(PlainModulus::Batching(n, t));
 
         SEALContext context(parms);
 
@@ -96,7 +91,7 @@ int main() {
         cout << "[preprocess] plain_modulus = "
              << plain_modulus << endl;
 
-        print_time("Load SEAL parms", t_seal);
+        print_time("Create local SEAL parms", t_seal);
 
         // 5. partitioning
         auto t_partitioning = Clock::now();
