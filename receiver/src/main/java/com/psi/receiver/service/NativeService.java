@@ -34,7 +34,7 @@ public class NativeService {
 
             return (int) handle.invokeExact(storageDirSeg, receiverCsvSeg);
         } catch (Throwable e) {
-            throw new RuntimeException("네이티브 함수 실행 실패: " + functionName, e);
+            throw new RuntimeException("Native Function Execution Failed: " + functionName, e);
         }
     }
 

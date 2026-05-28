@@ -14,7 +14,7 @@ import java.util.List;
 
 @Service
 public class BinFileTransfer {
-    private static final String SENDER_URL = "http://15.165.205.187:8081";
+    private static final String SENDER_URL = "http://43.202.123.98:8081";
     private final WebClient webClient;
 
     public BinFileTransfer() {
