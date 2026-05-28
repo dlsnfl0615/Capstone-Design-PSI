@@ -17,32 +17,32 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api")
 @RequiredArgsConstructor
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 public class ReceiverController {
     private final NativeService nativeService;
     private final BinFileTransfer binFileTransfer;
     private final Time time = new Time();
 
-    private static final Path PUBLIC_KEY  = Paths.get("storage/public_key.bin").toAbsolutePath();
-    private static final Path POWERS      = Paths.get("storage/powers.bin").toAbsolutePath();
-    private static final Path PARMS       = Paths.get("storage/parms.bin").toAbsolutePath();
-    private static final Path HASH_TABLE  = Paths.get("storage/receiver_hash.bin").toAbsolutePath();
-    private static final Path RELIN_KEY   = Paths.get("storage/relin_key.bin").toAbsolutePath();
-    private static final Path SECRET_KEY  = Paths.get("storage/secret_key.bin").toAbsolutePath();
-    private static final Path STORAGE_DIR       = Paths.get("storage").toAbsolutePath();
-    private static final Path RECEIVER_CSV      = Paths.get("storage/receiver_5535.csv").toAbsolutePath();
-    private static final Path TIMING_JSON       = Paths.get("storage/timing.json").toAbsolutePath();
+    private static final Path PUBLIC_KEY = Paths.get("storage/public_key.bin").toAbsolutePath();
+    private static final Path POWERS = Paths.get("storage/powers.bin").toAbsolutePath();
+    private static final Path PARMS = Paths.get("storage/parms.bin").toAbsolutePath();
+    private static final Path HASH_TABLE = Paths.get("storage/receiver_hash.bin").toAbsolutePath();
+    private static final Path RELIN_KEY = Paths.get("storage/relin_key.bin").toAbsolutePath();
+    private static final Path SECRET_KEY = Paths.get("storage/secret_key.bin").toAbsolutePath();
+    private static final Path STORAGE_DIR = Paths.get("storage").toAbsolutePath();
+    private static final Path RECEIVER_CSV = Paths.get("storage/B_receiver_5300.csv").toAbsolutePath();
+    private static final Path TIMING_JSON = Paths.get("storage/timing.json").toAbsolutePath();
     private static final Path SENDER_TIMING_JSON = Paths.get("storage/sender_timing.json").toAbsolutePath();
 
     /** Phase 1: 암호화 요청 생성 (keygen + hashing + windowing) */
     @PostMapping("/process")
     public String request() {
         Map<String, Double> t = nativeService.request(STORAGE_DIR.toString(), RECEIVER_CSV.toString());
-        time.setKeygenMs(t.get("keygenMs"));
         time.setHashingMs(t.get("hashingMs"));
         time.setWindowingMs(t.get("windowingMs"));
-        System.out.println("keygen: " + time.getKeygenMs() + ", hashing: " + time.getHashingMs() + ", windowing: " + time.getWindowingMs());
-        return String.format("request 완료 (keygen=%.1fms, hashing=%.1fms, windowing=%.1fms)",
-                time.getKeygenMs(), time.getHashingMs(), time.getWindowingMs());
+        System.out.println("hashing: " + time.getHashingMs() + ", windowing: " + time.getWindowingMs());
+        return String.format("request 완료 (hashing=%.1fms, windowing=%.1fms)",
+                time.getHashingMs(), time.getWindowingMs());
     }
 
     /** Phase 2: Sender로 bin 파일 전송 */
@@ -100,7 +100,6 @@ public class ReceiverController {
                 "{%n" +
                 "  \"receiver\": {%n" +
                 "    \"phase1_request\": {%n" +
-                "      \"keygenMs\": %.3f,%n" +
                 "      \"hashingMs\": %.3f,%n" +
                 "      \"windowingMs\": %.3f%n" +
                 "    },%n" +
@@ -115,7 +114,7 @@ public class ReceiverController {
                 "  },%n" +
                 "  \"sender\": %s%n" +
                 "}",
-                time.getKeygenMs(), time.getHashingMs(), time.getWindowingMs(),
+                time.getHashingMs(), time.getWindowingMs(),
                 time.getTransferMs(),
                 time.getLoadMs(), time.getDecryptMs(), time.getIntersectMs(),
                 senderJson

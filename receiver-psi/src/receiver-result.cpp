@@ -16,9 +16,8 @@ using Ms = chrono::milliseconds;
 
 int main() {
     cout << "[load] SEAL objects loading..";
-
     // receiver 원본 데이터 다시 로드
-    auto receiver_data = load_receiver("data/B_receiver_5300.csv");
+    auto receiver_data = load_receiver("../data/receiver.csv");
 
     // parms 로드
     EncryptionParameters parms;
@@ -73,39 +72,37 @@ int main() {
     BatchEncoder batch_encoder(context);
 
     // sender가 보내준 다항식 연산 결과 로드
+    // sender가 보내준 다항식 연산 결과 로드
     vector<Ciphertext> producted;
-    ifstream res_in("data/result.bin", ios::binary);
-    if (res_in.is_open()) {
-        size_t result_size;
-        res_in.read(reinterpret_cast<char*>(&result_size), sizeof(size_t));
+    ifstream res_in("../data/result.bin", ios::binary);
 
-        for (size_t i = 0; i < result_size; i++) {
-            Ciphertext ct;
-            ct.load(context, res_in);
-            producted.push_back(move(ct));
-        }
-        res_in.close();
+    if (!res_in.is_open()) {
+        cerr << "Error: result.bin 파일을 찾을 수 없습니다: ../data/result.bin" << endl;
+        return 1;
     }
+
+    size_t result_size;
+    res_in.read(reinterpret_cast<char*>(&result_size), sizeof(size_t));
+
+    cout << "[load] result_size: " << result_size << endl;
+
+    for (size_t i = 0; i < result_size; i++) {
+        Ciphertext ct;
+        ct.load(context, res_in);
+        producted.push_back(move(ct));
+    }
+
+    res_in.close();
     cout << "completed.\n\n";
 
     cout << "Final intersection checking..";
 
-    // 교집합 결과 확인
-    // 복호화된 교집합 패킹 값들을 저장할 셋 (중복 제거)
-    set<uint64_t> intersection_packed_values;
+    set<uint64_t> intersection_packed_values;           // 디버깅용
+    set<pair<int, uint64_t>> intersection_candidates;   // 최종 판정용
 
     int count = 0;
 
-    // sender product()의 결과 순서가 다음과 같다고 가정:
-    //   partition 0, block 0
-    //   partition 0, block 1
-    //   partition 1, block 0
-    //   partition 1, block 1
-    //   ...
-    //
-    // 따라서 idx % num_blocks로 block_idx를 복원할 수 있음.
     for (size_t idx = 0; idx < producted.size(); idx++) {
-
         int block_idx = static_cast<int>(idx % num_blocks);
 
         Plaintext plain_result;
@@ -114,68 +111,60 @@ int main() {
         vector<uint64_t> decoded_slots;
         batch_encoder.decode(plain_result, decoded_slots);
 
-        // ciphertext 하나에는 n개 slot만 들어 있음.
-        // 따라서 여기서는 m까지 돌면 안 되고 n까지만 돌아야 함.
         for (int slot = 0; slot < n; slot++) {
-
-            // block 내부 slot 번호를 전체 receiver hash table의 bin 번호로 복원
-            //
-            // 예:
-            // block 0, slot 10 -> global_bin 10
-            // block 1, slot 10 -> global_bin 16384 + 10
             int global_bin = block_idx * n + slot;
 
-            // 마지막 block에서 실제 bin이 없는 slot은 무시
             if (global_bin >= m) {
                 continue;
             }
 
-            // 수학적으로 P(y) = 0이면 해당 receiver 값이
-            // sender 다항식의 root 중 하나라는 뜻이므로 교집합 후보임.
+            if (global_bin >= static_cast<int>(hash_table.size())) {
+                continue;
+            }
+
             if (decoded_slots[slot] == 0) {
                 uint64_t packed_val = hash_table[global_bin];
                 count++;
 
-                // dummy가 아닌 실제 receiver 값만 결과 후보에 넣음.
                 if (packed_val != RECEIVER_DUMMY) {
                     intersection_packed_values.insert(packed_val);
+                    intersection_candidates.insert({global_bin, packed_val});
                 }
             }
         }
     }
-
-
     cout << "completed.\n\n";
-    
+
     cout << "count: " << count << endl;
 
     // [receiver result] 원본 데이터와 대조하여 어떤 데이터가 교집합인지
     ofstream intersection_out("../data/intersections.csv");
     int found_count = 0;
-    ReceiverHashing receiver_hashing;
-    cout << "Receiver: Intersection Results is saved in \"intersections.csv\"" << endl;
-    
-    size_t total_records = receiver_data.size(); // 전체 데이터 개수
-    size_t processed_records = 0; // 처리된 데이터 개수
-    size_t report_interval = total_records / 10 == 0 ? 1 : total_records / 10; // 10% 단위 설정함
-    int shift_bits = static_cast<int>(std::log2(m)); // m 기반 시프트 비트 계산함
 
+    ReceiverHashing receiver_hashing;
+
+    cout << "Receiver: Intersection Results is saved in \"intersections.csv\"" << endl;
     for (const auto& record : receiver_data) {
-        // csv 저장을 위해 원본 문자열에서 pid와 질병코드를 분리함
+        // 원본 레코드를 다시 패킹하여 비교 대상으로 만듦 (hashing 로직과 동일해야 함)
         string pid_str = record.substr(0, 13);
         string disease_str = record.substr(13, 10);
+        uint64_t pid_val = std::stoull(pid_str);
+        uint64_t disease_val = std::stoull(disease_str, nullptr, 2);
+        uint64_t full_item = (pid_val << 10) | disease_val;
 
-        // [핵심] compress 함수와 동일하게 원본 문자열 전체를 32비트 MurmurHash로 해싱함
-        uint32_t hashed_item = receiver_hashing.get_hash(record);
+        int shift_bits = get_log2_m();
+        uint64_t mask = get_x_r_mask();
 
-        // 32비트 해싱 결과물에서 상위 비트 분리함 (locate 함수의 x_L 분리 로직과 일치)
-        uint64_t x_L = hashed_item >> shift_bits;
+        uint64_t x_R = full_item & mask;
+        uint64_t x_L = full_item >> shift_bits;
 
         bool is_intersected = false;
-        // h개의 가능한 해시 인덱스 중 하나라도 셋에 존재하면 교집합임
+
         for (int i = 0; i < h; i++) {
-            uint64_t packed = (x_L << 2) | (static_cast<uint64_t>(i));
-            if (intersection_packed_values.count(packed)) {
+            int loc = static_cast<int>((receiver_hashing.get_hash(x_L, i) % m) ^ x_R);
+            uint64_t packed = (x_L << 2) | static_cast<uint64_t>(i);
+
+            if (intersection_candidates.count({loc, packed})) {
                 is_intersected = true;
                 break;
             }
@@ -185,14 +174,7 @@ int main() {
             intersection_out << pid_str << "," << disease_str << endl;
             found_count++;
         }
-
-        // 작업률 디버깅 출력함
-        processed_records++;
-        if (processed_records % report_interval == 0 || processed_records == total_records) {
-            double progress = (static_cast<double>(processed_records) / total_records) * 100.0;
-            std::cout << "[Intersection Progress] " << progress << "% (" << processed_records << "/" << total_records << ")\n";
-        }
     }
-    
+
     return 0;
 }

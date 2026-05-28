@@ -13,21 +13,12 @@ import java.util.Map;
 
 @Service
 public class NativeService {
-    private static final Path LIB_PATH =
-            Paths.get("src/main/native/build/Release/receiver-psi.dll").toAbsolutePath();
-
-    static {
-        // zstd.dll은 Windows DLL 탐색 경로에 없으므로 sender-psi.dll 로딩 전에 먼저 로드
-        Path zstdPath = Paths.get("src/main/native/build/Release/zstd.dll").toAbsolutePath();
-        System.load(zstdPath.toString());
-        Path zlib1Path = Paths.get("src/main/native/build/Release/zlib1.dll").toAbsolutePath();
-        System.load(zlib1Path.toString());
-    }
+    Path libraryPath = Paths.get("/app/libs/libreceiver-psi.so");
 
     private int callNative(String functionName, String storageDir, String receiverCsv) {
         System.out.println("callNative: " + functionName + " storageDir=" + storageDir + " receiverCsv=" + receiverCsv);
         try (Arena arena = Arena.ofConfined()) {
-            SymbolLookup lookup = SymbolLookup.libraryLookup(LIB_PATH, arena);
+            SymbolLookup lookup = SymbolLookup.libraryLookup(libraryPath, arena);
             Linker linker = Linker.nativeLinker();
 
             MemorySegment funcSegment = lookup.find(functionName)
