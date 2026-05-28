@@ -15,7 +15,7 @@ import java.nio.file.Path;
 
 @Service
 public class FileTransfer {
-    private static final String SENDER_URL = "http://43.201.96.126:8080";
+    private static final String SENDER_URL = "http://3.34.152.64:8080";
     private final WebClient webClient;
 
     public FileTransfer() {
