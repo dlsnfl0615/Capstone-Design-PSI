@@ -1,10 +1,6 @@
 #include <iostream>
-#include <vector>
-#include <map>
-#include <set>
-#include <cstdint>
 #include <chrono>
-#include <iomanip>
+#include <exception>
 #include <fstream>
 #include <omp.h> // OpenMP 헤더 추
 
@@ -23,172 +19,140 @@ using namespace seal;
 using Clock = chrono::high_resolution_clock;
 using Ms = chrono::milliseconds;
 
-extern "C" {
-
-#ifdef _WIN32
-__declspec(dllexport) // 윈도우 환경 DLL 내보내기
-#endif
-
-int preprocess(const char* storage, const char* sender_csv) {
-    try {
+int main() {
     omp_set_num_threads(NUM_THREADS);
+    
+    cout << "[preprocess] sender preprocessing started" << endl;
+    cout << "[preprocess] acceleration multi-threading enabled: " << NUM_THREADS << " threads" << endl;
 
-    auto print_time = [](const string& label, Clock::time_point start, Clock::time_point end) {
-        auto elapsed = chrono::duration_cast<Ms>(end - start).count();
+    auto total_start = Clock::now();
+
+    auto print_time = [](const string& label, Clock::time_point start) {
+        auto elapsed = chrono::duration_cast<Ms>(Clock::now() - start).count();
         cout << "[time] " << label << ": "
              << elapsed << " ms"
              << " (" << elapsed / 1000.0 << " sec)"
              << endl;
     };
-    
-    cout << "[preprocess] sender preprocessing started" << endl;
-    cout << "[preprocess] acceleration multi-threading enabled: " << NUM_THREADS << " threads" << endl;
 
-    string storage_dir(storage);
+    try {
+        // 경로 설정
+        string sender_csv_path = "../data/sender.csv";
+        string parms_path = "../data/parms.bin";
 
-    auto total_start = Clock::now();
+        string table_bin_path = "../data/sender_table.bin";
+        string coeffs_bin_path = "../data/sender_coeffs.bin";
+        string meta_path = "../data/sender_meta.txt";
 
-    string parms_path = storage_dir + "/parms.bin";
+        // 1. sender.csv 로드
+        auto t_load = Clock::now();
 
-    string table_bin_path = storage_dir + "/sender_table.bin";
-    string coeffs_bin_path = storage_dir + "/sender_coeffs.bin";
-    string meta_path = storage_dir + "/sender_meta.txt";
+        cout << "[preprocess] loading sender csv: " << sender_csv_path << endl;
 
-    // 1. sender.csv 로드
-    auto t_load_start = Clock::now();
+        auto sender_data = load_sender(sender_csv_path);
 
-    cout << "[preprocess] loading sender csv: " << sender_csv << endl;
+        cout << "[preprocess] sender data size = "
+             << sender_data.size() << endl;
 
-    auto sender_data = load_sender(sender_csv);
+        print_time("Sender csv loading", t_load);
 
-    cout << "[preprocess] sender data size = "
-         << sender_data.size() << endl;
+        // 2. Sender hashing
+        auto t_hash = Clock::now();
 
-    auto t_load_end = Clock::now();
-    print_time("Sender csv loading", t_load_start, t_load_end);
+        cout << "[preprocess] building sender hash table" << endl;
 
-    // 2. Sender hashing
-    auto t_hash_start = Clock::now();
+        SenderHashing sender_hashing;
+        sender_hashing.locate(sender_data);
 
-    cout << "[preprocess] building sender hash table" << endl;
+        print_time("Sender hashing", t_hash);
 
-    SenderHashing sender_hashing;
-    sender_hashing.locate(sender_data);
+        // 3. sender_table.bin 저장
+        auto t_save_table = Clock::now();
 
-    auto t_hash_end = Clock::now();
-    print_time("Sender hashing", t_hash_start, t_hash_end);
+        save_hash_table_bin(sender_hashing.hash_table, table_bin_path);
 
-    // 3. sender_table.bin 저장
-    auto t_save_table_start = Clock::now();
+        print_time("Save sender_table.bin", t_save_table);
 
-    save_hash_table_bin(sender_hashing.hash_table, table_bin_path);
+        // 4. sender가 receiver와 같은 방식으로 SEAL parms를 직접 생성해서 plain_modulus 가져오기
+        auto t_seal = Clock::now();
 
-    auto t_save_table_end = Clock::now();
-    print_time("Save sender_table.bin", t_save_table_start, t_save_table_end);
+        cout << "[preprocess] creating local SEAL parms for plain_modulus" << endl;
 
-    // 4. parms.bin 로드해서 plain_modulus 가져오기
-    auto t_seal_start = Clock::now();
+        EncryptionParameters parms(scheme_type::bfv);
+        parms.set_poly_modulus_degree(n);
+        parms.set_coeff_modulus(CoeffModulus::BFVDefault(n));
+        parms.set_plain_modulus(PlainModulus::Batching(n, t));
 
-    cout << "[preprocess] loading SEAL parms: " << parms_path << endl;
+        SEALContext context(parms);
 
-    EncryptionParameters parms;
-    ifstream parms_in(parms_path, ios::binary);
+        uint64_t plain_modulus =
+            context.first_context_data()->parms().plain_modulus().value();
 
-    if (!parms_in.is_open()) {
-        throw runtime_error("Failed to open parms.bin: " + parms_path);
-    }
+        cout << "[preprocess] plain_modulus = "
+             << plain_modulus << endl;
 
-    parms.load(parms_in);
-    parms_in.close();
+        print_time("Create local SEAL parms", t_seal);
 
-    SEALContext context(parms);
+        // 5. partitioning
+        auto t_partitioning = Clock::now();
 
-    uint64_t plain_modulus =
-        context.first_context_data()->parms().plain_modulus().value();
+        cout << "[preprocess] partitioning sender hash table" << endl;
 
-    cout << "[preprocess] plain_modulus = "
-         << plain_modulus << endl;
+        SenderEvaluate sender_evaluator;
 
-    auto t_seal_end = Clock::now();
-    print_time("Load SEAL parms", t_seal_start, t_seal_end);
+        auto partitioned =
+            sender_evaluator.partitioning(sender_hashing.hash_table);
 
-    // 5. partitioning
-    auto t_partitioning_start = Clock::now();
+        cout << "[preprocess] partitioned size = "
+             << partitioned.size() << endl;
 
-    cout << "[preprocess] partitioning sender hash table" << endl;
+        print_time("Partitioning", t_partitioning);
 
-    SenderEvaluate sender_evaluator;
+        // 6. coefficient extraction
+        auto t_coefficients = Clock::now();
 
-    auto partitioned =
-        sender_evaluator.partitioning(sender_hashing.hash_table);
+        cout << "[preprocess] extracting coefficients" << endl;
 
-    cout << "[preprocess] partitioned size = "
-         << partitioned.size() << endl;
+        auto coeffs =
+            sender_evaluator.extract_all_coefficients(
+                partitioned,
+                plain_modulus
+            );
 
-    auto t_partitioning_end = Clock::now();
-    print_time("Partitioning", t_partitioning_start, t_partitioning_end);
+        cout << "[preprocess] coeffs size = "
+             << coeffs.size() << endl;
 
-    // 6. coefficient extraction
-    auto t_coefficients_start = Clock::now();
+        print_time("Coefficient extraction", t_coefficients);
 
-    cout << "[preprocess] extracting coefficients" << endl;
+        // 7. sender_coeffs.bin 저장
+        auto t_save_coeffs = Clock::now();
 
-    auto coeffs =
-        sender_evaluator.extract_all_coefficients(
-            partitioned,
+        save_coeffs_bin(coeffs, coeffs_bin_path);
+
+        print_time("Save sender_coeffs.bin", t_save_coeffs);
+
+        // 8. metadata 저장
+        auto t_save_meta = Clock::now();
+
+        SenderCacheMeta meta = make_current_sender_meta(
+            "sender_table.bin",
+            "sender_coeffs.bin",
             plain_modulus
         );
 
-    cout << "[preprocess] coeffs size = "
-         << coeffs.size() << endl;
+        save_sender_meta(meta, meta_path);
 
-    auto t_coefficients_end = Clock::now();
-    print_time("Coefficient extraction", t_coefficients_start, t_coefficients_end);
-
-    // 7. sender_coeffs.bin 저장
-
-    save_coeffs_bin(coeffs, coeffs_bin_path);
-
-    // 8. metadata 저장
-
-    SenderCacheMeta meta = make_current_sender_meta(
-        "sender_table.bin",
-        "sender_coeffs.bin",
-        plain_modulus
-    );
-
-    save_sender_meta(meta, meta_path);
-
-    auto total_end = Clock::now();
-    print_time("TOTAL sender preprocessing runtime", total_start, total_end);
-
-    double loadMs = chrono::duration<double, milli>(t_load_end - t_load_start).count();
-    double hashMs = chrono::duration<double, milli>(t_hash_end - t_hash_start).count();
-    double tableMs = chrono::duration<double, milli>(t_save_table_end - t_save_table_start).count();
-    double sealMs = chrono::duration<double, milli>(t_seal_end - t_seal_start).count();
-    double partitioningMs = chrono::duration<double, milli>(t_partitioning_end - t_partitioning_start).count();
-    double coeffsMs = chrono::duration<double, milli>(t_coefficients_end - t_coefficients_start).count();
-    double totalMs = chrono::duration<double, milli>(total_end - total_start).count();
-
-    ofstream timing_out(storage_dir + "/sender_timing.json");
-    timing_out << fixed << setprecision(3)
-               << "{\"loadMs\":" << loadMs
-               << ",\"hashMs\":" << hashMs
-               << ",\"tableMs\":" << tableMs
-               << ",\"sealMs\":" << sealMs
-               << ",\"partitioningMs\":" << partitioningMs
-               << ",\"coeffsMs\":" << coeffsMs
-               << ",\"totalMs\":" << totalMs << "}\n";
-    timing_out.close();
-
-    cout << "[preprocess] sender preprocessing completed" << endl;
-
-    return 0;
+        print_time("Save sender_meta.txt", t_save_meta);
 
     } catch (const exception& e) {
         cerr << "[error] sender preprocessing failed: "
              << e.what() << endl;
         return 1;
     }
-}
+
+    print_time("TOTAL sender preprocessing runtime", total_start);
+
+    cout << "[preprocess] sender preprocessing completed" << endl;
+
+    return 0;
 }
