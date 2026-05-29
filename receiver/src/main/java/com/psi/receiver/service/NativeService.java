@@ -22,7 +22,7 @@ public class NativeService {
             Linker linker = Linker.nativeLinker();
 
             MemorySegment funcSegment = lookup.find(functionName)
-                    .orElseThrow(() -> new RuntimeException("함수 탐색 실패: " + functionName));
+                    .orElseThrow(() -> new RuntimeException("Native function search failed: " + functionName));
 
             MethodHandle handle = linker.downcallHandle(
                     funcSegment,
@@ -56,14 +56,14 @@ public class NativeService {
             }
             return map;
         } catch (IOException e) {
-            throw new RuntimeException("cpp_timing.json 읽기 실패", e);
+            throw new RuntimeException("cpp_timing.json read failed", e);
         }
     }
 
     public Map<String, Double> request(String storageDir, String receiverCsvPath) {
         int code = callNative("request", storageDir, receiverCsvPath);
         if (code != 0) {
-            throw new RuntimeException("request() 실패 (반환값: " + code + ")");
+            throw new RuntimeException("request() failed (return code: " + code + ")");
         }
         return readCppTiming(storageDir);
     }
@@ -71,7 +71,7 @@ public class NativeService {
     public Map<String, Double> result(String storageDir, String receiverCsvPath) {
         int code = callNative("result", storageDir, receiverCsvPath);
         if (code != 0) {
-            throw new RuntimeException("result() 실패 (반환값: " + code + ")");
+            throw new RuntimeException("result() failed (return code: " + code + ")");
         }
         return readCppTiming(storageDir);
     }

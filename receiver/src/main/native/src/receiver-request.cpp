@@ -104,7 +104,7 @@ int request(const char* storage, const char* csv) {
     ofstream ofs(storage_dir + "/powers.bin", ios::binary);
 
     if (!ofs.is_open()) {
-        cerr << "Error: storage/powers.bin 저장 경로를 열 수 없습니다." << endl;
+        cerr << "Error: Can't open storage/powers.bin" << endl;
         return 1;
     }
 

@@ -37,7 +37,7 @@ int result(const char* storage, const char* csv) {
     EncryptionParameters parms;
     ifstream parms_in(storage_dir + "/parms.bin", ios::binary);
     if (!parms_in.is_open()) {
-        cerr << "Error: parms.bin 파일을 찾을 수 없습니다." << endl;
+        cerr << "Error: Can't find parms.bin" << endl;
         return 1;
     }
     parms.load(parms_in);
@@ -90,7 +90,7 @@ int result(const char* storage, const char* csv) {
     ifstream res_in(storage_dir + "/result.bin", ios::binary);
 
     if (!res_in.is_open()) {
-        cerr << "Error: result.bin 파일을 찾을 수 없습니다: storage/result.bin" << endl;
+        cerr << "Error: Can't find result.bin: storage/result.bin" << endl;
         return 1;
     }
 

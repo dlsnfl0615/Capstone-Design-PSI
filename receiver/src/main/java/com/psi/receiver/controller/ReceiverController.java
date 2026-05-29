@@ -60,7 +60,7 @@ public class ReceiverController {
         Files.createDirectories(STORAGE_DIR);
         String filename = binFile.getOriginalFilename();
         if (filename == null || filename.isBlank()) {
-            throw new IllegalArgumentException("파일 이름이 없습니다.");
+            throw new IllegalArgumentException("No such file name.");
         }
         Path dest = STORAGE_DIR.resolve(Paths.get(filename).getFileName());
         Files.write(dest, binFile.getBytes());
