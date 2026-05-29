@@ -32,7 +32,7 @@ public class SenderController {
         for (MultipartFile file : binFiles) {
             String filename = file.getOriginalFilename();
             if (filename == null || filename.isBlank()) {
-                throw new IllegalArgumentException("파일 이름이 없습니다.");
+                throw new IllegalArgumentException("No such file: " + filename);
             }
             Path dest = STORAGE_DIR.resolve(Paths.get(filename).getFileName());
             file.transferTo(dest);
@@ -43,7 +43,7 @@ public class SenderController {
 
     @PostMapping("/product")
     public String product() {
-        System.out.println("[Sender] 다항식 연산 요청 접수됨. 백그라운드 연산 시작...");
+        System.out.println("[Sender] Background operation started...");
 
         // 비동기 스레드를 생성하여 367초 동안 걸리는 C++ 연산과 전송을 백그라운드에서 실행
         CompletableFuture.runAsync(() -> {
@@ -76,7 +76,7 @@ public class SenderController {
         });
 
         // 백그라운드 스레드가 돌아가는 것과 관계없이, 요청을 보낸 브라우저에는 즉시 접수 메시지를 반환함
-        return "다항식 연산 및 전송 요청이 백그라운드에서 정상적으로 접수되었습니다. (약 6~7분 소요)";
+        return "백그라운드에서 PSI 연산 시작";
     }
 
     @PostMapping("/preprocess")
@@ -87,7 +87,9 @@ public class SenderController {
     }
 
     @PostMapping("/timing")
-    public void sendTiming() {
+    public String sendTiming() {
         fileTransfer.sendJsonFile(CPP_TIMING);
+
+        return "연산 및 통신 시간 전송 완료.";
     }
 }

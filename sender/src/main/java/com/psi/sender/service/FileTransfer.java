@@ -27,7 +27,7 @@ public class FileTransfer {
         try {
             bytes = Files.readAllBytes(filePath);
         } catch (IOException e) {
-            throw new RuntimeException("파일 읽기 실패: " + filePath, e);
+            throw new RuntimeException("File read failed: " + filePath, e);
         }
 
         MultipartBodyBuilder builder = new MultipartBodyBuilder();
@@ -45,8 +45,8 @@ public class FileTransfer {
                 .body(BodyInserters.fromMultipartData(builder.build()))
                 .retrieve()
                 .bodyToMono(String.class)
-                .doOnSuccess(response -> System.out.println("전송 성공: " + response))
-                .doOnError(error -> System.err.println("전송 실패: " + error.getMessage()))
+                .doOnSuccess(response -> System.out.println("Transfer success: " + response))
+                .doOnError(error -> System.err.println("Transfer failed: " + error.getMessage()))
                 .block();
 
         return System.nanoTime() - start;

@@ -46,7 +46,7 @@ int intersect(const char* storage, const char* sender_csv) {
 
         cout << "[load] SEAL objects loading.." << endl;
 
-        // receiver가 보내준 값 가져오기
+        // preprocess가 만든 값 가져오기
         EncryptionParameters parms;
         cout << "[debug] opening parms.bin" << endl;
 

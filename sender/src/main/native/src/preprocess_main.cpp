@@ -107,6 +107,11 @@ int preprocess(const char* storage, const char* sender_csv) {
     auto t_seal_end = Clock::now();
     print_time("Create local SEAL parms", t_seal_start, t_seal_end);
 
+    // sender-main에서도 parms 객체 써야 하니까
+    ofstream parms_out(storage_dir + "/parms.bin", ios::binary);
+    parms.save(parms_out);
+    parms_out.close();
+
     // 5. partitioning
     auto t_partitioning_start = Clock::now();
 

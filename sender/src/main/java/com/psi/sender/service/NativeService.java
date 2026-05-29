@@ -27,7 +27,7 @@ public class NativeService {
             Linker linker = Linker.nativeLinker();
 
             MemorySegment funcSegment = lookup.find(functionName)
-                    .orElseThrow(() -> new RuntimeException("함수 탐색 실패: " + functionName));
+                    .orElseThrow(() -> new RuntimeException("Native function search failed: " + functionName));
 
             MethodHandle handle = linker.downcallHandle(
                     funcSegment,
@@ -39,7 +39,7 @@ public class NativeService {
 
             return (int) handle.invokeExact(storageDirSeg, senderCsvSeg);
         } catch (Throwable e) {
-            throw new RuntimeException("네이티브 함수 실행 실패: " + functionName, e);
+            throw new RuntimeException("Native function execution failed: " + functionName, e);
         }
     }
 
