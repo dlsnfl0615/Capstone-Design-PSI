@@ -86,20 +86,15 @@ int preprocess(const char* storage, const char* sender_csv) {
     auto t_save_table_end = Clock::now();
     print_time("Save sender_table.bin", t_save_table_start, t_save_table_end);
 
-    // 4. parms.bin 로드해서 plain_modulus 가져오기
+    // 4. sender가 receiver와 같은 방식으로 SEAL parms를 직접 생성해서 plain_modulus 가져오기
     auto t_seal_start = Clock::now();
 
-    cout << "[preprocess] loading SEAL parms: " << parms_path << endl;
+    cout << "[preprocess] creating local SEAL parms for plain_modulus" << endl;
 
-    EncryptionParameters parms;
-    ifstream parms_in(parms_path, ios::binary);
-
-    if (!parms_in.is_open()) {
-        throw runtime_error("Failed to open parms.bin: " + parms_path);
-    }
-
-    parms.load(parms_in);
-    parms_in.close();
+    EncryptionParameters parms(scheme_type::bfv);
+    parms.set_poly_modulus_degree(n);
+    parms.set_coeff_modulus(CoeffModulus::BFVDefault(n));
+    parms.set_plain_modulus(PlainModulus::Batching(n, t));
 
     SEALContext context(parms);
 
@@ -110,7 +105,7 @@ int preprocess(const char* storage, const char* sender_csv) {
          << plain_modulus << endl;
 
     auto t_seal_end = Clock::now();
-    print_time("Load SEAL parms", t_seal_start, t_seal_end);
+    print_time("Create local SEAL parms", t_seal_start, t_seal_end);
 
     // 5. partitioning
     auto t_partitioning_start = Clock::now();
