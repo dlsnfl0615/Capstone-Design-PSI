@@ -1,9 +1,11 @@
 package com.psi.receiver.controller;
 
-import com.psi.receiver.domain.Time;
 import com.psi.receiver.service.BinFileTransfer;
 import com.psi.receiver.service.NativeService;
+import com.psi.receiver.service.TimingEditor;
 import lombok.RequiredArgsConstructor;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -21,7 +23,8 @@ import java.util.Map;
 public class ReceiverController {
     private final NativeService nativeService;
     private final BinFileTransfer binFileTransfer;
-    private final Time time = new Time();
+    private final TimingEditor timingEditor;
+    private JSONObject timing = new JSONObject();
 
     private static final Path PUBLIC_KEY = Paths.get("storage/public_key.bin").toAbsolutePath();
     private static final Path POWERS = Paths.get("storage/powers.bin").toAbsolutePath();
@@ -36,22 +39,27 @@ public class ReceiverController {
 
     /** Phase 1: 암호화 요청 생성 (keygen + hashing + windowing) */
     @PostMapping("/process")
-    public String request() {
+    public String request() throws JSONException {
         Map<String, Double> t = nativeService.request(STORAGE_DIR.toString(), RECEIVER_CSV.toString());
-        time.setHashingMs(t.get("hashingMs"));
-        time.setWindowingMs(t.get("windowingMs"));
-        System.out.println("hashing: " + time.getHashingMs() + ", windowing: " + time.getWindowingMs());
-        return String.format("request 완료 (hashing=%.1fms, windowing=%.1fms)",
-                time.getHashingMs(), time.getWindowingMs());
+        JSONObject receiverRequest = new JSONObject();
+        receiverRequest.put("hashing", t.get("hashingMs"));
+        receiverRequest.put("windowing", t.get("windowingMs"));
+        timing.put("receiver", receiverRequest);
+
+        return String.format("request completed (hashing=%.1fms, windowing=%.1fms)",
+                receiverRequest.getDouble("hashing"), receiverRequest.getDouble("windowing"));
     }
 
     /** Phase 2: Sender로 bin 파일 전송 */
     @PostMapping("/send")
-    public String send() {
+    public String send() throws JSONException {
         long transferNs = binFileTransfer.sendBinFiles(
                 List.of(PUBLIC_KEY, POWERS, PARMS, HASH_TABLE, RELIN_KEY, SECRET_KEY));
-        time.setTransferMs(transferNs / 1_000_000.0);
-        return String.format("전송 완료 (transfer=%.1fms)", time.getTransferMs());
+        JSONObject transfer = timing.getJSONObject("receiver");
+        transfer.put("receiverToSender", Math.round(transferNs / 1_000_000.0 * 1000.0) / 1000.0);
+        timing.put("receiver", transfer);
+
+        return String.format("Transfer completed (transfer=%.1fms)", transfer.getDouble("receiverToSender"));
     }
 
     /** Phase 2-b: Sender로부터 result.bin 수신 */
@@ -77,50 +85,18 @@ public class ReceiverController {
 
     /** Phase 3: 복호화 및 교집합 검증, 최종 timing.json 저장 */
     @PostMapping("/check")
-    public String check() throws IOException {
+    public String check() throws IOException, JSONException {
         Map<String, Double> t = nativeService.result(STORAGE_DIR.toString(), RECEIVER_CSV.toString());
-        time.setLoadMs(t.get("loadMs"));
-        time.setDecryptMs(t.get("decryptMs"));
-        time.setIntersectMs(t.get("intersectMs"));
+        JSONObject result = timing.getJSONObject("receiver");
+        result.put("load", t.get("loadMs"));
+        result.put("decrypt", t.get("decryptMs"));
+        result.put("intersect", t.get("intersectMs"));
+        timing.put("receiver", result);
 
-        saveTimingJson();
+        timingEditor.combineJson(TIMING_JSON, timing, SENDER_TIMING_JSON);
 
         return String.format(
-                "교집합 찾기 완료 (load=%.1fms, decrypt=%.1fms, intersect=%.1fms)",
-                time.getLoadMs(), time.getDecryptMs(), time.getIntersectMs());
-    }
-
-    /** 누적된 receiver 타이밍 + sender_timing.json을 병합하여 storage/timing.json 저장 */
-    private void saveTimingJson() throws IOException {
-        String senderJson = Files.exists(SENDER_TIMING_JSON)
-                ? Files.readString(SENDER_TIMING_JSON).trim()
-                : "{}";
-
-        String json = String.format(
-                "{%n" +
-                "  \"receiver\": {%n" +
-                "    \"phase1_request\": {%n" +
-                "      \"hashingMs\": %.3f,%n" +
-                "      \"windowingMs\": %.3f%n" +
-                "    },%n" +
-                "    \"phase2_transfer\": {%n" +
-                "      \"transferMs\": %.3f%n" +
-                "    },%n" +
-                "    \"phase3_result\": {%n" +
-                "      \"loadMs\": %.3f,%n" +
-                "      \"decryptMs\": %.3f,%n" +
-                "      \"intersectMs\": %.3f%n" +
-                "    }%n" +
-                "  },%n" +
-                "  \"sender\": %s%n" +
-                "}",
-                time.getHashingMs(), time.getWindowingMs(),
-                time.getTransferMs(),
-                time.getLoadMs(), time.getDecryptMs(), time.getIntersectMs(),
-                senderJson
-        );
-        Files.createDirectories(STORAGE_DIR);
-        Files.writeString(TIMING_JSON, json);
-        System.out.println("[timing] storage/timing.json 저장 완료");
+                "intersect completed (load=%.1fms, decrypt=%.1fms, intersect=%.1fms)",
+                result.getDouble("load"), result.getDouble("decrypt"), result.getDouble("intersect"));
     }
 }
