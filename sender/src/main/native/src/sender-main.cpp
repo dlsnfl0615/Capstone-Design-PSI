@@ -269,13 +269,13 @@ int intersect(const char* storage, const char* sender_csv) {
 
         ofstream timing_out(storage_dir + "/sender_timing.json");
         timing_out << fixed << setprecision(3)
-                   << "{\"loadMs\":" << loadMs
-                   << ",\"cacheMs\":" << cacheMs
-                   << ",\"coeffsMs\":" << coeffsMs
-                   << ",\"powersMs\":" << powersMs
-                   << ",\"zeroPowersMs\":" << zeroPowersMs
-                   << ",\"productMs\":" << productMs
-                   << ",\"totalMs\":" << totalMs << "}";
+                   << "{\"load\":" << loadMs
+                   << ",\"cache\":" << cacheMs
+                   << ",\"coeffs\":" << coeffsMs
+                   << ",\"powers\":" << powersMs
+                   << ",\"zeroPowers\":" << zeroPowersMs
+                   << ",\"product\":" << productMs
+                   << ",\"total\":" << totalMs << "}";
         timing_out.close();
 
         print_time("TOTAL sender runtime", total_start, total_end);

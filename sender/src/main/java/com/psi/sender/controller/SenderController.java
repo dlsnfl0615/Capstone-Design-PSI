@@ -3,6 +3,7 @@ package com.psi.sender.controller;
 import com.psi.sender.service.FileTransfer;
 import com.psi.sender.service.NativeService;
 import lombok.RequiredArgsConstructor;
+import org.json.JSONObject;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -18,6 +19,7 @@ import java.util.concurrent.CompletableFuture;
 @RequiredArgsConstructor
 @CrossOrigin(origins = "*", allowedHeaders = "*")
 public class SenderController {
+    private JSONObject timing = new JSONObject();
     private static final Path STORAGE_DIR = Paths.get("storage").toAbsolutePath();
     private static final Path RESULT = Paths.get("storage/result.bin").toAbsolutePath();
     private static final Path CPP_TIMING = Paths.get("storage/sender_timing.json").toAbsolutePath();
@@ -57,13 +59,18 @@ public class SenderController {
                 double transferMs = transferNs / 1000000.0;
 
                 // 3. cpp_timing.json 읽기 및 transferMs 추가 저장
-                if (Files.exists(CPP_TIMING)) {
-                    String json = Files.readString(CPP_TIMING).trim();
-                    String updated = json.substring(0, json.lastIndexOf('}'))
-                            + String.format(",\"transferMs\":%.3f}", transferMs);
-                    Files.writeString(CPP_TIMING, updated);
-                    System.out.println("[Sender] Operation timing data file update complete");
-                }
+                String content = new String(Files.readAllBytes(CPP_TIMING));
+                JSONObject senderTiming = new JSONObject(content);
+                senderTiming.put("transfer", String.format("%.3f", transferMs));
+                System.out.println("[Sender] Operation timing data file update complete");
+
+//                if (Files.exists(CPP_TIMING)) {
+//                    String json = Files.readString(CPP_TIMING).trim();
+//                    String updated = json.substring(0, json.lastIndexOf('}'))
+//                            + String.format(",\"transferMs\":%.3f}", transferMs);
+//                    Files.writeString(CPP_TIMING, updated);
+//
+//                }
 
                 // 4. 연산 타이밍이 저장된 JSON 파일을 receiver 측으로 자동 최종 전송
                 fileTransfer.sendJsonFile(CPP_TIMING);
@@ -90,6 +97,7 @@ public class SenderController {
     public String sendTiming() {
         fileTransfer.sendJsonFile(CPP_TIMING);
 
-        return "연산 및 통신 시간 전송 완료.";
+//        return "연산 및 통신 시간 전송 완료.";
+        return "product and transfer time send completed";
     }
 }
