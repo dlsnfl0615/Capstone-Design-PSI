@@ -17,7 +17,6 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api")
 @RequiredArgsConstructor
 @CrossOrigin(origins = "*", allowedHeaders = "*")
 public class ReceiverController {
@@ -29,7 +28,6 @@ public class ReceiverController {
     private static final Path PUBLIC_KEY = Paths.get("storage/public_key.bin").toAbsolutePath();
     private static final Path POWERS = Paths.get("storage/powers.bin").toAbsolutePath();
     private static final Path PARMS = Paths.get("storage/parms.bin").toAbsolutePath();
-    private static final Path HASH_TABLE = Paths.get("storage/receiver_hash.bin").toAbsolutePath();
     private static final Path RELIN_KEY = Paths.get("storage/relin_key.bin").toAbsolutePath();
     private static final Path SECRET_KEY = Paths.get("storage/secret_key.bin").toAbsolutePath();
     private static final Path STORAGE_DIR = Paths.get("storage").toAbsolutePath();
@@ -37,8 +35,8 @@ public class ReceiverController {
     private static final Path TIMING_JSON = Paths.get("storage/timing.json").toAbsolutePath();
     private static final Path SENDER_TIMING_JSON = Paths.get("storage/sender_timing.json").toAbsolutePath();
 
-    /** Phase 1: 암호화 요청 생성 (keygen + hashing + windowing) */
-    @PostMapping("/process")
+    /** 암호화 요청 생성 (keygen + hashing + windowing) */
+    @PostMapping("/requests")
     public String request() throws JSONException {
         Map<String, Double> t = nativeService.request(STORAGE_DIR.toString(), RECEIVER_CSV.toString());
         JSONObject receiverRequest = new JSONObject();
@@ -50,19 +48,23 @@ public class ReceiverController {
                 receiverRequest.getDouble("hashing"), receiverRequest.getDouble("windowing"));
     }
 
-    /** Phase 2: Sender로 bin 파일 전송 */
-    @PostMapping("/send")
+    /** Sender로 bin 파일 전송 */
+    @PostMapping("/transfers")
     public String send() throws JSONException {
-        long transferNs = binFileTransfer.sendBinFiles(
-                List.of(PUBLIC_KEY, POWERS, PARMS, HASH_TABLE, RELIN_KEY, SECRET_KEY));
+        long transferPowersNs = binFileTransfer.sendBinFiles(List.of(POWERS));
+        long transferKeysNs = binFileTransfer.sendBinFiles(
+                List.of(PUBLIC_KEY, RELIN_KEY, SECRET_KEY, PARMS));
         JSONObject transfer = timing.getJSONObject("receiver");
-        transfer.put("receiverToSender", Math.round(transferNs / 1_000_000.0 * 1000.0) / 1000.0);
+        transfer.put("transferPowersMs", Math.round(transferPowersNs / 1_000_000.0 * 1000.0) / 1000.0);
+        transfer.put("transferKeysMs", Math.round(transferKeysNs / 1_000_000.0 * 1000.0) / 1000.0);
+
         timing.put("receiver", transfer);
 
-        return String.format("Transfer completed (transfer=%.1fms)", transfer.getDouble("receiverToSender"));
+        return String.format("Transfer completed (transferPowersMs=%.3fms, transferKeysMs=%.3f)",
+                transfer.getDouble("transferPowersMs"), transfer.getDouble("transferKeysMs"));
     }
 
-    /** Phase 2-b: Sender로부터 result.bin 수신 */
+    /** Sender로부터 result.bin 수신 */
     @PostMapping("/files/result")
     public String loadResult(@RequestPart("binFile") MultipartFile binFile) throws IOException {
         Files.createDirectories(STORAGE_DIR);
@@ -70,9 +72,11 @@ public class ReceiverController {
         if (filename == null || filename.isBlank()) {
             throw new IllegalArgumentException("No such file name.");
         }
-        Path dest = STORAGE_DIR.resolve(Paths.get(filename).getFileName());
-        Files.write(dest, binFile.getBytes());
-        return "교집합 결과 로드 완료.";
+
+        Path targetPath = STORAGE_DIR.resolve(filename);
+        binFile.transferTo(targetPath.toFile());
+
+        return "intersect result received.";
     }
 
     /** Phase 2-c: Sender로부터 sender 측 실행 시간 JSON 수신 */
@@ -80,11 +84,12 @@ public class ReceiverController {
     public String loadSenderTiming(@RequestBody String timingJson) throws IOException {
         Files.createDirectories(STORAGE_DIR);
         Files.writeString(SENDER_TIMING_JSON, timingJson);
-        return "sender timing 수신 완료.";
+
+        return "sender timing received.";
     }
 
     /** Phase 3: 복호화 및 교집합 검증, 최종 timing.json 저장 */
-    @PostMapping("/check")
+    @PostMapping("/intersections")
     public String check() throws IOException, JSONException {
         Map<String, Double> t = nativeService.result(STORAGE_DIR.toString(), RECEIVER_CSV.toString());
         JSONObject result = timing.getJSONObject("receiver");

@@ -11,19 +11,19 @@
 
     <script>
         function preprocess() {
-            fetch('/api/process', { method: 'POST' })
+            fetch('/requests', { method: 'POST' })
                 .then(res => res.text())
                 .then(msg => alert(msg))
                 .catch(err => alert('전송 실패: ' + err));
         }
         function sendFiles() {
-            fetch('/api/send', { method: 'POST' })
+            fetch('/transfers', { method: 'POST' })
                 .then(res => res.text())
                 .then(msg => alert(msg))
                 .catch(err => alert('전송 실패: ' + err));
         }
         function checkIntersection() {
-            fetch('/api/check', { method: 'POST' })
+            fetch('/intersections', { method: 'POST' })
                 .then(res => res.text())
                 .then(msg => alert(msg))
                 .catch(err => alert('전송 실패: ' + err));
