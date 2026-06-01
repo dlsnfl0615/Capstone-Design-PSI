@@ -1,5 +1,6 @@
 package com.psi.sender.service;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.MediaType;
@@ -14,51 +15,43 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 @Service
+@RequiredArgsConstructor
 public class FileTransfer {
     private static final String SENDER_URL = "http://3.34.152.64:8080";
     private final WebClient webClient;
 
-    public FileTransfer() {
-        this.webClient = WebClient.builder().baseUrl(SENDER_URL).build();
-    }
-
     public long sendBinFile(Path filePath) {
-        byte[] bytes;
-        try {
-            bytes = Files.readAllBytes(filePath);
-        } catch (IOException e) {
-            throw new RuntimeException("File read failed: " + filePath, e);
-        }
-
         MultipartBodyBuilder builder = new MultipartBodyBuilder();
-        builder.part("binFile", new ByteArrayResource(bytes) {
-            @Override
-            public String getFilename() {
-                return filePath.getFileName().toString();
-            }
-        }).contentType(MediaType.APPLICATION_OCTET_STREAM);
+        builder.part("binFile", new FileSystemResource(filePath));
 
-        long start = System.nanoTime();
-        webClient.post()
-                .uri("/api/files/result")
-                .contentType(MediaType.MULTIPART_FORM_DATA)
+        System.out.println("[Sender] resultDir exists: " + Files.exists(filePath));
+        System.out.println("[Sender] resultDir isDirectory: " + Files.isDirectory(filePath));
+
+        long startTime = System.currentTimeMillis();
+        String response = webClient.post()
+                .uri("/files/result")
                 .body(BodyInserters.fromMultipartData(builder.build()))
                 .retrieve()
                 .bodyToMono(String.class)
-                .doOnSuccess(response -> System.out.println("Transfer success: " + response))
-                .doOnError(error -> System.err.println("Transfer failed: " + error.getMessage()))
+                .doOnSuccess(success -> System.out.println("sender result transfer success: " + success))
+                .doOnError(error -> System.err.println("sender result transfer failed: " + error.getMessage()))
                 .block();
+        long endTime = System.currentTimeMillis();
 
-        return System.nanoTime() - start;
+        System.out.println(response);
+
+        return endTime - startTime;
     }
 
     public void sendJsonFile(Path filePath) {
         webClient.post()
-                .uri("/api/files/sender-timing")
+                .uri("/files/sender-timing")
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(BodyInserters.fromResource(new FileSystemResource(filePath))) // 리소스 삽입함
                 .retrieve()
                 .bodyToMono(String.class)
+                .doOnSuccess(success -> System.out.println("sender timing transfer success: " + success))
+                .doOnError(error -> System.err.println("sender timing transfer failed: " + error.getMessage()))
                 .block();
     }
 }

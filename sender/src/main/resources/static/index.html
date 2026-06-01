@@ -10,20 +10,28 @@
     <button onclick="sendTiming()">수행 시간 보내기</button>
 
 <script>
+    // 페이지 로드시 서버 알림 연결 통로 뚫어둠
+    const eventSource = new EventSource('/connect');
+
+    // 서버에서 complete 이벤트 신호 보내면(c++ 코드 실행 끝나면) 실행됨
+    eventSource.addEventListener('complete', function(event) {
+        alert("polynomial product completed: " + event.data);
+    });
+
     function preprocess() {
-        fetch('/api/preprocess', { method: 'POST' })
+        fetch('/preprocess', { method: 'POST' })
             .then(res => res.text())
             .then(msg => alert(msg))
             .catch(err => alert('전송 실패: ' + err));
     }
     function productPolynomial() {
-        fetch('/api/product', { method: 'POST' })
+        fetch('/polynomial', { method: 'POST' })
             .then(res => res.text())
             .then(msg => alert(msg))
             .catch(err => alert('전송 실패: ' + err));
     }
     function sendTiming() {
-        fetch('/api/timing', { method: 'POST' })
+        fetch('/timing', { method: 'POST' })
             .then(res => res.text())
             .then(msg => alert(msg))
             .catch(err => alert('전송 실패: ' + err));
