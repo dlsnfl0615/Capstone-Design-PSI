@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    // 애플리케이션 어디서든 JSONException이 발생하면 이 메서드가 가로채서 처리함
     @ExceptionHandler(JSONException.class)
     public ResponseEntity<String> handleJSONException(JSONException e) {
         // 로그 출력 등 공통 작업 수행 가능

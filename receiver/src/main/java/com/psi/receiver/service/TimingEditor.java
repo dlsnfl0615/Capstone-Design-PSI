@@ -27,38 +27,5 @@ public class TimingEditor {
         );
 
         System.out.println("[timing] storage/timing.json saved");
-
-
-
-//        String senderJson = Files.exists(senderJson)
-//                ? Files.readString(senderJson).trim()
-//                : "{}";
-//
-//        String json = String.format(
-//                "{%n" +
-//                        "  \"receiver\": {%n" +
-//                        "    \"phase1_request\": {%n" +
-//                        "      \"hashingMs\": %.3f,%n" +
-//                        "      \"windowingMs\": %.3f%n" +
-//                        "    },%n" +
-//                        "    \"phase2_transfer\": {%n" +
-//                        "      \"transferMs\": %.3f%n" +
-//                        "    },%n" +
-//                        "    \"phase3_result\": {%n" +
-//                        "      \"loadMs\": %.3f,%n" +
-//                        "      \"decryptMs\": %.3f,%n" +
-//                        "      \"intersectMs\": %.3f%n" +
-//                        "    }%n" +
-//                        "  },%n" +
-//                        "  \"sender\": %s%n" +
-//                        "}",
-//                time.getHashingMs(), time.getWindowingMs(),
-//                time.getTransferMs(),
-//                time.getLoadMs(), time.getDecryptMs(), time.getIntersectMs(),
-//                senderJson
-//        );
-//        Files.createDirectories(STORAGE_DIR);
-//        Files.writeString(TIMING_JSON, json);
-//        System.out.println("[timing] storage/timing.json 저장 완료");
     }
 }
