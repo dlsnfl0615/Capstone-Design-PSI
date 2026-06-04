@@ -60,6 +60,7 @@ public class SenderController {
             if (clientReceiver != null) {
                 try {
                     clientReceiver.send(SseEmitter.event().name("complete").data(result));
+
                 } catch (Exception e) {
                     clientReceiver = null;
                 }

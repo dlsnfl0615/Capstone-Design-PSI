@@ -24,10 +24,7 @@ public class FileTransfer {
         MultipartBodyBuilder builder = new MultipartBodyBuilder();
         builder.part("binFile", new FileSystemResource(filePath));
 
-        System.out.println("[Sender] resultDir exists: " + Files.exists(filePath));
-        System.out.println("[Sender] resultDir isDirectory: " + Files.isDirectory(filePath));
-
-        long startTime = System.currentTimeMillis();
+        long startTime = System.nanoTime();
         String response = webClient.post()
                 .uri("/files/result")
                 .body(BodyInserters.fromMultipartData(builder.build()))
@@ -36,7 +33,7 @@ public class FileTransfer {
                 .doOnSuccess(success -> System.out.println("sender result transfer success: " + success))
                 .doOnError(error -> System.err.println("sender result transfer failed: " + error.getMessage()))
                 .block();
-        long endTime = System.currentTimeMillis();
+        long endTime = System.nanoTime();
 
         System.out.println(response);
 

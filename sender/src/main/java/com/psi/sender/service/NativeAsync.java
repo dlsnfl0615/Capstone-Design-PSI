@@ -25,12 +25,14 @@ public class NativeAsync {
             System.out.println("[Sender C++] Operation completed. Return code: " + result);
 
             // 다항식 결과 전송 걸리는 시간
-            long transferMs = fileTransfer.sendBinFile(resultDir);
+            long transferNs = fileTransfer.sendBinFile(resultDir);
 
             // 시간 저장
             String content = new String(Files.readAllBytes(cppTiming));
             JSONObject senderTiming = new JSONObject(content);
-            senderTiming.put("transferResult", Math.round(transferMs * 1000.0) / 1000.0);
+            senderTiming.put("transferResult", Math.round(transferNs / 1000000.0 * 1000.0) / 1000.0);
+            Files.writeString(cppTiming, senderTiming.toString());
+
             System.out.println("[Sender] Operation timing data file update complete");
 
             // 연산 시간 전송
