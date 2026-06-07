@@ -50,7 +50,6 @@ public class ReceiverController {
                 // 매칭되는 파일이 존재하면 파일 이름 추출
                 if (latestCsvFile.isPresent()) {
                     fileNameToShow = latestCsvFile.get().getFileName().toString(); // 순수 파일명 변환 저장
-                    System.out.println("fileNameToShow = " + fileNameToShow);
                 }
             }
         } catch (IOException e) {
