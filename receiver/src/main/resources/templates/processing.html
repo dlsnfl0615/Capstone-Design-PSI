@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>의료 데이터 검증 - 진행 중</title>
+    <style>
+        :root {
+            --bg: #f5f7fb;
+            --surface: #ffffff;
+            --surface-soft: #f8fafc;
+            --border: #e5eaf2;
+            --border-strong: #d5ddeb;
+            --text: #172033;
+            --muted: #647084;
+            --muted-light: #8a94a6;
+            --primary: #1f5fd6;
+            --primary-soft: #eaf1ff;
+            --primary-dark: #174eb6;
+            --success: #12805c;
+            --success-soft: #e7f7f0;
+            --shadow: 0 18px 50px rgba(31, 45, 70, 0.08);
+            --radius-lg: 28px;
+            --radius-md: 18px;
+            --radius-sm: 12px;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans KR", "Apple SD Gothic Neo", sans-serif;
+            color: var(--text);
+            background: radial-gradient(circle at top left, rgba(31, 95, 214, 0.07), transparent 32%),
+            linear-gradient(180deg, #f7f9fd 0%, var(--bg) 100%);
+        }
+
+        .topbar {
+            height: 68px;
+            background: rgba(255, 255, 255, 0.82);
+            backdrop-filter: blur(14px);
+            border-bottom: 1px solid rgba(229, 234, 242, 0.9);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .topbar-inner {
+            max-width: 1080px;
+            height: 100%;
+            margin: 0 auto;
+            padding: 0 28px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 750;
+            letter-spacing: -0.02em;
+            color: var(--text);
+        }
+
+        .brand-mark {
+            width: 34px;
+            height: 34px;
+            border-radius: 12px;
+            display: grid;
+            place-items: center;
+            background: var(--primary-soft);
+            color: var(--primary);
+            font-weight: 800;
+            font-size: 15px;
+        }
+
+        .user-area {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            color: var(--muted);
+            font-size: 14px;
+            white-space: nowrap;
+        }
+
+        .logout {
+            border: 1px solid var(--border);
+            background: #fff;
+            color: var(--muted);
+            border-radius: 999px;
+            padding: 8px 13px;
+            font-weight: 650;
+            cursor: pointer;
+        }
+
+        main {
+            max-width: 960px;
+            margin: 0 auto;
+            padding: 54px 28px 70px;
+        }
+
+        .page-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            gap: 32px;
+            margin-bottom: 26px;
+        }
+
+        .eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--primary);
+            background: var(--primary-soft);
+            border: 1px solid rgba(31, 95, 214, 0.12);
+            border-radius: 999px;
+            padding: 7px 12px;
+            font-size: 13px;
+            font-weight: 750;
+            margin-bottom: 14px;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 34px;
+            line-height: 1.22;
+            letter-spacing: -0.04em;
+        }
+
+        .lead {
+            margin: 12px 0 0;
+            color: var(--muted);
+            font-size: 16px;
+            line-height: 1.65;
+            max-width: 620px;
+        }
+
+        .small-button {
+            border: 1px solid var(--border);
+            background: var(--surface);
+            color: var(--text);
+            border-radius: 14px;
+            height: 44px;
+            padding: 0 16px;
+            font-weight: 750;
+            cursor: pointer;
+            box-shadow: 0 8px 24px rgba(31, 45, 70, 0.04);
+        }
+
+        .layout {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 18px;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.92);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow);
+        }
+
+        .file-card {
+            padding: 22px;
+            display: grid;
+            grid-template-columns: auto 1fr auto;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .icon-box {
+            width: 48px;
+            height: 48px;
+            border-radius: 16px;
+            background: var(--success-soft);
+            color: var(--success);
+            display: grid;
+            place-items: center;
+            font-weight: 900;
+            font-size: 21px;
+        }
+
+        .file-title {
+            margin: 0;
+            font-size: 17px;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+        }
+
+        .file-meta {
+            margin: 5px 0 0;
+            color: var(--muted);
+            font-size: 14px;
+        }
+
+        .status-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            background: var(--success-soft);
+            color: var(--success);
+            border: 1px solid rgba(18, 128, 92, 0.12);
+            border-radius: 999px;
+            padding: 8px 12px;
+            font-size: 13px;
+            font-weight: 800;
+            white-space: nowrap;
+        }
+
+        .dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 999px;
+            background: currentColor;
+        }
+
+        .progress-card {
+            padding: 34px;
+        }
+
+        .progress-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 18px;
+            margin-bottom: 30px;
+        }
+
+        .progress-top h2 {
+            margin: 0;
+            font-size: 24px;
+            letter-spacing: -0.03em;
+        }
+
+        .running-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--primary-soft);
+            color: var(--primary);
+            border: 1px solid rgba(31, 95, 214, 0.13);
+            border-radius: 999px;
+            padding: 8px 13px;
+            font-size: 13px;
+            font-weight: 800;
+            white-space: nowrap;
+        }
+
+        .pulse {
+            width: 8px;
+            height: 8px;
+            border-radius: 999px;
+            background: var(--primary);
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                opacity: .38;
+                transform: scale(.88);
+            }
+            50% {
+                opacity: 1;
+                transform: scale(1.08);
+            }
+        }
+
+        .progress-main {
+            display: grid;
+            grid-template-columns: 180px 1fr;
+            align-items: center;
+            gap: 30px;
+        }
+
+        .ring-wrap {
+            width: 178px;
+            height: 178px;
+            border-radius: 50%;
+            display: grid;
+            place-items: center;
+            background: conic-gradient(var(--primary) 0 64%, #e9eef7 64% 100%);
+            position: relative;
+        }
+
+        .ring-wrap::before {
+            content: "";
+            position: absolute;
+            inset: 13px;
+            border-radius: 50%;
+            background: var(--surface);
+            box-shadow: inset 0 0 0 1px var(--border);
+        }
+
+        .ring-content {
+            position: relative;
+            text-align: center;
+        }
+
+        .ring-number {
+            font-size: 34px;
+            font-weight: 850;
+            letter-spacing: -0.04em;
+            color: var(--primary);
+        }
+
+        .ring-label {
+            margin-top: 2px;
+            color: var(--muted);
+            font-size: 12px;
+            font-weight: 750;
+        }
+
+        .progress-copy h3 {
+            margin: 0 0 9px;
+            font-size: 22px;
+            letter-spacing: -0.03em;
+        }
+
+        .progress-copy p {
+            margin: 0;
+            color: var(--muted);
+            font-size: 15px;
+            line-height: 1.7;
+            max-width: 560px;
+        }
+
+
+        .step-list {
+            margin-top: 28px;
+            padding-top: 24px;
+            border-top: 1px solid var(--border);
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+        }
+
+        .step {
+            background: var(--surface-soft);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 16px;
+        }
+
+        .step .label {
+            color: var(--muted-light);
+            font-size: 12px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .step .name {
+            margin-top: 6px;
+            font-size: 14px;
+            font-weight: 800;
+        }
+
+        .step.done {
+            border-color: rgba(18, 128, 92, 0.2);
+            background: var(--success-soft);
+        }
+
+        .step.active {
+            border-color: rgba(31, 95, 214, 0.22);
+            background: var(--primary-soft);
+        }
+
+        .actions {
+            margin-top: 22px;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        .secondary-btn, .primary-btn {
+            height: 46px;
+            border-radius: 14px;
+            padding: 0 18px;
+            font-weight: 800;
+            cursor: pointer;
+        }
+
+        .secondary-btn {
+            border: 1px solid var(--border);
+            background: #fff;
+            color: var(--muted);
+        }
+
+        .primary-btn {
+            border: 0;
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 12px 26px rgba(31, 95, 214, 0.18);
+        }
+
+        .primary-btn:disabled {
+            background: #b9c4d7;
+            box-shadow: none;
+            cursor: not-allowed;
+        }
+
+        @media (max-width: 720px) {
+            .topbar-inner {
+                padding: 0 18px;
+            }
+
+            .user-area span {
+                display: none;
+            }
+
+            main {
+                padding: 36px 18px 48px;
+            }
+
+            .page-head {
+                display: block;
+            }
+
+            h1 {
+                font-size: 28px;
+            }
+
+            .small-button {
+                display: none;
+            }
+
+            .file-card {
+                grid-template-columns: auto 1fr;
+            }
+
+            .status-chip {
+                grid-column: 2;
+                width: fit-content;
+            }
+
+            .progress-card {
+                padding: 24px;
+            }
+
+            .progress-main {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+
+            .ring-wrap {
+                margin: 0 auto;
+            }
+
+            .progress-copy p {
+                margin: 0 auto;
+            }
+
+            .step-list {
+                grid-template-columns: 1fr;
+            }
+
+            .actions {
+                justify-content: stretch;
+                flex-direction: column;
+            }
+
+            .secondary-btn, .primary-btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+<header class="topbar">
+    <div class="topbar-inner">
+        <div class="brand">
+            <div class="brand-mark">MD</div>
+            <div>의료 데이터 검증</div>
+        </div>
+        <div class="user-area">
+            <span>김철수 님</span>
+            <button class="logout">로그아웃</button>
+        </div>
+    </div>
+</header>
+
+<main>
+    <section class="page-head">
+        <div>
+            <div class="eyebrow"><span class="dot"></span> Verification in progress</div>
+            <h1>검증을 진행하고 있습니다</h1>
+            <p class="lead">업로드된 CSV 파일을 기준으로 암호화된 검증 요청을 처리 중입니다. 완료 후 결과 화면에서 불일치 건수와 다운로드 파일을 확인할 수 있습니다.</p>
+        </div>
+        <button class="small-button">검증 내역 보기</button>
+    </section>
+
+    <div class="layout">
+        <section class="card file-card">
+            <div class="icon-box">✓</div>
+            <div>
+                <p class="file-title"><span th:text="${csvName}"></span></p>
+                <p class="file-meta">42KB · CSV · 업로드 완료</p>
+            </div>
+            <div class="status-chip"><span class="dot"></span> 업로드 완료</div>
+        </section>
+
+        <section class="card progress-card">
+            <div class="progress-top">
+                <h2>현재 검증 단계</h2>
+                <div class="running-chip"><span class="pulse"></span> 진행 중</div>
+            </div>
+
+            <div class="progress-main">
+                <div class="ring-wrap" aria-label="진행률 64%">
+                    <div class="ring-content">
+                        <div class="ring-number">64%</div>
+                        <div class="ring-label">PROCESSING</div>
+                    </div>
+                </div>
+
+                <div class="progress-copy">
+                    <h3>암호화된 데이터 매칭을 수행 중입니다</h3>
+                    <p>원본 개인정보를 직접 노출하지 않고 검증에 필요한 값만 처리합니다. 작업이 끝나면 결과 확인 단계로 자동 이동됩니다.</p>
+
+                </div>
+            </div>
+
+            <div class="step-list">
+                <div class="step done">
+                    <div class="label">Step 1</div>
+                    <div class="name">파일 업로드 완료</div>
+                </div>
+                <div class="step active">
+                    <div class="label">Step 2</div>
+                    <div class="name">검증 진행 중</div>
+                </div>
+                <div class="step">
+                    <div class="label">Step 3</div>
+                    <div class="name">결과 확인 대기</div>
+                </div>
+            </div>
+
+            <div class="actions">
+                <button class="secondary-btn">이전 화면</button>
+                <button class="primary-btn" th:onclick="|location.href='@{/receiver/result}'|">결과 확인</button>
+            </div>
+        </section>
+    </div>
+</main>
+</body>
+</html>

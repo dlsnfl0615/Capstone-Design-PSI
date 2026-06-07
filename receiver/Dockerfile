@@ -59,7 +59,7 @@ COPY --from=cpp-builder /build-cpp/build/libreceiver-psi.so /app/libs/
 COPY --from=cpp-builder /opt/vcpkg/installed/x64-linux/lib/*.so* /usr/local/lib/
 RUN ldconfig
 
-COPY storage /app/storage
+RUN mkdir -p /app/storage && chmod 777 /app/storage
 
 # 스프링 부트 JAR 파일 복사
 ARG JAR_FILE=build/libs/*-SNAPSHOT.jar
