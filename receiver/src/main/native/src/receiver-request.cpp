@@ -17,13 +17,17 @@ using namespace seal;
 using Clock = chrono::high_resolution_clock;
 using Ms = chrono::milliseconds;
 
+int alpha;
+int l;
+int B_prime = static_cast<int>(ceil(static_cast<double>(B) / alpha));
+
 extern "C" {
 
 #ifdef _WIN32
 __declspec(dllexport) // 윈도우 환경 DLL 내보내기
 #endif
 
-int request(const char* storage, const char* csv) {
+int request(const char* storage, const char* csv, const int alpha_var, const int l_var) {
     cout << "[setup] Receiver SEAL setting..";
 
     string storage_dir(storage);
@@ -54,6 +58,9 @@ int request(const char* storage, const char* csv) {
 
     // 데이터 로드
     auto receiver_data = load_receiver(receiver_csv);
+    alpha = alpha_var;
+    l = l_var;
+    B_prime = static_cast<int>(ceil(static_cast<double>(B) / alpha)); // 재계산
 
     // 해싱
     auto t_hashing_start = Clock::now();

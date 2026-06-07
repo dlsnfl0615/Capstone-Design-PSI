@@ -1,6 +1,6 @@
 package com.psi.receiver.controller;
 
-import com.psi.receiver.service.BinFileTransfer;
+import com.psi.receiver.service.ReceiverClient;
 import com.psi.receiver.service.NativeService;
 import com.psi.receiver.service.TimingEditor;
 import lombok.RequiredArgsConstructor;
@@ -15,15 +15,18 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
 @CrossOrigin(origins = "*", allowedHeaders = "*")
 public class ReceiverController {
     private final NativeService nativeService;
-    private final BinFileTransfer binFileTransfer;
+    private final ReceiverClient receiverClient;
     private final TimingEditor timingEditor;
     private JSONObject timing = new JSONObject();
+    private int alpha = 0;
+    private int windowing = 0;
 
     private static final Path PUBLIC_KEY = Paths.get("storage/public_key.bin").toAbsolutePath();
     private static final Path POWERS = Paths.get("storage/powers.bin").toAbsolutePath();
@@ -35,25 +38,41 @@ public class ReceiverController {
     private static final Path TIMING_JSON = Paths.get("storage/timing.json").toAbsolutePath();
     private static final Path SENDER_TIMING_JSON = Paths.get("storage/sender_timing.json").toAbsolutePath();
 
-    /** 암호화 요청 생성 (keygen + hashing + windowing) */
+    /** 암호화 및 전송
+     * 해싱 및 윈도잉 진행
+     * 결과 전송
+     */
     @PostMapping("/requests")
     public String request() throws JSONException {
-        Map<String, Double> t = nativeService.request(STORAGE_DIR.toString(), RECEIVER_CSV.toString());
+        String sessionId = UUID.randomUUID().toString();
+
+        // sender 서버의 작업 큐에 작업 몰렸는지 확인
+        List<Integer> parameters = receiverClient.checkCongestion();
+        alpha = parameters.get(0);
+        windowing = parameters.get(1);
+
+        // receiver 해싱 및 윈도잉
+        Map<String, Double> t = nativeService.request(STORAGE_DIR.toString(), RECEIVER_CSV.toString(), alpha, windowing);
+
+        // 시간 기록
         JSONObject receiverRequest = new JSONObject();
         receiverRequest.put("hashing", t.get("hashingMs"));
         receiverRequest.put("windowing", t.get("windowingMs"));
         timing.put("receiver", receiverRequest);
 
-        return String.format("request completed (hashing=%.1fms, windowing=%.1fms)",
-                receiverRequest.getDouble("hashing"), receiverRequest.getDouble("windowing"));
+        // receiver 해싱 및 윈도잉 결과 sender로 전송
+        String sendResult = sendResult(sessionId);
+
+        return String.format("request completed (hashing=%.1fms, windowing=%.1fms)\n%s",
+                receiverRequest.getDouble("hashing"), receiverRequest.getDouble("windowing"), sendResult);
     }
 
     /** Sender로 bin 파일 전송 */
-    @PostMapping("/transfers")
-    public String send() throws JSONException {
-        long transferPowersNs = binFileTransfer.sendBinFiles(List.of(POWERS));
-        long transferKeysNs = binFileTransfer.sendBinFiles(
-                List.of(PUBLIC_KEY, RELIN_KEY, SECRET_KEY, PARMS));
+    public String sendResult(String sessionId) throws JSONException {
+        // 윈도잉 결과 파일의 통신 속도 측정을 위해서 따로 보냄
+        long transferPowersNs = receiverClient.sendBinFiles(List.of(POWERS), sessionId);
+        long transferKeysNs = receiverClient.sendBinFiles(
+                List.of(PUBLIC_KEY, RELIN_KEY, SECRET_KEY, PARMS), sessionId);
         JSONObject transfer = timing.getJSONObject("receiver");
         transfer.put("transferPowersMs", Math.round(transferPowersNs / 1_000_000.0 * 1000.0) / 1000.0);
         transfer.put("transferKeysMs", Math.round(transferKeysNs / 1_000_000.0 * 1000.0) / 1000.0);
@@ -91,7 +110,7 @@ public class ReceiverController {
     /** Phase 3: 복호화 및 교집합 검증, 최종 timing.json 저장 */
     @PostMapping("/intersections")
     public String check() throws IOException, JSONException {
-        Map<String, Double> t = nativeService.result(STORAGE_DIR.toString(), RECEIVER_CSV.toString());
+        Map<String, Double> t = nativeService.result(STORAGE_DIR.toString(), RECEIVER_CSV.toString(), alpha, windowing);
         JSONObject result = timing.getJSONObject("receiver");
         result.put("load", t.get("loadMs"));
         result.put("decrypt", t.get("decryptMs"));

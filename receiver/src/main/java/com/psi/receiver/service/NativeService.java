@@ -15,7 +15,7 @@ import java.util.Map;
 public class NativeService {
     Path libraryPath = Paths.get("/app/libs/libreceiver-psi.so");
 
-    private int callNative(String functionName, String storageDir, String receiverCsv) {
+    private int callNative(String functionName, String storageDir, String receiverCsv, int alpha, int windowing) {
         System.out.println("callNative: " + functionName + " storageDir=" + storageDir + " receiverCsv=" + receiverCsv);
         try (Arena arena = Arena.ofConfined()) {
             SymbolLookup lookup = SymbolLookup.libraryLookup(libraryPath, arena);
@@ -26,13 +26,13 @@ public class NativeService {
 
             MethodHandle handle = linker.downcallHandle(
                     funcSegment,
-                    FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS)
+                    FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT)
             );
 
             MemorySegment storageDirSeg = arena.allocateFrom(storageDir);
             MemorySegment receiverCsvSeg = arena.allocateFrom(receiverCsv);
 
-            return (int) handle.invokeExact(storageDirSeg, receiverCsvSeg);
+            return (int) handle.invokeExact(storageDirSeg, receiverCsvSeg, alpha, windowing);
         } catch (Throwable e) {
             throw new RuntimeException("Native Function Execution Failed: " + functionName, e);
         }
@@ -60,16 +60,16 @@ public class NativeService {
         }
     }
 
-    public Map<String, Double> request(String storageDir, String receiverCsvPath) {
-        int code = callNative("request", storageDir, receiverCsvPath);
+    public Map<String, Double> request(String storageDir, String receiverCsvPath, int alpha, int windowing) {
+        int code = callNative("request", storageDir, receiverCsvPath, alpha, windowing);
         if (code != 0) {
             throw new RuntimeException("request() failed (return code: " + code + ")");
         }
         return readCppTiming(storageDir);
     }
 
-    public Map<String, Double> result(String storageDir, String receiverCsvPath) {
-        int code = callNative("result", storageDir, receiverCsvPath);
+    public Map<String, Double> result(String storageDir, String receiverCsvPath, int alpha, int windowing) {
+        int code = callNative("result", storageDir, receiverCsvPath, alpha, windowing);
         if (code != 0) {
             throw new RuntimeException("result() failed (return code: " + code + ")");
         }
