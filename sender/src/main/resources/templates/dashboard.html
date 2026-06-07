@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html class="light" lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>MedVerify PSI | Sender Dashboard</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+          rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+          rel="stylesheet"/>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#091426',
+                        secondary: '#2170e4',
+                        secondaryDark: '#0058be',
+                        mint: '#4edea3',
+                        success: '#00a472',
+                        danger: '#ba1a1a',
+                        background: '#f8f9fa',
+                        surface: '#ffffff',
+                        surfaceSoft: '#f3f4f5',
+                        surfaceLine: '#e5e7eb',
+                        textMain: '#191c1d',
+                        textMuted: '#5d6268',
+                        textLight: '#c8d1e4',
+                        sidebarHover: '#3c475a'
+                    },
+                    boxShadow: {
+                        card: '0 4px 14px rgba(15, 23, 42, 0.06)',
+                        soft: '0 8px 30px rgba(15, 23, 42, 0.08)'
+                    }
+                }
+            }
+        };
+    </script>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f8f9fa;
+            color: #191c1d;
+        }
+
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+
+        .app-card {
+            background: #fff;
+            border: 1px solid #e5e7eb;
+            border-radius: 18px;
+            box-shadow: 0 4px 14px rgba(15, 23, 42, 0.06);
+        }
+
+        .metric-card {
+            background: #fff;
+            border: 1px solid #e5e7eb;
+            border-radius: 16px;
+            box-shadow: 0 4px 14px rgba(15, 23, 42, 0.06);
+            padding: 20px;
+        }
+
+        .sidebar-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 14px;
+            border-radius: 12px;
+            color: #c8d1e4;
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: .01em;
+            transition: all .18s ease;
+        }
+
+        .sidebar-link:hover {
+            background: #3c475a;
+            color: #fff;
+            transform: translateX(2px);
+        }
+
+        .sidebar-link .material-symbols-outlined {
+            font-size: 22px;
+        }
+
+        .status-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            padding: 6px 10px;
+            border-radius: 999px;
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: .04em;
+            text-transform: uppercase;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #c5c6cd;
+            border-radius: 999px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .pulse-dot {
+            animation: pulse-dot 1.8s infinite;
+        }
+
+        @keyframes pulse-dot {
+            0%, 100% {
+                opacity: .35;
+                transform: scale(.88);
+            }
+            50% {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .desktop-sidebar {
+                display: none;
+            }
+
+            .main-shell {
+                margin-left: 0 !important;
+            }
+
+            .topbar {
+                padding-left: 16px;
+                padding-right: 16px;
+            }
+
+            .content-canvas {
+                padding: 20px 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<aside class="desktop-sidebar fixed left-0 top-0 z-50 flex h-screen w-64 flex-col bg-primary px-4 py-8 shadow-soft">
+    <div class="mb-8 px-2">
+        <div class="flex items-center gap-3">
+            <div class="flex h-10 w-10 items-center justify-center rounded-2xl bg-secondary text-white shadow-soft">
+                <span class="material-symbols-outlined">encrypted</span>
+            </div>
+            <div>
+                <h1 class="text-[22px] font-extrabold leading-tight text-white">PSI Node 01</h1>
+                <p class="mt-1 text-[12px] font-semibold text-textLight/70">Status: Autonomous</p>
+            </div>
+        </div>
+    </div>
+
+    <nav class="flex-1 space-y-1.5">
+        <a class="sidebar-link" href="sender_dashboard_clean.html"><span
+                class="material-symbols-outlined">dashboard</span><span>Dashboard</span></a>
+        <a class="sidebar-link" href="#"><span class="material-symbols-outlined">terminal</span><span>Executions</span></a>
+        <a class="sidebar-link" href="metadata_management_clean.html"><span
+                class="material-symbols-outlined">database</span><span>Metadata</span></a>
+        <a class="sidebar-link" href="#"><span
+                class="material-symbols-outlined">monitoring</span><span>System Metrics</span></a>
+        <a class="sidebar-link" href="#"><span class="material-symbols-outlined">shield</span><span>Security Logs</span></a>
+    </nav>
+
+    <div class="mt-auto border-t border-white/10 pt-6">
+        <button class="mb-5 flex w-full items-center justify-center gap-2 rounded-xl bg-white/10 px-4 py-3 text-[12px] font-extrabold text-white transition hover:bg-white/15">
+            <span class="material-symbols-outlined text-[18px]">power_settings_new</span>
+            Manual Override
+        </button>
+        <div class="space-y-1">
+            <a class="sidebar-link !py-2.5" href="#"><span
+                    class="material-symbols-outlined">contact_support</span><span>Support</span></a>
+            <a class="sidebar-link !py-2.5" href="#"><span
+                    class="material-symbols-outlined">logout</span><span>Logout</span></a>
+        </div>
+    </div>
+</aside>
+
+<main class="main-shell ml-64 min-h-screen">
+
+    <header class="topbar sticky top-0 z-40 flex h-16 shrink-0 items-center justify-between border-b border-surfaceLine bg-background/95 px-8 backdrop-blur">
+        <div class="flex min-w-0 items-center gap-4">
+            <button class="md:hidden rounded-xl border border-surfaceLine bg-white p-2 text-primary"><span
+                    class="material-symbols-outlined">menu</span></button>
+            <div class="min-w-0">
+                <div class="flex items-center gap-3">
+                    <h2 class="truncate text-[21px] font-extrabold tracking-tight text-secondaryDark">Sender
+                        Dashboard</h2>
+                    <span class="status-pill bg-[#4edea3]/20 text-success"><span
+                            class="h-2 w-2 rounded-full bg-success pulse-dot"></span>Online</span>
+                </div>
+                <p class="hidden text-[12px] font-semibold text-textMuted sm:block">Encrypted PSI requests are processed
+                    automatically without exposing raw data.</p>
+            </div>
+        </div>
+        <div class="flex items-center gap-3">
+            <label class="hidden items-center gap-2 rounded-full bg-white px-3 py-2 shadow-card lg:flex">
+                <span class="material-symbols-outlined text-[20px] text-textMuted">search</span>
+                <input class="w-56 border-none bg-transparent p-0 text-[13px] text-textMain placeholder:text-textMuted focus:ring-0"
+                       placeholder="Search PSI requests..." type="text"/>
+            </label>
+            <button class="rounded-full p-2 text-textMuted transition hover:bg-white hover:text-secondary"><span
+                    class="material-symbols-outlined">notifications</span></button>
+            <button class="rounded-full p-2 text-textMuted transition hover:bg-white hover:text-secondary"><span
+                    class="material-symbols-outlined">settings</span></button>
+            <div class="h-8 w-8 overflow-hidden rounded-full bg-[#d8e2ff] ring-2 ring-white">
+                <img alt="Administrator Profile" class="h-full w-full object-cover"
+                     src="https://lh3.googleusercontent.com/aida-public/AB6AXuCollec7LFEVN79hs7b7qhBZIbm5_wY1yLjgjZhcGCoJSqanm-ZEJGXUHTSJzPClicrlhHdpYOwt9Dt9FwluaMsbBwDS5APHi_dOGnAdqRydPHMSVCbz77RaQVYbVqFUqy_HXz0yRzHRyEwuXb-pyhkOiMBXadbHMzOe_RqQlntChXnA2sehx7kbrAwSo5VQJo-c7Jut_izZ0Ykl-tbuMhF3AftRt3wBoGkmrGuny1e3dW4bY10LJi9f2OnN5G3MeE6j36gvvfUj2I6"/>
+            </div>
+        </div>
+    </header>
+
+    <section class="content-canvas mx-auto max-w-[1440px] space-y-7 px-8 py-8">
+
+        <section class="app-card overflow-hidden bg-gradient-to-r from-white to-[#eef5ff] p-6">
+            <div class="flex flex-col justify-between gap-5 lg:flex-row lg:items-center">
+                <div>
+                    <p class="mb-2 flex items-center gap-2 text-[13px] font-bold text-secondary"><span
+                            class="material-symbols-outlined text-[20px]">verified_user</span>Encrypted PSI automation
+                    </p>
+                    <h3 class="text-2xl font-extrabold tracking-tight text-primary">Sender node is processing incoming
+                        PSI requests automatically.</h3>
+                    <p class="mt-2 max-w-3xl text-sm leading-6 text-textMuted">Raw resident identifiers and medical
+                        labels remain hidden. The sender node only loads preprocessing artifacts, runs homomorphic PSI
+                        computation, and returns encrypted match responses to the receiver.</p>
+                </div>
+                <div class="grid min-w-[280px] grid-cols-2 gap-3">
+                    <div class="rounded-2xl bg-white/75 p-4 shadow-card"><p
+                            class="text-[11px] font-bold uppercase text-textMuted">Active Session</p>
+                        <p class="mt-1 text-xl font-extrabold text-primary">PSI-001</p></div>
+                    <div class="rounded-2xl bg-white/75 p-4 shadow-card"><p
+                            class="text-[11px] font-bold uppercase text-textMuted">Last Sync</p>
+                        <p class="mt-1 text-xl font-extrabold text-primary">14:23</p></div>
+                </div>
+            </div>
+        </section>
+
+        <section class="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-4">
+            <div class="metric-card">
+                <div class="flex items-start justify-between"><p class="text-[12px] font-bold uppercase text-textMuted">
+                    Active PSI Request</p><span class="status-pill bg-secondary/10 text-secondary"><span
+                        class="h-1.5 w-1.5 rounded-full bg-secondary pulse-dot"></span>Running</span></div>
+                <p class="mt-3 text-2xl font-extrabold text-primary">1 request</p>
+                <p class="mt-1 text-sm text-textMuted">Current execution session</p></div>
+            <div class="metric-card">
+                <div class="flex items-start justify-between"><p class="text-[12px] font-bold uppercase text-textMuted">
+                    Sender Dataset</p><span class="material-symbols-outlined text-success">check_circle</span></div>
+                <p class="mt-3 text-2xl font-extrabold text-primary">Preprocessed</p>
+                <p class="mt-1 text-sm text-textMuted">Hashed, windowed, partitioned</p></div>
+            <div class="metric-card">
+                <div class="flex items-start justify-between"><p class="text-[12px] font-bold uppercase text-textMuted">
+                    Estimated Time</p><span class="material-symbols-outlined text-textMuted">timer</span></div>
+                <p class="mt-3 text-2xl font-extrabold text-primary">01m 12s</p>
+                <p class="mt-1 text-sm text-textMuted">Based on selected parameters</p></div>
+            <div class="metric-card">
+                <div class="flex items-start justify-between"><p class="text-[12px] font-bold uppercase text-textMuted">
+                    Privacy Mode</p><span class="material-symbols-outlined text-success">lock</span></div>
+                <p class="mt-3 text-2xl font-extrabold text-primary">Encrypted Only</p>
+                <p class="mt-1 text-sm text-textMuted">No raw data access</p></div>
+        </section>
+
+        <section class="grid grid-cols-1 gap-7 xl:grid-cols-12">
+            <div class="app-card p-6 xl:col-span-8">
+                <div class="mb-6 flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
+                    <div>
+                        <h3 class="flex items-center gap-2 text-xl font-extrabold text-primary"><span
+                                class="material-symbols-outlined text-secondary">memory</span>Current PSI Execution</h3>
+                        <p class="mt-1 text-sm text-textMuted">ID: PSI-REQ-2026-0606-001</p>
+                    </div>
+                    <span class="status-pill bg-secondary/10 text-secondary">Homomorphic Computation</span>
+                </div>
+                <div class="mb-8">
+                    <div class="mb-2 flex justify-between text-[12px] font-extrabold"><span class="text-secondary">Progress 68%</span><span
+                            class="text-textMuted">ETA 22s</span></div>
+                    <div class="h-3 overflow-hidden rounded-full bg-surfaceSoft">
+                        <div class="h-full w-[68%] rounded-full bg-secondary shadow-[0_0_16px_rgba(33,112,228,.35)]"></div>
+                    </div>
+                </div>
+                <div class="relative space-y-5 pl-1">
+                    <div class="absolute left-[12px] top-2 bottom-2 w-0.5 bg-surfaceLine"></div>
+                    <div class="relative z-10 flex items-center gap-4"><span
+                            class="flex h-6 w-6 items-center justify-center rounded-full bg-success text-white"><span
+                            class="material-symbols-outlined text-[16px]">check</span></span>
+                        <p class="text-sm font-semibold text-textMuted">Request received</p></div>
+                    <div class="relative z-10 flex items-center gap-4"><span
+                            class="flex h-6 w-6 items-center justify-center rounded-full bg-success text-white"><span
+                            class="material-symbols-outlined text-[16px]">check</span></span>
+                        <p class="text-sm font-semibold text-textMuted">Parameter validation</p></div>
+                    <div class="relative z-10 flex items-center gap-4"><span
+                            class="flex h-6 w-6 items-center justify-center rounded-full bg-success text-white"><span
+                            class="material-symbols-outlined text-[16px]">check</span></span>
+                        <p class="text-sm font-semibold text-textMuted">Load preprocessed sender table</p></div>
+                    <div class="relative z-10 flex items-center gap-4"><span
+                            class="flex h-6 w-6 items-center justify-center rounded-full bg-secondary text-white ring-4 ring-secondary/15"><span
+                            class="material-symbols-outlined text-[16px]">sync</span></span>
+                        <p class="text-sm font-extrabold text-primary">Homomorphic PSI computation</p></div>
+                    <div class="relative z-10 flex items-center gap-4 opacity-45"><span
+                            class="flex h-6 w-6 items-center justify-center rounded-full bg-surfaceLine text-white"><span
+                            class="material-symbols-outlined text-[16px]">more_horiz</span></span>
+                        <p class="text-sm font-semibold text-textMuted">Generate encrypted response</p></div>
+                    <div class="relative z-10 flex items-center gap-4 opacity-45"><span
+                            class="flex h-6 w-6 items-center justify-center rounded-full bg-surfaceLine text-white"><span
+                            class="material-symbols-outlined text-[16px]">send</span></span>
+                        <p class="text-sm font-semibold text-textMuted">Send response to receiver</p></div>
+                </div>
+            </div>
+            <div class="space-y-7 xl:col-span-4">
+                <div class="app-card p-6">
+                    <h3 class="mb-5 text-xl font-extrabold text-primary">Request Details</h3>
+                    <dl class="space-y-4 text-sm">
+                        <div>
+                            <dt class="text-[11px] font-bold uppercase text-textMuted">Receiver</dt>
+                            <dd class="font-semibold text-primary">Insurance Verification Server</dd>
+                        </div>
+                        <div>
+                            <dt class="text-[11px] font-bold uppercase text-textMuted">Type</dt>
+                            <dd class="font-semibold text-primary">Medical Label Verification</dd>
+                        </div>
+                        <div>
+                            <dt class="text-[11px] font-bold uppercase text-textMuted">Format</dt>
+                            <dd class="font-semibold text-primary">Encrypted query</dd>
+                        </div>
+                        <div>
+                            <dt class="text-[11px] font-bold uppercase text-textMuted">Result</dt>
+                            <dd class="font-semibold text-primary">Encrypted match response</dd>
+                        </div>
+                        <div>
+                            <dt class="text-[11px] font-bold uppercase text-textMuted">Raw Data Access</dt>
+                            <dd class="mt-1 flex items-center gap-2 font-extrabold text-danger"><span
+                                    class="material-symbols-outlined text-[18px]">cancel</span>Not allowed
+                            </dd>
+                        </div>
+                    </dl>
+                </div>
+                <div class="app-card bg-primary p-6 text-white"><p
+                        class="flex items-start gap-3 text-sm leading-6 text-textLight"><span
+                        class="material-symbols-outlined text-mint">info</span>Sender cannot view the receiver's raw
+                    query. The receiver decrypts only the final PSI result.</p></div>
+            </div>
+        </section>
+
+        <section class="app-card p-6">
+            <div class="mb-5 flex flex-col justify-between gap-3 sm:flex-row sm:items-center"><h3
+                    class="text-xl font-extrabold text-primary">Execution Parameters</h3><span
+                    class="rounded-full bg-surfaceSoft px-3 py-1 text-[11px] font-extrabold text-textMuted">Depth-1 Optimized · α=256 · ℓ=5</span>
+            </div>
+            <div class="grid grid-cols-2 gap-3 md:grid-cols-4 xl:grid-cols-8">
+                <div class="rounded-2xl border border-surfaceLine bg-surfaceSoft p-4"><p
+                        class="text-[11px] font-bold uppercase text-textMuted">m</p>
+                    <p class="mt-1 text-lg font-extrabold text-secondary">16,384</p></div>
+                <div class="rounded-2xl border border-surfaceLine bg-surfaceSoft p-4"><p
+                        class="text-[11px] font-bold uppercase text-textMuted">n</p>
+                    <p class="mt-1 text-lg font-extrabold text-secondary">8,192</p></div>
+                <div class="rounded-2xl border border-surfaceLine bg-surfaceSoft p-4"><p
+                        class="text-[11px] font-bold uppercase text-textMuted">h</p>
+                    <p class="mt-1 text-lg font-extrabold text-secondary">3</p></div>
+                <div class="rounded-2xl border border-surfaceLine bg-surfaceSoft p-4"><p
+                        class="text-[11px] font-bold uppercase text-textMuted">B</p>
+                    <p class="mt-1 text-lg font-extrabold text-secondary">9,960</p></div>
+                <div class="rounded-2xl border border-surfaceLine bg-surfaceSoft p-4"><p
+                        class="text-[11px] font-bold uppercase text-textMuted">λ</p>
+                    <p class="mt-1 text-lg font-extrabold text-secondary">40</p></div>
+                <div class="rounded-2xl border border-surfaceLine bg-surfaceSoft p-4"><p
+                        class="text-[11px] font-bold uppercase text-textMuted">Depth</p>
+                    <p class="mt-1 text-lg font-extrabold text-secondary">1</p></div>
+                <div class="rounded-2xl border border-surfaceLine bg-surfaceSoft p-4"><p
+                        class="text-[11px] font-bold uppercase text-textMuted">α</p>
+                    <p class="mt-1 text-lg font-extrabold text-secondary">256</p></div>
+                <div class="rounded-2xl border border-surfaceLine bg-surfaceSoft p-4"><p
+                        class="text-[11px] font-bold uppercase text-textMuted">ℓ</p>
+                    <p class="mt-1 text-lg font-extrabold text-secondary">5</p></div>
+            </div>
+        </section>
+
+        <section class="grid grid-cols-1 gap-7 xl:grid-cols-2">
+            <div class="app-card overflow-hidden">
+                <div class="flex items-center justify-between border-b border-surfaceLine p-6"><h3
+                        class="text-xl font-extrabold text-primary">Execution Log</h3><span
+                        class="material-symbols-outlined text-textMuted">open_in_full</span></div>
+                <div class="custom-scrollbar h-64 overflow-y-auto bg-primary p-5 font-mono text-[12px] leading-6 text-textLight">
+                    <p>[14:21:03] Encrypted request received... DONE</p>
+                    <p>[14:21:05] Parameter set validated. λ=40</p>
+                    <p>[14:21:08] Sender hash table loaded from persistent storage</p>
+                    <p>[14:21:16] Homomorphic computation started. Session UUID: a1-f4-90</p>
+                    <p class="text-mint">[14:22:02] Processing partition 184 / 256... 72%</p>
+                    <p class="text-mint">[14:22:15] Rotation keys applied. Level depth 1 maintained.</p>
+                    <p class="text-mint">[14:22:30] Performing partial subtraction on ciphertexts...</p></div>
+            </div>
+            <div class="app-card p-6"><h3 class="mb-5 text-xl font-extrabold text-primary">System Metrics</h3>
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="rounded-2xl bg-surfaceSoft p-5"><p
+                            class="text-[11px] font-bold uppercase text-textMuted">CPU Usage</p>
+                        <p class="mt-2 text-3xl font-extrabold text-secondary">72%</p>
+                        <div class="mt-4 h-2 rounded-full bg-white">
+                            <div class="h-2 w-[72%] rounded-full bg-secondary"></div>
+                        </div>
+                    </div>
+                    <div class="rounded-2xl bg-surfaceSoft p-5"><p
+                            class="text-[11px] font-bold uppercase text-textMuted">Memory</p>
+                        <p class="mt-2 text-3xl font-extrabold text-secondary">58%</p>
+                        <div class="mt-4 h-2 rounded-full bg-white">
+                            <div class="h-2 w-[58%] rounded-full bg-secondary"></div>
+                        </div>
+                    </div>
+                    <div class="rounded-2xl bg-surfaceSoft p-5"><p
+                            class="text-[11px] font-bold uppercase text-textMuted">Network Out</p>
+                        <p class="mt-2 text-2xl font-extrabold text-primary">4.2 MB/s</p></div>
+                    <div class="rounded-2xl bg-surfaceSoft p-5"><p
+                            class="text-[11px] font-bold uppercase text-textMuted">Network In</p>
+                        <p class="mt-2 text-2xl font-extrabold text-primary">3.1 MB/s</p></div>
+                </div>
+            </div>
+        </section>
+
+        <section class="app-card overflow-hidden">
+            <div class="flex items-center justify-between border-b border-surfaceLine p-6"><h3
+                    class="text-xl font-extrabold text-primary">Request Queue</h3>
+                <button class="flex items-center gap-1 text-[13px] font-extrabold text-secondary"><span
+                        class="material-symbols-outlined text-[18px]">history</span>View History
+                </button>
+            </div>
+            <div class="overflow-x-auto custom-scrollbar">
+                <table class="w-full min-w-[820px] text-left text-sm">
+                    <thead class="bg-surfaceSoft text-[11px] uppercase tracking-wide text-textMuted">
+                    <tr>
+                        <th class="px-6 py-4">Request ID</th>
+                        <th class="px-6 py-4">Status</th>
+                        <th class="px-6 py-4">Received At</th>
+                        <th class="px-6 py-4">Progress</th>
+                        <th class="px-6 py-4">Priority</th>
+                        <th class="px-6 py-4 text-right">Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody class="divide-y divide-surfaceLine">
+                    <tr class="hover:bg-surfaceSoft/60">
+                        <td class="px-6 py-4 font-bold text-primary">PSI-REQ-001</td>
+                        <td class="px-6 py-4"><span class="status-pill bg-secondary/10 text-secondary">Running</span>
+                        </td>
+                        <td class="px-6 py-4 text-textMuted">14:21</td>
+                        <td class="px-6 py-4">
+                            <div class="flex items-center gap-3">
+                                <div class="h-1.5 w-28 rounded-full bg-surfaceSoft">
+                                    <div class="h-1.5 w-[68%] rounded-full bg-secondary"></div>
+                                </div>
+                                <span class="font-bold text-secondary">68%</span></div>
+                        </td>
+                        <td class="px-6 py-4 text-textMuted">Normal</td>
+                        <td class="px-6 py-4 text-right"><span class="material-symbols-outlined text-textMuted">more_vert</span>
+                        </td>
+                    </tr>
+                    <tr class="hover:bg-surfaceSoft/60">
+                        <td class="px-6 py-4 font-bold text-primary">PSI-REQ-002</td>
+                        <td class="px-6 py-4"><span class="status-pill bg-surfaceSoft text-textMuted">Waiting</span>
+                        </td>
+                        <td class="px-6 py-4 text-textMuted">14:25</td>
+                        <td class="px-6 py-4"><span class="font-bold text-textMuted">0%</span></td>
+                        <td class="px-6 py-4 text-textMuted">Normal</td>
+                        <td class="px-6 py-4 text-right"><span class="material-symbols-outlined text-textMuted">more_vert</span>
+                        </td>
+                    </tr>
+                    <tr class="hover:bg-surfaceSoft/60">
+                        <td class="px-6 py-4 font-bold text-primary">PSI-REQ-003</td>
+                        <td class="px-6 py-4"><span class="status-pill bg-[#4edea3]/20 text-success">Completed</span>
+                        </td>
+                        <td class="px-6 py-4 text-textMuted">14:10</td>
+                        <td class="px-6 py-4"><span class="font-bold text-success">100%</span></td>
+                        <td class="px-6 py-4 text-textMuted">Normal</td>
+                        <td class="px-6 py-4 text-right"><span class="material-symbols-outlined text-textMuted">more_vert</span>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+    </section>
+</main>
+</body>
+</html>

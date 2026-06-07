@@ -34,9 +34,6 @@ public class SenderController {
     private static final int CONGESTION_WINDOWING = 7;
     private static final int CONGESTION_ALPHA = 128;
     private static final Path STORAGE_DIR = Paths.get("storage/sessions").toAbsolutePath();
-//    private static final Path RESULT = Paths.get("storage/result.bin").toAbsolutePath();
-//    private static final Path CPP_TIMING = Paths.get("storage/sender_timing.json").toAbsolutePath();
-//    private static final Path SENDER_CSV = Paths.get("storage/B_sender_50M.csv").toAbsolutePath();
     private static final String bucketName = "capstone-design-sender-bucker-684494100299-ap-northeast-2-an";
     private static final String CONGESTED_DIR = "congested-queue/";
     private static final String DEFAULT_DIR = "default-queue/";
