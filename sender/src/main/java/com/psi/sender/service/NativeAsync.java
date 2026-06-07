@@ -9,6 +9,7 @@ import org.springframework.util.FileSystemUtils;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 @Service
@@ -46,7 +47,10 @@ public class NativeAsync {
         }
 
         // 다항식 결과 전송 걸리는 시간
-        long transferNs = senderClient.sendBinFile(resultDir);
+//        long transferNs = senderClient.sendBinFile(resultDir);
+
+        // result, cpp timing 같이 전송
+        long transferNs = senderClient.sendBinFiles(List.of(resultDir, cppTiming), sessionId);
 
         // 시간 저장
         String content = new String(Files.readAllBytes(cppTiming));
@@ -57,7 +61,7 @@ public class NativeAsync {
         System.out.println("[Sender] Operation timing data file update complete");
 
         // 연산 시간 전송
-        senderClient.sendJsonFile(cppTiming);
+//        senderClient.sendJsonFile(cppTiming);
 
         System.out.println("[Sender] Final execution time, file transfer completed");
 

@@ -9,15 +9,21 @@ import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import java.nio.file.Path;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class SenderClient {
     private final WebClient webClient;
 
-    public long sendBinFile(Path filePath) {
+    public long sendBinFiles(List<Path> filePaths, String sessionId) {
         MultipartBodyBuilder builder = new MultipartBodyBuilder();
-        builder.part("binFile", new FileSystemResource(filePath));
+
+        builder.part("sessionId", sessionId);
+
+        for (Path path : filePaths) {
+            builder.part("binFiles", new FileSystemResource(path));
+        }
 
         long startTime = System.nanoTime();
         String response = webClient.post()
@@ -25,8 +31,8 @@ public class SenderClient {
                 .body(BodyInserters.fromMultipartData(builder.build()))
                 .retrieve()
                 .bodyToMono(String.class)
-                .doOnSuccess(success -> System.out.println("sender result transfer success: " + success))
-                .doOnError(error -> System.err.println("sender result transfer failed: " + error.getMessage()))
+                .doOnSuccess(success -> System.out.println("receiver powers and key transfer success: " + success))
+                .doOnError(error -> System.err.println("receiver powers and key transfer failed: " + error.getMessage()))
                 .block();
         long endTime = System.nanoTime();
 
@@ -35,15 +41,35 @@ public class SenderClient {
         return endTime - startTime;
     }
 
-    public void sendJsonFile(Path filePath) {
-        webClient.post()
-                .uri("/files/sender-timing")
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(BodyInserters.fromResource(new FileSystemResource(filePath))) // 리소스 삽입함
-                .retrieve()
-                .bodyToMono(String.class)
-                .doOnSuccess(success -> System.out.println("sender timing transfer success: " + success))
-                .doOnError(error -> System.err.println("sender timing transfer failed: " + error.getMessage()))
-                .block();
-    }
+//    public long sendBinFile(Path filePath) {
+//        MultipartBodyBuilder builder = new MultipartBodyBuilder();
+//        builder.part("binFile", new FileSystemResource(filePath));
+//
+//        long startTime = System.nanoTime();
+//        String response = webClient.post()
+//                .uri("/files/result")
+//                .body(BodyInserters.fromMultipartData(builder.build()))
+//                .retrieve()
+//                .bodyToMono(String.class)
+//                .doOnSuccess(success -> System.out.println("sender result transfer success: " + success))
+//                .doOnError(error -> System.err.println("sender result transfer failed: " + error.getMessage()))
+//                .block();
+//        long endTime = System.nanoTime();
+//
+//        System.out.println(response);
+//
+//        return endTime - startTime;
+//    }
+//
+//    public void sendJsonFile(Path filePath) {
+//        webClient.post()
+//                .uri("/files/sender-timing")
+//                .contentType(MediaType.APPLICATION_JSON)
+//                .body(BodyInserters.fromResource(new FileSystemResource(filePath))) // 리소스 삽입함
+//                .retrieve()
+//                .bodyToMono(String.class)
+//                .doOnSuccess(success -> System.out.println("sender timing transfer success: " + success))
+//                .doOnError(error -> System.err.println("sender timing transfer failed: " + error.getMessage()))
+//                .block();
+//    }
 }
