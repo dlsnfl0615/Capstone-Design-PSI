@@ -18,12 +18,16 @@ using namespace seal;
 using Clock = chrono::high_resolution_clock;
 using Ms = chrono::milliseconds;
 
+int alpha;
+int l;
+int B_prime = static_cast<int>(ceil(static_cast<double>(B) / alpha));
+
 extern "C" {
 #ifdef _WIN32
 __declspec(dllexport) // 윈도우 환경 DLL 내보내기
 #endif
 
-int intersect(const char* storage, const char* sender_csv) {
+int intersect(const char* storage, const char* sender_csv, const int alpha_var, const int l_var) {
     try {
 
     cout << "[debug] sender main started" << endl;
@@ -87,6 +91,10 @@ int intersect(const char* storage, const char* sender_csv) {
         } else {
             cerr << "[warning] relin_key.bin 파일을 열 수 없습니다." << endl;
         }
+
+        alpha = alpha_var;
+        l = l_var;
+        B_prime = static_cast<int>(ceil(static_cast<double>(B) / alpha)); // 재계산
 
         map<int, vector<Ciphertext>> encrypted_powers;
 

@@ -1,23 +1,18 @@
 package com.psi.sender.service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.MultipartBodyBuilder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
-import reactor.core.publisher.Mono;
 
-import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 
 @Service
 @RequiredArgsConstructor
-public class FileTransfer {
-    private static final String SENDER_URL = "http://3.34.152.64:8080";
+public class SenderClient {
     private final WebClient webClient;
 
     public long sendBinFile(Path filePath) {

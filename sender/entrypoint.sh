@@ -5,7 +5,7 @@ mkdir -p /app/storage
 
 echo "진행: S3에서 동기화 시작..."
 
-aws s3 sync s3://capstone-design-sender-bucker-684494100299-ap-northeast-2-an/alpha256-l6/ /app/storage/
+aws s3 cp s3://capstone-design-sender-bucker-684494100299-ap-northeast-2-an/storage/B_sender_50M.csv /app/storage/B_sender_50M.csv --region ap-northeast-2
 
 echo "💡 [디버깅] /app/storage/ 내부 실제 파일 목록:"
 ls -al /app/storage/

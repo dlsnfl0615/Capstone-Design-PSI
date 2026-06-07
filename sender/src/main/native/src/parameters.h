@@ -34,10 +34,10 @@ const int CUCKOO_MAX_KICK = 500;
 const uint64_t RECEIVER_DUMMY = (1ULL << sigma);
 const uint64_t SENDER_DUMMY = ((1ULL << (sigma + 1)) - 1);
 // const int q 자동으로 생성됨
-const int l = 3; // 윈도잉 파라미터
-const int alpha = 256;
+extern int l; // 윈도잉 파라미터
+extern int alpha;
 const int seed = 4365234; // 일단 아무거나
-const int B_prime = static_cast<int>(ceil(static_cast<double>(B) / alpha));
+extern int B_prime;
 const int NUM_THREADS = 4; // 멀티스레드 개수
 
 // 해시 함수용 log2m 계산

@@ -9,37 +9,38 @@ import java.nio.file.Paths;
 
 @Service
 public class NativeService {
+    private static final String FUNCTION_NAME = "intersect";
     Path libraryPath = Paths.get("/app/libs/libsender-psi.so");
 
-    public int callNative(String functionName, String storageDir, String senderCsv) {
-        System.out.println("callNative: " + functionName + " storageDir=" + storageDir + " senderCsv=" + senderCsv);
+    public int callNative(String storageDir, String senderCsv, int alpha, int windowing) {
+        System.out.println("callNative: " + FUNCTION_NAME + " storageDir=" + storageDir + " senderCsv=" + senderCsv);
 
         try (Arena arena = Arena.ofConfined()) {
             SymbolLookup lookup = SymbolLookup.libraryLookup(libraryPath, arena);
             Linker linker = Linker.nativeLinker();
 
-            MemorySegment funcSegment = lookup.find(functionName)
-                    .orElseThrow(() -> new RuntimeException("Native function search failed: " + functionName));
+            MemorySegment funcSegment = lookup.find(FUNCTION_NAME)
+                    .orElseThrow(() -> new RuntimeException("Native function search failed: " + FUNCTION_NAME));
 
             MethodHandle handle = linker.downcallHandle(
                     funcSegment,
-                    FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS)
+                    FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT)
             );
 
             MemorySegment storageDirSeg = arena.allocateFrom(storageDir);
             MemorySegment senderCsvSeg = arena.allocateFrom(senderCsv);
 
-            return (int) handle.invokeExact(storageDirSeg, senderCsvSeg);
+            return (int) handle.invokeExact(storageDirSeg, senderCsvSeg, alpha, windowing);
         } catch (Throwable e) {
-            throw new RuntimeException("Native function execution failed: " + functionName, e);
+            throw new RuntimeException("Native function execution failed: " + FUNCTION_NAME, e);
         }
     }
 
-    public int intersect(String storageDir, String senderCsv) {
-        return callNative("intersect", storageDir, senderCsv);
+    public int intersect(String storageDir, String senderCsv, int alpha, int windowing) {
+        return callNative(storageDir, senderCsv, alpha, windowing);
     }
 
-    public int hashing(String storageDir, String senderCsv) {
-        return callNative("preprocess", storageDir, senderCsv);
-    }
+//    public int hashing(String storageDir, String senderCsv) {
+//        return callNative("preprocess", storageDir, senderCsv);
+//    }
 }

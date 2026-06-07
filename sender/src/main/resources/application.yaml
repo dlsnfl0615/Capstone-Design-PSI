@@ -1,0 +1,15 @@
+spring:
+  application:
+    name: sender
+
+  servlet:
+    multipart:
+      max-file-size: 2048MB
+      max-request-size: 2048MB
+  cloud:
+    aws:
+      region:
+        static: ap-northeast-2
+
+server:
+  port: 8081
