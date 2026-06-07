@@ -37,13 +37,13 @@ public class Uploader {
         }
     }
 
-    public boolean hasAllRequiredFiles(String bucketName, String s3Prefix, List<String> requiredFiles) {
-        List<S3Resource> resources = s3Template.listObjects(bucketName, s3Prefix);
-        Set<String> uploadedFileNames = resources.stream()
-                .map(r -> Paths.get(r.getFilename()).getFileName().toString())
-                .collect(Collectors.toSet());
-        return uploadedFileNames.containsAll(requiredFiles);
-    }
+//    public boolean hasAllRequiredFiles(String bucketName, String s3Prefix, List<String> requiredFiles) {
+//        List<S3Resource> resources = s3Template.listObjects(bucketName, s3Prefix);
+//        Set<String> uploadedFileNames = resources.stream()
+//                .map(r -> Paths.get(r.getFilename()).getFileName().toString())
+//                .collect(Collectors.toSet());
+//        return uploadedFileNames.containsAll(requiredFiles);
+//    }
 
     public void downloadDirectoryFromS3(String s3Prefix, String dockerPath, String bucketName) throws Exception {
         List<S3Resource> resources = s3Template.listObjects(bucketName, s3Prefix);

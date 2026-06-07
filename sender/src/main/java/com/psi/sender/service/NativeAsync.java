@@ -18,17 +18,24 @@ public class NativeAsync {
     private final SenderClient senderClient;
     private final Uploader uploader;
 
+    private static final String BUCKET_NAME = "capstone-design-sender-bucker-684494100299-ap-northeast-2-an";
+
     /**
      * 다항식 연산 후 결과 반환하는 함수
      * */
     @Async("psiExecutor")
-    public CompletableFuture<String> productPolynomial(Path storageDir, String sessionId, int alpha, int windowing) throws Exception {
+    public CompletableFuture<String> productPolynomial(Path storageDir, String sessionId, int alpha, int windowing, String s3PreprocessPrefix) throws Exception {
         System.out.println("[Sender] Background operation started...");
 
+        Path sessionPath = Paths.get(storageDir.toString(), sessionId);
         Path csv = Paths.get("storage/B_sender_50M.csv");
         Path resultDir = Paths.get(storageDir.toString(), sessionId, "result.bin");
         Path cppTiming = Paths.get(storageDir.toString(), sessionId, "sender_timing.json");
 
+        // 로컬 세션 디렉토리 생성 및 S3 파일 다운로드
+        Files.createDirectories(sessionPath);
+        uploader.downloadDirectoryFromS3("storage/sessions/" + sessionId, sessionPath.toString(), BUCKET_NAME);
+        uploader.downloadDirectoryFromS3(s3PreprocessPrefix, sessionPath.toString(), BUCKET_NAME);
 
         // 다항식 연산
         int result = nativeService.intersect(storageDir.toString() + "/" + sessionId, csv.toString(), alpha, windowing);
