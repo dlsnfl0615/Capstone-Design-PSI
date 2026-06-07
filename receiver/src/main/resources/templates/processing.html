@@ -549,8 +549,11 @@
         </section>
     </div>
 </main>
-<script>
-    const evtSource = new EventSource('/status/stream');
+<script th:inline="javascript">
+    const sessionId = [[${sessionId}]];
+    console.log(sessionId);
+
+    const evtSource = new EventSource(`/status/stream/${sessionId}`);
     evtSource.addEventListener('done', () => {
         evtSource.close();
         fetch('/intersections', { method: 'POST' })
@@ -564,6 +567,7 @@
             .catch(err => alert('서버 통신 오류: ' + err));
     });
     evtSource.onerror = () => {
+        if (evtSource.readyState === EventSource.CLOSED) return;
         evtSource.close();
         alert('SSE 연결 오류가 발생했습니다.');
     };

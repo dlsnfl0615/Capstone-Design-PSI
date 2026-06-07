@@ -1,8 +1,11 @@
 package com.psi.receiver.controller;
 
+import com.psi.receiver.component.SessionEmitter;
+import com.psi.receiver.component.SessionParameters;
 import com.psi.receiver.service.ReceiverClient;
 import com.psi.receiver.service.NativeService;
 import com.psi.receiver.service.TimingEditor;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -30,17 +33,18 @@ public class ReceiverApiController {
     private final NativeService nativeService;
     private final ReceiverClient receiverClient;
     private final TimingEditor timingEditor;
-    private JSONObject timing = new JSONObject();
-    private int alpha = 0;
-    private int windowing = 0;
-    private volatile SseEmitter sseEmitter;
+    private final JSONObject timing = new JSONObject();
+    private final SessionParameters sessionParameters;
+//    private int alpha = 0;
+//    private int windowing = 0;
+    private final SessionEmitter sessionEmitter;
     private Path receiverCsv;
 
-    private static final Path PUBLIC_KEY = Paths.get("storage/public_key.bin").toAbsolutePath();
-    private static final Path POWERS = Paths.get("storage/powers.bin").toAbsolutePath();
-    private static final Path PARMS = Paths.get("storage/parms.bin").toAbsolutePath();
-    private static final Path RELIN_KEY = Paths.get("storage/relin_key.bin").toAbsolutePath();
-    private static final Path SECRET_KEY = Paths.get("storage/secret_key.bin").toAbsolutePath();
+//    private static final Path PUBLIC_KEY = Paths.get("storage/public_key.bin").toAbsolutePath();
+//    private static final Path POWERS = Paths.get("storage/powers.bin").toAbsolutePath();
+//    private static final Path PARMS = Paths.get("storage/parms.bin").toAbsolutePath();
+//    private static final Path RELIN_KEY = Paths.get("storage/relin_key.bin").toAbsolutePath();
+//    private static final Path SECRET_KEY = Paths.get("storage/secret_key.bin").toAbsolutePath();
     private static final Path STORAGE_DIR = Paths.get("storage").toAbsolutePath();
     private static final Path TIMING_JSON = Paths.get("storage/timing.json").toAbsolutePath();
     private static final Path SENDER_TIMING_JSON = Paths.get("storage/sender_timing.json").toAbsolutePath();
@@ -48,7 +52,11 @@ public class ReceiverApiController {
 
     /** receiver client에서 csv 파일 업로드 */
     @PostMapping("/csv")
-    public ResponseEntity<?> uploadReceiverFile(@RequestParam("file") MultipartFile file) {
+    public ResponseEntity<?> uploadReceiverFile(@RequestParam("file") MultipartFile file,
+                                                HttpSession sessionId) throws IOException {
+        Path sessionBase = Paths.get(STORAGE_DIR.toString(), "sessions", sessionId.getId());
+        Files.createDirectories(sessionBase);
+
         // 파일 유효성 검증
         if (file.isEmpty()) {
             return ResponseEntity.badRequest().body(Map.of("status", "fail", "message", "파일이 비어있습니다."));
@@ -57,11 +65,11 @@ public class ReceiverApiController {
         try {
             // 파일명 추출 및 디렉터리와 결합하여 절대 경로 생성
             String originalFileName = file.getOriginalFilename();
-            receiverCsv = Paths.get("storage", originalFileName).toAbsolutePath();
-            Path targetPath = Paths.get(STORAGE_DIR.toString(), originalFileName); // /app/storage/파일명.csv 형태로 결합
+            receiverCsv = sessionBase.toAbsolutePath();
+            Path targetPath = Paths.get(sessionBase.toString(), originalFileName); // /app/storage/sesseions/{sessionId}/파일명.csv 형태로 결합
 
             // 파일 쓰기 (기존 동일 파일명 존재 시 덮어쓰기)
-            file.transferTo(targetPath.toFile()); // MultipartFile 지원 내장 메서드로 파일 저장 진행
+            file.transferTo(targetPath.toFile());
 
             System.out.println("file saved in docker local: " + targetPath.toAbsolutePath()); // 로그 출력용
 
@@ -81,16 +89,20 @@ public class ReceiverApiController {
      * 결과 전송
      */
     @PostMapping("/requests")
-    public ResponseEntity<String> request() throws JSONException {
-        String sessionId = UUID.randomUUID().toString();
+    public ResponseEntity<String> request(HttpSession session) throws JSONException, IOException {
+        String sessionId = session.getId();
+
+        Path sessionDir = Paths.get(STORAGE_DIR.toString(), "sessions", sessionId);
+        System.out.println("sessionDir = " + sessionDir);
 
         // sender 서버의 작업 큐에 작업 몰렸는지 확인
         List<Integer> parameters = receiverClient.checkCongestion();
-        alpha = parameters.get(0);
-        windowing = parameters.get(1);
+        sessionParameters.put(sessionId, parameters.getFirst(), parameters.getLast());
+        int alpha = sessionParameters.get(sessionId).getAlpha();
+        int windowing = sessionParameters.get(sessionId).getWindowing();
 
         // receiver 해싱 및 윈도잉
-        Map<String, Double> t = nativeService.request(STORAGE_DIR.toString(), receiverCsv.toString(), alpha, windowing);
+        Map<String, Double> t = nativeService.request(sessionDir.toString(), receiverCsv.toString(), alpha, windowing);
 
         // 시간 기록
         JSONObject receiverRequest = new JSONObject();
@@ -110,7 +122,13 @@ public class ReceiverApiController {
     /** Sender로 bin 파일 전송 */
     public String sendResult(String sessionId) throws JSONException {
         // 윈도잉 결과 파일의 통신 속도 측정을 위해서 따로 보냄
-        long transferFilesNs = receiverClient.sendBinFiles(List.of(POWERS, PUBLIC_KEY, RELIN_KEY, SECRET_KEY, PARMS), sessionId);
+        Path powers = Paths.get(STORAGE_DIR.toString(), "sessions/" + sessionId + "/powers.bin");
+        Path publicKey = Paths.get(STORAGE_DIR.toString(), "sessions/" + sessionId + "/public_key.bin");
+        Path relinKey = Paths.get(STORAGE_DIR.toString(), "sessions/" + sessionId + "/relin_key.bin");
+        Path secretKey = Paths.get(STORAGE_DIR.toString(), "sessions/" + sessionId + "/secret_key.bin");
+        Path parms = Paths.get(STORAGE_DIR.toString(), "sessions/" + sessionId + "/parms.bin");
+
+        long transferFilesNs = receiverClient.sendBinFiles(List.of(powers, publicKey, relinKey, secretKey, parms), sessionId);
         JSONObject transfer = timing.getJSONObject("receiver");
         transfer.put("transferFilesMs", Math.round(transferFilesNs / 1_000_000.0 * 1000.0) / 1000.0);
 
@@ -120,44 +138,56 @@ public class ReceiverApiController {
     }
 
     /** Sender로부터 result.bin 수신 */
-    @PostMapping("/files/result")
-    public String loadResult(@RequestPart("binFile") MultipartFile binFile) throws IOException {
-        Files.createDirectories(STORAGE_DIR);
-        String filename = binFile.getOriginalFilename();
-        if (filename == null || filename.isBlank()) {
-            throw new IllegalArgumentException("No such file name.");
-        }
+//    @PostMapping("/files/result")
+//    public String loadResult(@RequestPart("binFile") MultipartFile binFile) throws IOException {
+//        Files.createDirectories(STORAGE_DIR);
+//        String filename = binFile.getOriginalFilename();
+//        if (filename == null || filename.isBlank()) {
+//            throw new IllegalArgumentException("No such file name.");
+//        }
+//
+//        Path targetPath = STORAGE_DIR.resolve(filename);
+//        binFile.transferTo(targetPath.toFile());
+//
+//        return "intersect result received.";
+//    }
 
-        Path targetPath = STORAGE_DIR.resolve(filename);
-        binFile.transferTo(targetPath.toFile());
-
-        return "intersect result received.";
-    }
-
-    @GetMapping("/status/stream")
-    public SseEmitter statusStream() {
-        SseEmitter emitter = new SseEmitter(600_000L);
-        this.sseEmitter = emitter;
-        emitter.onTimeout(() -> this.sseEmitter = null);
-        emitter.onCompletion(() -> this.sseEmitter = null);
-        return emitter;
+    @GetMapping("/status/stream/{sessionId}")
+    public SseEmitter subscribe(@PathVariable String sessionId) {
+        System.out.println("sessionId = " + sessionId);
+        return sessionEmitter.subscribe(sessionId);
     }
 
     /** Sender로부터 sender 측 실행 시간 JSON 수신 */
-    @PostMapping("/files/sender-timing")
-    public String loadSenderTiming(@RequestBody String timingJson) throws IOException {
-        Files.createDirectories(STORAGE_DIR);
-        Files.writeString(SENDER_TIMING_JSON, timingJson);
+    @PostMapping("/files/result")
+    public String loadSenderTiming(
+            @RequestParam("sessionId") String sessionId,
+            @RequestPart("binFiles") List<MultipartFile> binFiles) throws IOException {
+        Path sessionDir = STORAGE_DIR.resolve("sessions/" + sessionId);
 
-        SseEmitter emitter = this.sseEmitter;
-        if (emitter != null) {
-            try {
-                emitter.send(SseEmitter.event().name("done").data("complete"));
-                emitter.complete();
-            } catch (IOException e) {
-                emitter.completeWithError(e);
+        for (MultipartFile multipartFile : binFiles) {
+            if (multipartFile.isEmpty()) {
+                continue; // 비어있는 파일은 건너뜀
             }
+
+            // 원본 파일명 추출
+            String originalFileName = multipartFile.getOriginalFilename();
+
+            Path targetPath = sessionDir.resolve(originalFileName);
+
+            multipartFile.transferTo(targetPath.toFile());
         }
+
+//        SseEmitter emitter = this.sseEmitter;
+//        if (emitter != null) {
+//            try {
+//                emitter.send(SseEmitter.event().name("done").data("complete"));
+//                emitter.complete();
+//            } catch (IOException e) {
+//                emitter.completeWithError(e);
+//            }
+//        }
+        sessionEmitter.sendCompletionMessage(sessionId);
 
         return "sender timing received.";
     }
@@ -174,15 +204,24 @@ public class ReceiverApiController {
 
     /** 복호화 및 교집합 검증, 최종 timing.json 저장 */
     @PostMapping("/intersections")
-    public String check() throws IOException, JSONException {
-        Map<String, Double> t = nativeService.result(STORAGE_DIR.toString(), receiverCsv.toString(), alpha, windowing);
+    public String check(HttpSession sessionId) throws IOException, JSONException {
+        Path sessionDir = STORAGE_DIR.resolve("sessions/" + sessionId.getId());
+
+        int alpha = sessionParameters.get(sessionId.getId()).getAlpha();
+        int windowing = sessionParameters.get(sessionId.getId()).getWindowing();
+
+        Map<String, Double> t = nativeService.result(sessionDir.toString(), receiverCsv.toString(), alpha, windowing);
+
         JSONObject result = timing.getJSONObject("receiver");
         result.put("load", t.get("loadMs"));
         result.put("decrypt", t.get("decryptMs"));
         result.put("intersect", t.get("intersectMs"));
         timing.put("receiver", result);
 
-        timingEditor.combineJson(TIMING_JSON, timing, SENDER_TIMING_JSON);
+        Path timingJson = Paths.get(sessionDir.toString(), "timing.json").toAbsolutePath();
+        Path senderTimingJson = Paths.get(sessionDir.toString(), "sender_timing.json").toAbsolutePath();
+
+        timingEditor.combineJson(timingJson, timing, senderTimingJson);
 
         return String.format(
                 "intersect completed (load=%.1fms, decrypt=%.1fms, intersect=%.1fms)",

@@ -1,5 +1,6 @@
 package com.psi.receiver.controller;
 
+import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -35,7 +36,7 @@ public class ReceiverController {
 
     // 검증 진행 중 화면 이동
     @GetMapping("/processing")
-    public String processingPage(Model model) {
+    public String processingPage(HttpSession session, Model model) {
         String fileNameToShow = "업로드된 파일이 없습니다."; // 기본 메시지 세팅
 
         try {
@@ -59,6 +60,7 @@ public class ReceiverController {
 
         // 최종 결정된 파일 이름을 타임리프에 전달
         model.addAttribute("csvName", fileNameToShow); // 타임리프의 ${fileName} 변수와 매핑
+        model.addAttribute("sessionId", session.getId());
 
         return "processing";
     }
