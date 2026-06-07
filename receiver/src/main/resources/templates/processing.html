@@ -543,10 +543,36 @@
 
             <div class="actions">
                 <button class="secondary-btn">이전 화면</button>
-                <button class="primary-btn" th:onclick="|location.href='@{/receiver/result}'|">결과 확인</button>
+                <button class="primary-btn" id="result-btn" disabled
+                        onclick="location.href='/receiver/result'">결과 확인</button>
             </div>
         </section>
     </div>
 </main>
+<script>
+    const evtSource = new EventSource('/status/stream');
+    evtSource.addEventListener('done', () => {
+        evtSource.close();
+        fetch('/intersections', { method: 'POST' })
+            .then(res => {
+                if (res.ok) {
+                    document.getElementById('result-btn').disabled = false;
+                } else {
+                    alert('교집합 연산에 실패했습니다.');
+                }
+            })
+            .catch(err => alert('서버 통신 오류: ' + err));
+    });
+    evtSource.onerror = () => {
+        evtSource.close();
+        alert('SSE 연결 오류가 발생했습니다.');
+    };
+
+    fetch('/requests', { method: 'POST' })
+        .then(res => {
+            if (!res.ok) alert('검증 요청에 실패했습니다.');
+        })
+        .catch(err => alert('서버 통신 오류: ' + err));
+</script>
 </body>
 </html>

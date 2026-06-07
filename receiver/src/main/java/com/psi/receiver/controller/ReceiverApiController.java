@@ -6,9 +6,14 @@ import com.psi.receiver.service.TimingEditor;
 import lombok.RequiredArgsConstructor;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
@@ -30,6 +35,7 @@ public class ReceiverApiController {
     private JSONObject timing = new JSONObject();
     private int alpha = 0;
     private int windowing = 0;
+    private volatile SseEmitter sseEmitter;
 
     private static final Path PUBLIC_KEY = Paths.get("storage/public_key.bin").toAbsolutePath();
     private static final Path POWERS = Paths.get("storage/powers.bin").toAbsolutePath();
@@ -40,6 +46,7 @@ public class ReceiverApiController {
     private static final Path RECEIVER_CSV = Paths.get("storage/B_receiver_5300.csv").toAbsolutePath();
     private static final Path TIMING_JSON = Paths.get("storage/timing.json").toAbsolutePath();
     private static final Path SENDER_TIMING_JSON = Paths.get("storage/sender_timing.json").toAbsolutePath();
+    private static final Path INTERSECTIONS_CSV = Paths.get("storage/intersections.csv").toAbsolutePath();
 
     /** receiver client에서 csv 파일 업로드 */
     @PostMapping("/csv")
@@ -130,16 +137,44 @@ public class ReceiverApiController {
         return "intersect result received.";
     }
 
-    /** Phase 2-c: Sender로부터 sender 측 실행 시간 JSON 수신 */
+    @GetMapping("/status/stream")
+    public SseEmitter statusStream() {
+        SseEmitter emitter = new SseEmitter(600_000L);
+        this.sseEmitter = emitter;
+        emitter.onTimeout(() -> this.sseEmitter = null);
+        emitter.onCompletion(() -> this.sseEmitter = null);
+        return emitter;
+    }
+
+    /** Sender로부터 sender 측 실행 시간 JSON 수신 */
     @PostMapping("/files/sender-timing")
     public String loadSenderTiming(@RequestBody String timingJson) throws IOException {
         Files.createDirectories(STORAGE_DIR);
         Files.writeString(SENDER_TIMING_JSON, timingJson);
 
+        SseEmitter emitter = this.sseEmitter;
+        if (emitter != null) {
+            try {
+                emitter.send(SseEmitter.event().name("done").data("complete"));
+                emitter.complete();
+            } catch (IOException e) {
+                emitter.completeWithError(e);
+            }
+        }
+
         return "sender timing received.";
     }
 
-    /** Phase 3: 복호화 및 교집합 검증, 최종 timing.json 저장 */
+    @GetMapping("/files/intersections")
+    public ResponseEntity<Resource> downloadIntersections() {
+        Resource resource = new FileSystemResource(INTERSECTIONS_CSV);
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"intersections.csv\"")
+                .contentType(MediaType.parseMediaType("text/csv"))
+                .body(resource);
+    }
+
+    /** 복호화 및 교집합 검증, 최종 timing.json 저장 */
     @PostMapping("/intersections")
     public String check() throws IOException, JSONException {
         Map<String, Double> t = nativeService.result(STORAGE_DIR.toString(), RECEIVER_CSV.toString(), alpha, windowing);
