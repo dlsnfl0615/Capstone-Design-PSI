@@ -500,7 +500,7 @@
             <div class="icon-box">✓</div>
             <div>
                 <p class="file-title"><span th:text="${csvName}"></span></p>
-                <p class="file-meta">42KB · CSV · 업로드 완료</p>
+                <p class="file-meta"><span th:text="${fileSize}"></span>MB · CSV · 업로드 완료</p>
             </div>
             <div class="status-chip"><span class="dot"></span> 업로드 완료</div>
         </section>
@@ -508,7 +508,7 @@
         <section class="card progress-card">
             <div class="progress-top">
                 <h2>현재 검증 단계</h2>
-                <div class="running-chip"><span class="pulse"></span> 진행 중</div>
+                <div class="running-chip" id="running-chip"><span class="pulse"></span> 진행 중</div>
             </div>
 
             <div class="progress-main">
@@ -535,7 +535,7 @@
                     <div class="label">Step 2</div>
                     <div class="name">검증 진행 중</div>
                 </div>
-                <div class="step">
+                <div class="step" id="step3">
                     <div class="label">Step 3</div>
                     <div class="name">결과 확인 대기</div>
                 </div>
@@ -556,6 +556,16 @@
     const evtSource = new EventSource(`/status/stream/${sessionId}`);
     evtSource.addEventListener('done', () => {
         evtSource.close();
+
+        const chip = document.getElementById('running-chip');
+        chip.innerHTML = '<span class="dot"></span> 완료됨';
+        chip.style.background = 'var(--success-soft)';
+        chip.style.color = 'var(--success)';
+        chip.style.borderColor = 'rgba(18, 128, 92, 0.13)';
+
+        document.querySelector('.step.active').classList.replace('active', 'done');
+        document.getElementById('step3').classList.add('active');
+
         fetch('/intersections', { method: 'POST' })
             .then(res => {
                 if (res.ok) {

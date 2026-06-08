@@ -48,7 +48,7 @@ public class ReceiverApiController {
     private static final Path STORAGE_DIR = Paths.get("storage").toAbsolutePath();
     private static final Path TIMING_JSON = Paths.get("storage/timing.json").toAbsolutePath();
     private static final Path SENDER_TIMING_JSON = Paths.get("storage/sender_timing.json").toAbsolutePath();
-    private static final Path INTERSECTIONS_CSV = Paths.get("storage/intersections.csv").toAbsolutePath();
+//    private static final Path INTERSECTIONS_CSV = Paths.get("storage/intersections.csv").toAbsolutePath();
 
     /** receiver client에서 csv 파일 업로드 */
     @PostMapping("/csv")
@@ -65,8 +65,8 @@ public class ReceiverApiController {
         try {
             // 파일명 추출 및 디렉터리와 결합하여 절대 경로 생성
             String originalFileName = file.getOriginalFilename();
-            receiverCsv = sessionBase.toAbsolutePath();
             Path targetPath = Paths.get(sessionBase.toString(), originalFileName); // /app/storage/sesseions/{sessionId}/파일명.csv 형태로 결합
+            receiverCsv = targetPath.toAbsolutePath();
 
             // 파일 쓰기 (기존 동일 파일명 존재 시 덮어쓰기)
             file.transferTo(targetPath.toFile());
@@ -194,8 +194,10 @@ public class ReceiverApiController {
 
     /** 교집합 검증 결과 csv 파일 다운로드 하기 */
     @GetMapping("/files/intersections")
-    public ResponseEntity<Resource> downloadIntersections() {
-        Resource resource = new FileSystemResource(INTERSECTIONS_CSV);
+    public ResponseEntity<Resource> downloadIntersections(HttpSession session) {
+        String sessionId = session.getId();
+        Path sessionDir = Paths.get(STORAGE_DIR.toString(), "sessions", sessionId, "intersections.csv");
+        Resource resource = new FileSystemResource(sessionDir);
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"intersections.csv\"")
                 .contentType(MediaType.parseMediaType("text/csv"))

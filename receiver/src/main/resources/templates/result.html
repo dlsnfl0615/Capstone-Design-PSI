@@ -466,24 +466,24 @@
         <article class="card result-card">
             <div class="card-title-row">
                 <h2 class="card-title">결과 요약</h2>
-                <span class="timestamp">완료 시각 2026.06.05 13:42</span>
+                <span class="timestamp">완료 시각 <span th:text="${createdTime}"></span></span>
             </div>
 
             <div class="metric-grid">
                 <div class="metric subtle">
                     <span class="metric-label">전체 검수 데이터</span>
-                    <span class="metric-value">5,300건</span>
+                    <span class="metric-value"><span th:text="${orgLength}"></span>건</span>
                 </div>
                 <div class="metric alert">
                     <span class="metric-label">불일치 데이터</span>
-                    <span class="metric-value">176건</span>
+                    <span class="metric-value"><span th:text="${mismatchCount}"></span></span>
                 </div>
             </div>
 
             <div class="ratio-area">
                 <div class="ratio-head">
                     <span>일치율</span>
-                    <strong>96.7%</strong>
+                    <strong><span th:text="${ratio}"></span>%</strong>
                 </div>
                 <div class="bar" aria-label="일치율 96.7%, 불일치율 3.3%">
                     <div class="bar-match"></div>
@@ -502,8 +502,8 @@
             <div class="file-box">
                 <div class="file-icon">CSV</div>
                 <div class="file-meta">
-                    <div class="file-name">result_receiver_verification.csv</div>
-                    <div class="file-sub">생성 완료 · 1.2 MB</div>
+                    <div class="file-name">intersections.csv</div>
+                    <div class="file-sub">생성 완료 · <span th:text="${intersectionSize}"></span> MB</div>
                 </div>
             </div>
 
@@ -513,8 +513,8 @@
             </div>
 
             <div class="actions-row">
-                <button class="btn btn-ghost" onclick="location.href='/receiver/home'">홈으로</button>
-                <button class="btn btn-ghost" onclick="location.href='/receiver/upload'">새 검증</button>
+                <button class="btn btn-ghost" th:onclick="|location.href='@{/receiver/home}'|">홈으로</button>
+                <button class="btn btn-ghost" th:onclick="|location.href='@{/receiver/upload}'|">새 검증</button>
             </div>
         </aside>
     </section>
