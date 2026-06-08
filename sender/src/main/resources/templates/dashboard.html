@@ -204,7 +204,7 @@
                     <h2 class="truncate text-[21px] font-extrabold tracking-tight text-secondaryDark">Sender
                         Dashboard</h2>
                     <span class="status-pill bg-[#4edea3]/20 text-success"><span
-                            class="h-2 w-2 rounded-full bg-success pulse-dot"></span>Online</span>
+                            class="h-2 w-2 rounded-full bg-success pulse-dot" id="status"></span>Online</span>
                 </div>
                 <p class="hidden text-[12px] font-semibold text-textMuted sm:block">Encrypted PSI requests are processed
                     automatically without exposing raw data.</p>
@@ -284,41 +284,37 @@
                                 class="material-symbols-outlined text-secondary">memory</span>Current PSI Execution</h3>
                         <p class="mt-1 text-sm text-textMuted">ID: PSI-REQ-2026-0606-001</p>
                     </div>
-                    <span class="status-pill bg-secondary/10 text-secondary">Homomorphic Computation</span>
+                    <span id="current-step-label" class="status-pill bg-secondary/10 text-secondary">Waiting</span>
                 </div>
                 <div class="mb-8">
-                    <div class="mb-2 flex justify-between text-[12px] font-extrabold"><span class="text-secondary">Progress 68%</span><span
-                            class="text-textMuted">ETA 22s</span></div>
+                    <div class="mb-2 flex justify-between text-[12px] font-extrabold"><span class="text-secondary">Progress <span id="progress">0</span>%</span><span
+                            class="text-textMuted">Elapsed: <span id="elapsed">0s</span></span></div>
                     <div class="h-3 overflow-hidden rounded-full bg-surfaceSoft">
-                        <div class="h-full w-[68%] rounded-full bg-secondary shadow-[0_0_16px_rgba(33,112,228,.35)]"></div>
+                        <div id="progress-bar" class="h-full w-0 rounded-full bg-secondary shadow-[0_0_16px_rgba(33,112,228,.35)] transition-all duration-500"></div>
                     </div>
                 </div>
                 <div class="relative space-y-5 pl-1">
                     <div class="absolute left-[12px] top-2 bottom-2 w-0.5 bg-surfaceLine"></div>
-                    <div class="relative z-10 flex items-center gap-4"><span
-                            class="flex h-6 w-6 items-center justify-center rounded-full bg-success text-white"><span
-                            class="material-symbols-outlined text-[16px]">check</span></span>
-                        <p class="text-sm font-semibold text-textMuted">Request received</p></div>
-                    <div class="relative z-10 flex items-center gap-4"><span
-                            class="flex h-6 w-6 items-center justify-center rounded-full bg-success text-white"><span
-                            class="material-symbols-outlined text-[16px]">check</span></span>
-                        <p class="text-sm font-semibold text-textMuted">Parameter validation</p></div>
-                    <div class="relative z-10 flex items-center gap-4"><span
-                            class="flex h-6 w-6 items-center justify-center rounded-full bg-success text-white"><span
-                            class="material-symbols-outlined text-[16px]">check</span></span>
-                        <p class="text-sm font-semibold text-textMuted">Load preprocessed sender table</p></div>
-                    <div class="relative z-10 flex items-center gap-4"><span
-                            class="flex h-6 w-6 items-center justify-center rounded-full bg-secondary text-white ring-4 ring-secondary/15"><span
-                            class="material-symbols-outlined text-[16px]">sync</span></span>
-                        <p class="text-sm font-extrabold text-primary">Homomorphic PSI computation</p></div>
-                    <div class="relative z-10 flex items-center gap-4 opacity-45"><span
-                            class="flex h-6 w-6 items-center justify-center rounded-full bg-surfaceLine text-white"><span
-                            class="material-symbols-outlined text-[16px]">more_horiz</span></span>
-                        <p class="text-sm font-semibold text-textMuted">Generate encrypted response</p></div>
-                    <div class="relative z-10 flex items-center gap-4 opacity-45"><span
-                            class="flex h-6 w-6 items-center justify-center rounded-full bg-surfaceLine text-white"><span
-                            class="material-symbols-outlined text-[16px]">send</span></span>
-                        <p class="text-sm font-semibold text-textMuted">Send response to receiver</p></div>
+                    <div id="step-1-row" class="relative z-10 flex items-center gap-4">
+                        <span id="step-1-container" class="flex h-6 w-6 items-center justify-center rounded-full bg-secondary text-white ring-4 ring-secondary/15">
+                            <span id="step-1-icon" class="material-symbols-outlined text-[16px]">sync</span></span>
+                        <p id="step-1-text" class="text-sm font-extrabold text-primary">Request received</p></div>
+                    <div id="step-2-row" class="relative z-10 flex items-center gap-4 opacity-45">
+                        <span id="step-2-container" class="flex h-6 w-6 items-center justify-center rounded-full bg-surfaceLine text-white">
+                            <span id="step-2-icon" class="material-symbols-outlined text-[16px]">more_horiz</span></span>
+                        <p id="step-2-text" class="text-sm font-semibold text-textMuted">Parameter validation</p></div>
+                    <div id="step-3-row" class="relative z-10 flex items-center gap-4 opacity-45">
+                        <span id="step-3-container" class="flex h-6 w-6 items-center justify-center rounded-full bg-surfaceLine text-white">
+                            <span id="step-3-icon" class="material-symbols-outlined text-[16px]">more_horiz</span></span>
+                        <p id="step-3-text" class="text-sm font-semibold text-textMuted">Load preprocessed sender coefficients</p></div>
+                    <div id="step-4-row" class="relative z-10 flex items-center gap-4 opacity-45">
+                        <span id="step-4-container" class="flex h-6 w-6 items-center justify-center rounded-full bg-surfaceLine text-white">
+                            <span id="step-4-icon" class="material-symbols-outlined text-[16px]">more_horiz</span></span>
+                        <p id="step-4-text" class="text-sm font-semibold text-textMuted">Homomorphic PSI computation</p></div>
+                    <div id="step-5-row" class="relative z-10 flex items-center gap-4 opacity-45">
+                        <span id="step-5-container" class="flex h-6 w-6 items-center justify-center rounded-full bg-surfaceLine text-white">
+                            <span id="step-5-icon" class="material-symbols-outlined text-[16px]">more_horiz</span></span>
+                        <p id="step-5-text" class="text-sm font-semibold text-textMuted">Send response to receiver</p></div>
                 </div>
             </div>
             <div class="space-y-7 xl:col-span-4">
@@ -492,5 +488,90 @@
 
     </section>
 </main>
+<script th:inline="javascript">
+    const es = new EventSource('/sse');
+    const progressEl = document.getElementById('progress');
+    const progressBar = document.getElementById('progress-bar');
+    const stepLabel = document.getElementById('current-step-label');
+    const elapsedEl = document.getElementById('elapsed');
+
+    let elapsedTimer = null;
+    let elapsedSec = 0;
+
+    function startTimer() {
+        elapsedSec = 0;
+        elapsedTimer = setInterval(() => {
+            elapsedSec++;
+            if (elapsedEl) elapsedEl.textContent = elapsedSec < 60
+                ? elapsedSec + 's'
+                : Math.floor(elapsedSec / 60) + 'm ' + (elapsedSec % 60) + 's';
+        }, 1000);
+    }
+
+    function stopTimer() {
+        clearInterval(elapsedTimer);
+        elapsedTimer = null;
+    }
+
+    function setProgress(pct, label) {
+        if (progressEl) progressEl.textContent = pct;
+        if (progressBar) progressBar.style.width = pct + '%';
+        if (stepLabel) stepLabel.textContent = label;
+    }
+
+    function markDone(n) {
+        const c = document.getElementById('step-' + n + '-container');
+        const ic = document.getElementById('step-' + n + '-icon');
+        const tx = document.getElementById('step-' + n + '-text');
+        const row = document.getElementById('step-' + n + '-row');
+        if (!c) return;
+        c.className = 'flex h-6 w-6 items-center justify-center rounded-full bg-success text-white';
+        ic.textContent = 'check';
+        tx.className = 'text-sm font-semibold text-textMuted';
+        row.classList.remove('opacity-45');
+    }
+
+    function markRunning(n) {
+        const c = document.getElementById('step-' + n + '-container');
+        const ic = document.getElementById('step-' + n + '-icon');
+        const tx = document.getElementById('step-' + n + '-text');
+        const row = document.getElementById('step-' + n + '-row');
+        if (!c) return;
+        c.className = 'flex h-6 w-6 items-center justify-center rounded-full bg-secondary text-white ring-4 ring-secondary/15';
+        ic.textContent = 'sync';
+        tx.className = 'text-sm font-extrabold text-primary';
+        row.classList.remove('opacity-45');
+    }
+
+    es.onopen = () => { document.getElementById('status').className = 'h-2 w-2 rounded-full bg-success pulse-dot'; };
+    es.onerror = () => { document.getElementById('status').className = 'h-2 w-2 rounded-full bg-danger'; };
+
+    es.addEventListener('request-received', () => {
+        markDone(1); markRunning(2);
+        setProgress(20, 'Parameter Validation');
+        startTimer();
+    });
+
+    es.addEventListener('parameter-validation', () => {
+        markDone(1); markDone(2); markRunning(3);
+        setProgress(40, 'Loading Coefficients');
+    });
+
+    es.addEventListener('load-coeff', () => {
+        markDone(1); markDone(2); markDone(3); markRunning(4);
+        setProgress(60, 'Homomorphic Computation');
+    });
+
+    es.addEventListener('psi', () => {
+        markDone(1); markDone(2); markDone(3); markDone(4); markRunning(5);
+        setProgress(80, 'Sending Response');
+    });
+
+    es.addEventListener('send-response', () => {
+        markDone(1); markDone(2); markDone(3); markDone(4); markDone(5);
+        setProgress(100, 'Completed');
+        stopTimer();
+    });
+</script>
 </body>
 </html>

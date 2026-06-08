@@ -5,6 +5,8 @@ import io.awspring.cloud.s3.S3Template;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.*;
 
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -12,13 +14,12 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class Uploader {
+public class S3Service {
     private final S3Template s3Template;
+    private final S3Client s3Client;
 
     public void uploadFilesToS3(List<MultipartFile> binFiles, String sessionId, String bucketName, String s3Prefix) throws Exception {
         for (MultipartFile file : binFiles) {

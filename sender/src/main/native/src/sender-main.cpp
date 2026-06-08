@@ -22,12 +22,14 @@ int alpha;
 int l;
 int B_prime = static_cast<int>(ceil(static_cast<double>(B) / alpha));
 
+typedef void (*ProgressCallback)(int progress, const char* message);
+
 extern "C" {
 #ifdef _WIN32
 __declspec(dllexport) // 윈도우 환경 DLL 내보내기
 #endif
 
-int intersect(const char* storage, const char* sender_csv, const int alpha_var, const int l_var) {
+int intersect(const char* storage, const char* sender_csv, const int alpha_var, const int l_var, ProgressCallback callback) {
     try {
 
     cout << "[debug] sender main started" << endl;
@@ -166,7 +168,7 @@ int intersect(const char* storage, const char* sender_csv, const int alpha_var, 
 
         auto t_cache_meta_end = Clock::now();
         print_time("Sender cache metadata validation", t_cache_meta_start, t_cache_meta_end);
-
+        callback(40, "validation completed");
 
         // sender_coeffs.bin 로드
         SenderEvaluate sender_evaluator;
@@ -181,7 +183,7 @@ int intersect(const char* storage, const char* sender_csv, const int alpha_var, 
              << coeffs.size() << endl;
         auto t_coeffs_load_end = Clock::now();
         print_time("Sender coeffs loading", t_coeffs_load_start, t_coeffs_load_end);
-
+        callback(60, "load completed");
 
         auto t_make_powers_start = Clock::now();
 
@@ -237,6 +239,7 @@ int intersect(const char* storage, const char* sender_csv, const int alpha_var, 
 
         cout << "[debug] after product, producted size = "
              << producted.size() << endl;
+        callback(80, "psi completed");
 
         auto t_product_end = Clock::now();
         print_time("Polynomial product", t_product_start, t_product_end);

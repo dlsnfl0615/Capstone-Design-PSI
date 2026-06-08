@@ -17,7 +17,8 @@ import java.util.concurrent.CompletableFuture;
 public class NativeAsync {
     private final NativeService nativeService;
     private final SenderClient senderClient;
-    private final Uploader uploader;
+    private final S3Service s3Service;
+    private final SseService sseService;
 
     private static final String BUCKET_NAME = "capstone-design-sender-bucker-684494100299-ap-northeast-2-an";
 
@@ -35,8 +36,8 @@ public class NativeAsync {
 
         // 로컬 세션 디렉토리 생성 및 S3 파일 다운로드
         Files.createDirectories(sessionPath);
-        uploader.downloadDirectoryFromS3("storage/sessions/" + sessionId, sessionPath.toString(), BUCKET_NAME);
-        uploader.downloadDirectoryFromS3(s3PreprocessPrefix, sessionPath.toString(), BUCKET_NAME);
+        s3Service.downloadDirectoryFromS3("storage/sessions/" + sessionId, sessionPath.toString(), BUCKET_NAME);
+        s3Service.downloadDirectoryFromS3(s3PreprocessPrefix, sessionPath.toString(), BUCKET_NAME);
 
         // 다항식 연산
         int result = nativeService.intersect(storageDir.toString() + "/" + sessionId, csv.toString(), alpha, windowing);
@@ -46,11 +47,9 @@ public class NativeAsync {
             throw new RuntimeException("[Sender C++] intersect failed with code: " + result);
         }
 
-        // 다항식 결과 전송 걸리는 시간
-//        long transferNs = senderClient.sendBinFile(resultDir);
-
         // result, cpp timing 같이 전송
         long transferNs = senderClient.sendBinFiles(List.of(resultDir, cppTiming), sessionId);
+        sseService.send("send-response", 100);
 
         // 시간 저장
         String content = new String(Files.readAllBytes(cppTiming));
