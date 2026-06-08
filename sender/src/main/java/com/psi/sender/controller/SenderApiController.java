@@ -27,7 +27,7 @@ public class SenderApiController {
     @Qualifier("psiExecutor")
     private ThreadPoolTaskExecutor psiExecutor;// thread queue 크기 확인 용도
 //    private SseEmitter clientReceiver;
-    private static final int MAX_READY_QUEUE_SIZE = 2;
+    private static final int MAX_READY_QUEUE_SIZE = 1; // 첫 요청은 바로 처리되기 때문에 대기 큐에 쌓이지 않음. 따라서 0 -> 0 -> 1-> ...
     private static final int DEFAULT_WINDOWING = 4;
     private static final int DEFAULT_ALPHA = 512;
     private static final int CONGESTION_WINDOWING = 7;
