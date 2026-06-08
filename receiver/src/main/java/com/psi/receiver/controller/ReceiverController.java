@@ -88,23 +88,23 @@ public class ReceiverController {
         String fileName = sessionFiles.get(sessionId);
         Path orgCsvPath = Paths.get(STORAGE_DIR.toString(), sessionId, fileName);
 
-        Path intersectionCsvPath = Paths.get(STORAGE_DIR.toString(), sessionId, "intersections.csv");
+        Path mismatchCsvPath = Paths.get(STORAGE_DIR.toString(), sessionId, "intersections.csv");
 
         long orgLength = Files.lines(orgCsvPath).count() - 1; // 헤더 빼기
-        long intersectionLength = Files.lines(intersectionCsvPath).count();
-        long mismatchCount = orgLength - intersectionLength;
-        long intersectionSizeBytes = Files.size(intersectionCsvPath);
-        double ratio = (double)intersectionLength / orgLength * 100;
+        long mismatchLength = Files.lines(mismatchCsvPath).count();
+        long matchCount = orgLength - mismatchLength;
+        long mismatchSizeBytes = Files.size(mismatchCsvPath);
+        double ratio = (double)matchCount / orgLength * 100;
 
-        BasicFileAttributes attrs = Files.readAttributes(intersectionCsvPath, BasicFileAttributes.class);
+        BasicFileAttributes attrs = Files.readAttributes(mismatchCsvPath, BasicFileAttributes.class);
         FileTime time = attrs.creationTime();
         String createdTime = LocalDateTime
                 .ofInstant(time.toInstant(), ZoneId.of("Asia/Seoul"))
                 .format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
 
         model.addAttribute("orgLength", orgLength);
-        model.addAttribute("mismatchCount", mismatchCount);
-        model.addAttribute("intersectionSize", Math.round(intersectionSizeBytes / 1000000.0 * 100.0) / 100.0);
+        model.addAttribute("mismatchLength", mismatchLength);
+        model.addAttribute("mismatchSizeBytes", Math.round(mismatchSizeBytes / 1000.0));
         model.addAttribute("ratio", Math.round(ratio * 100.0) / 100.0);
         model.addAttribute("createdTime", createdTime);
 

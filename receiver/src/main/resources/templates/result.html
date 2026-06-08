@@ -476,7 +476,7 @@
                 </div>
                 <div class="metric alert">
                     <span class="metric-label">불일치 데이터</span>
-                    <span class="metric-value"><span th:text="${mismatchCount}"></span></span>
+                    <span class="metric-value"><span th:text="${mismatchLength}"></span></span>
                 </div>
             </div>
 
@@ -503,7 +503,7 @@
                 <div class="file-icon">CSV</div>
                 <div class="file-meta">
                     <div class="file-name">intersections.csv</div>
-                    <div class="file-sub">생성 완료 · <span th:text="${intersectionSize}"></span> MB</div>
+                    <div class="file-sub">생성 완료 · <span th:text="${mismatchSizeBytes}"></span> MB</div>
                 </div>
             </div>
 

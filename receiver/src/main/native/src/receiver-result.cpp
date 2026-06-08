@@ -188,7 +188,7 @@ int result(const char* storage, const char* csv) {
             }
         }
 
-        if (is_intersected) {
+        if (!is_intersected) {
             intersection_out << pid_str << "," << disease_str << endl;
             found_count++;
         }

@@ -158,7 +158,7 @@ public class ReceiverApiController {
         return sessionEmitter.subscribe(sessionId);
     }
 
-    /** Sender로부터 sender 측 실행 시간 JSON 수신 */
+    /** Sender로부터 sender 측 실행 시간 JSON과 result.bin 수신 */
     @PostMapping("/files/result")
     public String loadSenderTiming(
             @RequestParam("sessionId") String sessionId,
