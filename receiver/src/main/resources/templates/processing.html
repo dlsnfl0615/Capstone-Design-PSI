@@ -284,17 +284,21 @@
             border-radius: 50%;
             display: grid;
             place-items: center;
-            background: conic-gradient(var(--primary) 0 64%, #e9eef7 64% 100%);
+            background: transparent;  /* conic-gradient 제거 */
             position: relative;
         }
 
-        .ring-wrap::before {
-            content: "";
+        .ring-spinner {
             position: absolute;
-            inset: 13px;
+            inset: 0;
             border-radius: 50%;
-            background: var(--surface);
-            box-shadow: inset 0 0 0 1px var(--border);
+            border: 13px solid #e9eef7;
+            border-top-color: var(--primary);  /* 이 부분만 파란색 */
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
         }
 
         .ring-content {
@@ -512,9 +516,9 @@
             </div>
 
             <div class="progress-main">
-                <div class="ring-wrap" aria-label="진행률 64%">
+                <div class="ring-wrap" aria-label="처리 중">
+                    <div class="ring-spinner"></div>
                     <div class="ring-content">
-                        <div class="ring-number">64%</div>
                         <div class="ring-label">PROCESSING</div>
                     </div>
                 </div>
@@ -556,6 +560,11 @@
     const evtSource = new EventSource(`/status/stream/${sessionId}`);
     evtSource.addEventListener('done', () => {
         evtSource.close();
+
+        const spinner = document.querySelector('.ring-spinner');
+        spinner.style.border = '13px solid var(--primary)';  // 전체 파란색
+        spinner.style.animation = 'none';                     // 회전 멈춤
+        document.querySelector('.ring-label').textContent = 'COMPLETED';
 
         const chip = document.getElementById('running-chip');
         chip.innerHTML = '<span class="dot"></span> 완료됨';
