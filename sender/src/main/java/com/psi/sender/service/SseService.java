@@ -11,7 +11,7 @@ public class SseService {
     private final AtomicReference<SseEmitter> emitterRef = new AtomicReference<>();
 
     public SseEmitter connect() {
-        SseEmitter emitter = new SseEmitter(180_000L);
+        SseEmitter emitter = new SseEmitter(600_000L);
 
         SseEmitter old = emitterRef.getAndSet(emitter);
         if (old != null) {
@@ -30,7 +30,7 @@ public class SseService {
 
         try {
             emitter.send(SseEmitter.event().name(eventName).data(data));
-        } catch (IOException e) {
+        } catch (IOException | IllegalStateException e) {
             emitterRef.compareAndSet(emitter, null);
         }
     }

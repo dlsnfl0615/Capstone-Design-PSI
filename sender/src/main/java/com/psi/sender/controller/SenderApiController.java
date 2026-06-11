@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @RestController
 @RequiredArgsConstructor
@@ -29,10 +30,12 @@ public class SenderApiController {
 
     @Autowired
     @Qualifier("psiExecutor")
-    private ThreadPoolTaskExecutor psiExecutor;// thread queue 크기 확인 용도
+    private ThreadPoolTaskExecutor psiExecutor;
+
+    private final AtomicInteger inFlightCount = new AtomicInteger(0);
 
 //    private SseEmitter clientReceiver;
-    private static final int MAX_READY_QUEUE_SIZE = 1; // 첫 요청은 바로 처리되기 때문에 대기 큐에 쌓이지 않음. 따라서 0 -> 0 -> 1-> ...
+    private static final int MAX_QUEUE_SIZE = 2; // 첫 요청은 바로 처리되기 때문에 대기 큐에 쌓이지 않음. 따라서 0 -> 0 -> 1-> ...
     private static final int DEFAULT_WINDOWING = 4;
     private static final int DEFAULT_ALPHA = 512;
     private static final int CONGESTION_WINDOWING = 7;
@@ -64,6 +67,7 @@ public class SenderApiController {
     ) {
         // Current PSI Execution에서 첫번째
         sseService.send("request-received", 20);
+        sseService.send("currentQueueSize", inFlightCount.incrementAndGet());
 
         String s3Prefix = String.format("storage/sessions/%s/", sessionId);
 
@@ -83,16 +87,19 @@ public class SenderApiController {
             sseService.send("windowing", windowing);
 
             String s3PreprocessPrefix = isCongested() ? CONGESTED_DIR : DEFAULT_DIR;
-            CompletableFuture<String> futureResult = nativeAsync.productPolynomial(STORAGE_DIR, sessionId, alpha, windowing, s3PreprocessPrefix);
+            CompletableFuture<String> futureResult = nativeAsync.productPolynomial(
+                    STORAGE_DIR, sessionId, alpha, windowing, s3PreprocessPrefix);
             futureResult
                     .thenAccept(_ -> {
                         System.out.println("job completed.");
-                        sseService.send("alpha", 512); // 기본 파라미터로 되돌리기
+                        sseService.send("currentQueueSize", inFlightCount.decrementAndGet());
+                        sseService.send("alpha", 512);
                         sseService.send("windowing", 4);
                     })
                     .exceptionally(e -> {
                         System.err.println("[Sender Error] Async task failed: " + e.getMessage());
                         e.printStackTrace();
+                        inFlightCount.decrementAndGet();
                         return null;
                     });
         } catch (Exception e) {
@@ -109,13 +116,7 @@ public class SenderApiController {
     }
 
     private boolean isCongested() {
-        int queueSize = psiExecutor.getQueueSize();
-
-        if (queueSize > MAX_READY_QUEUE_SIZE) {
-            return true;
-        }
-
-        return false;
+        return inFlightCount.get() >= MAX_QUEUE_SIZE;
     }
 
     private List<Integer> getParms() {

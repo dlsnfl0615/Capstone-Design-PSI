@@ -2,9 +2,11 @@ package com.psi.sender.service;
 
 import lombok.RequiredArgsConstructor;
 import org.json.JSONObject;
+import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.util.FileSystemUtils;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -28,6 +30,7 @@ public class NativeAsync {
     @Async("psiExecutor")
     public CompletableFuture<String> productPolynomial(Path storageDir, String sessionId, int alpha, int windowing, String s3PreprocessPrefix) throws Exception {
         System.out.println("[Sender] Background operation started...");
+        sseService.send("task-started", sessionId);
 
         Path sessionPath = Paths.get(storageDir.toString(), sessionId);
         Path csv = Paths.get("storage/B_sender_50M.csv");

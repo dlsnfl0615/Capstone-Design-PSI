@@ -34,7 +34,7 @@ public class S3Service {
             try (InputStream inputStream = file.getInputStream()) {
                 s3Template.upload(bucketName, s3Key, inputStream);
             }
-            System.out.println("upload to s3 completed: " + s3Key);
+//            System.out.println("upload to s3 completed: " + s3Key);
         }
     }
 
@@ -53,7 +53,7 @@ public class S3Service {
         for (S3Resource resource : resources) {
             // 전체 경로에서 맨 마지막 파일명만 추출함
             String pureFilename = Paths.get(resource.getFilename()).getFileName().toString();
-            System.out.println("pureFilename = " + pureFilename);
+//            System.out.println("pureFilename = " + pureFilename);
 
             if (pureFilename.isEmpty()) continue;
 
@@ -62,7 +62,7 @@ public class S3Service {
             try (InputStream inputStream = resource.getInputStream()) {
                 Files.copy(inputStream, localFilePath, StandardCopyOption.REPLACE_EXISTING);
             }
-            System.out.println("S3 files download completed: " + resource.getLocation());
+//            System.out.println("S3 files download completed: " + resource.getLocation());
         }
     }
 }

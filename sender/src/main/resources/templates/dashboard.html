@@ -257,8 +257,8 @@
                 <div class="flex items-start justify-between"><p class="text-[12px] font-bold uppercase text-textMuted">
                     Active PSI Request</p><span class="status-pill bg-secondary/10 text-secondary"><span
                         class="h-1.5 w-1.5 rounded-full bg-secondary pulse-dot"></span>Running</span></div>
-                <p class="mt-3 text-2xl font-extrabold text-primary">1 request</p>
-                <p class="mt-1 text-sm text-textMuted">Current execution session</p></div>
+                <p class="mt-3 text-2xl font-extrabold text-primary"><span id="currentQueueSize"></span> request</p>
+                <p class="mt-1 text-sm text-textMuted">Waiting execution session</p></div>
             <div class="metric-card">
                 <div class="flex items-start justify-between"><p class="text-[12px] font-bold uppercase text-textMuted">
                     Sender Dataset</p><span class="material-symbols-outlined text-success">check_circle</span></div>
@@ -496,11 +496,13 @@
     const elapsedEl = document.getElementById('elapsed');
     const alpha = document.getElementById('alpha');
     const windowing = document.getElementById('windowing');
+    const currentQueueSize = document.getElementById('currentQueueSize');
 
     let elapsedTimer = null;
     let elapsedSec = 0;
 
     function startTimer() {
+        clearInterval(elapsedTimer);
         elapsedSec = 0;
         elapsedTimer = setInterval(() => {
             elapsedSec++;
@@ -549,6 +551,10 @@
     es.onerror = () => { document.getElementById('status').className = 'h-2 w-2 rounded-full bg-danger'; };
 
     es.addEventListener('request-received', () => {
+        // currentQueueSize는 별도 이벤트로 업데이트됨
+    });
+
+    es.addEventListener('task-started', () => {
         markDone(1); markRunning(2);
         setProgress(20, 'Parameter Validation');
         startTimer();
@@ -581,6 +587,10 @@
 
     es.addEventListener('windowing', (event) => {
         windowing.textContent = event.data;
+    })
+
+    es.addEventListener('currentQueueSize', (event) => {
+        currentQueueSize.textContent = event.data;
     })
 </script>
 </body>
