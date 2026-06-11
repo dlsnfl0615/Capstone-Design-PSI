@@ -35,20 +35,11 @@ public class ReceiverApiController {
     private final TimingEditor timingEditor;
     private final JSONObject timing = new JSONObject();
     private final SessionParameters sessionParameters;
-//    private int alpha = 0;
-//    private int windowing = 0;
     private final SessionEmitter sessionEmitter;
     private Path receiverCsv;
-
-//    private static final Path PUBLIC_KEY = Paths.get("storage/public_key.bin").toAbsolutePath();
-//    private static final Path POWERS = Paths.get("storage/powers.bin").toAbsolutePath();
-//    private static final Path PARMS = Paths.get("storage/parms.bin").toAbsolutePath();
-//    private static final Path RELIN_KEY = Paths.get("storage/relin_key.bin").toAbsolutePath();
-//    private static final Path SECRET_KEY = Paths.get("storage/secret_key.bin").toAbsolutePath();
     private static final Path STORAGE_DIR = Paths.get("storage").toAbsolutePath();
-    private static final Path TIMING_JSON = Paths.get("storage/timing.json").toAbsolutePath();
-    private static final Path SENDER_TIMING_JSON = Paths.get("storage/sender_timing.json").toAbsolutePath();
-//    private static final Path INTERSECTIONS_CSV = Paths.get("storage/intersections.csv").toAbsolutePath();
+//    private static final Path TIMING_JSON = Paths.get("storage/timing.json").toAbsolutePath();
+//    private static final Path SENDER_TIMING_JSON = Paths.get("storage/sender_timing.json").toAbsolutePath();
 
     /** receiver client에서 csv 파일 업로드 */
     @PostMapping("/csv")
@@ -115,8 +106,6 @@ public class ReceiverApiController {
 
         return ResponseEntity.ok(String.format("request completed (hashing=%.1fms, windowing=%.1fms)\n%s",
                 receiverRequest.getDouble("hashing"), receiverRequest.getDouble("windowing"), sendResult));
-//        return String.format("request completed (hashing=%.1fms, windowing=%.1fms)\n%s",
-//                receiverRequest.getDouble("hashing"), receiverRequest.getDouble("windowing"), sendResult);
     }
 
     /** Sender로 bin 파일 전송 */
@@ -136,21 +125,6 @@ public class ReceiverApiController {
 
         return String.format("Transfer completed (transferFilesMs=%.3fms)", transfer.getDouble("transferFilesMs"));
     }
-
-    /** Sender로부터 result.bin 수신 */
-//    @PostMapping("/files/result")
-//    public String loadResult(@RequestPart("binFile") MultipartFile binFile) throws IOException {
-//        Files.createDirectories(STORAGE_DIR);
-//        String filename = binFile.getOriginalFilename();
-//        if (filename == null || filename.isBlank()) {
-//            throw new IllegalArgumentException("No such file name.");
-//        }
-//
-//        Path targetPath = STORAGE_DIR.resolve(filename);
-//        binFile.transferTo(targetPath.toFile());
-//
-//        return "intersect result received.";
-//    }
 
     @GetMapping("/status/stream/{sessionId}")
     public SseEmitter subscribe(@PathVariable String sessionId) {
@@ -177,16 +151,6 @@ public class ReceiverApiController {
 
             multipartFile.transferTo(targetPath.toFile());
         }
-
-//        SseEmitter emitter = this.sseEmitter;
-//        if (emitter != null) {
-//            try {
-//                emitter.send(SseEmitter.event().name("done").data("complete"));
-//                emitter.complete();
-//            } catch (IOException e) {
-//                emitter.completeWithError(e);
-//            }
-//        }
         sessionEmitter.sendCompletionMessage(sessionId);
 
         return "sender timing received.";
