@@ -79,11 +79,16 @@ public class SenderApiController {
         try {
             int alpha = getParms().getFirst();
             int windowing = getParms().getLast();
+            sseService.send("alpha", alpha); // 현재 작업중인 request의 파라미터로 변경
+            sseService.send("windowing", windowing);
+
             String s3PreprocessPrefix = isCongested() ? CONGESTED_DIR : DEFAULT_DIR;
             CompletableFuture<String> futureResult = nativeAsync.productPolynomial(STORAGE_DIR, sessionId, alpha, windowing, s3PreprocessPrefix);
             futureResult
                     .thenAccept(_ -> {
                         System.out.println("job completed.");
+                        sseService.send("alpha", 512); // 기본 파라미터로 되돌리기
+                        sseService.send("windowing", 4);
                     })
                     .exceptionally(e -> {
                         System.err.println("[Sender Error] Async task failed: " + e.getMessage());

@@ -282,7 +282,7 @@
                     <div>
                         <h3 class="flex items-center gap-2 text-xl font-extrabold text-primary"><span
                                 class="material-symbols-outlined text-secondary">memory</span>Current PSI Execution</h3>
-                        <p class="mt-1 text-sm text-textMuted">ID: PSI-REQ-2026-0606-001</p>
+                        <p class="mt-1 text-sm text-textMuted">ID: PSI-REQ-2026-0612-001</p>
                     </div>
                     <span id="current-step-label" class="status-pill bg-secondary/10 text-secondary">Waiting</span>
                 </div>
@@ -371,17 +371,17 @@
                         class="text-[11px] font-bold uppercase text-textMuted">B</p>
                     <p class="mt-1 text-lg font-extrabold text-secondary">9,960</p></div>
                 <div class="rounded-2xl border border-surfaceLine bg-surfaceSoft p-4"><p
-                        class="text-[11px] font-bold uppercase text-textMuted">λ</p>
+                        class="text-[11px] font-bold text-textMuted">λ</p>
                     <p class="mt-1 text-lg font-extrabold text-secondary">40</p></div>
                 <div class="rounded-2xl border border-surfaceLine bg-surfaceSoft p-4"><p
-                        class="text-[11px] font-bold uppercase text-textMuted">Depth</p>
+                        class="text-[11px] font-bold text-textMuted">Depth</p>
                     <p class="mt-1 text-lg font-extrabold text-secondary">1</p></div>
                 <div class="rounded-2xl border border-surfaceLine bg-surfaceSoft p-4"><p
-                        class="text-[11px] font-bold uppercase text-textMuted">α</p>
-                    <p class="mt-1 text-lg font-extrabold text-secondary">256</p></div>
+                        class="text-[11px] font-bold  text-textMuted">α</p>
+                    <p class="mt-1 text-lg font-extrabold text-secondary"><span id="alpha"></span></p></div>
                 <div class="rounded-2xl border border-surfaceLine bg-surfaceSoft p-4"><p
                         class="text-[11px] font-bold uppercase text-textMuted">ℓ</p>
-                    <p class="mt-1 text-lg font-extrabold text-secondary">5</p></div>
+                    <p class="mt-1 text-lg font-extrabold text-secondary"><span id="windowing"></span></p></div>
             </div>
         </section>
 
@@ -494,6 +494,8 @@
     const progressBar = document.getElementById('progress-bar');
     const stepLabel = document.getElementById('current-step-label');
     const elapsedEl = document.getElementById('elapsed');
+    const alpha = document.getElementById('alpha');
+    const windowing = document.getElementById('windowing');
 
     let elapsedTimer = null;
     let elapsedSec = 0;
@@ -572,6 +574,14 @@
         setProgress(100, 'Completed');
         stopTimer();
     });
+
+    es.addEventListener('alpha', (event) => {
+        alpha.textContent = event.data;
+    })
+
+    es.addEventListener('windowing', (event) => {
+        windowing.textContent = event.data;
+    })
 </script>
 </body>
 </html>
