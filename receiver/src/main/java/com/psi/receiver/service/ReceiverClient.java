@@ -42,9 +42,13 @@ public class ReceiverClient {
         return endTime - startTime;
     }
 
-    public List<Integer> checkCongestion() {
-        return webClient.get()
+    public List<Integer> checkCongestion(String sessionId) {
+        MultipartBodyBuilder builder = new MultipartBodyBuilder();
+        builder.part("sessionId", sessionId);
+
+        return webClient.post()
                 .uri("/parameters/congestion")
+                .body(BodyInserters.fromMultipartData(builder.build()))
                 .retrieve()
                 .bodyToMono(new ParameterizedTypeReference<List<Integer>>() {})
                 .block();

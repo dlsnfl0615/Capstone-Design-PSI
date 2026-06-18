@@ -87,7 +87,7 @@ public class ReceiverApiController {
         System.out.println("sessionDir = " + sessionDir);
 
         // sender 서버의 작업 큐에 작업 몰렸는지 확인
-        List<Integer> parameters = receiverClient.checkCongestion();
+        List<Integer> parameters = receiverClient.checkCongestion(sessionId);
         sessionParameters.put(sessionId, parameters.getFirst(), parameters.getLast());
         int alpha = sessionParameters.get(sessionId).getAlpha();
         int windowing = sessionParameters.get(sessionId).getWindowing();
