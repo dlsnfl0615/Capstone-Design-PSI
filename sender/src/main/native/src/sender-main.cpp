@@ -124,8 +124,8 @@ int intersect(const char* storage, const char* sender_csv, const int alpha_var, 
                 vector<Ciphertext> block_cts;
 
                 for (size_t b = 0; b < block_size; b++) {
-                    cout << "[debug] loading ciphertext block " << b
-                         << " for key " << key << endl;
+//                    cout << "[debug] loading ciphertext block " << b
+//                         << " for key " << key << endl;
 
                     Ciphertext ct;
                     ct.load(context, ofs_in);

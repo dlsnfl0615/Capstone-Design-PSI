@@ -1,5 +1,6 @@
 package com.psi.sender.controller;
 
+import com.psi.sender.component.RequestParms;
 import com.psi.sender.service.NativeAsync;
 import com.psi.sender.service.S3Service;
 import com.psi.sender.service.SseService;
@@ -27,6 +28,7 @@ public class SenderApiController {
     private final NativeAsync nativeAsync;
     private final S3Service s3Service;
     private final SseService sseService;
+    private final RequestParms requestParams;
 
     @Autowired
     @Qualifier("psiExecutor")
@@ -49,13 +51,14 @@ public class SenderApiController {
      * 큐에 일정 개수 이상의 작업이 쌓이면 곱셈 깊이를 1로 줄여야 함
      * true: 혼잡 상태임. receiver에서 l을 7로
      * false: 혼잡 상태 아님. receiver에서 l을 4로 */
-    @GetMapping("/parameters/congestion")
-    public List<Integer> checkThreadQueue() {
+    @PostMapping("/parameters/congestion")
+    public List<Integer> checkThreadQueue(@RequestParam("sessionId") String sessionId) {
         List<Integer> parms = getParms();
         Integer alpha = parms.get(0);
         Integer windowing = parms.get(1);
-        int queueSize = psiExecutor.getQueueSize();
-        System.out.println("windowing = " + windowing + ", alpha = " + alpha + ", queueSize = " + queueSize);
+
+        requestParams.put(sessionId, alpha, windowing);
+
         return parms;
     }
 
@@ -68,6 +71,7 @@ public class SenderApiController {
         // Current PSI Execution에서 첫번째
         sseService.send("request-received", 20);
         sseService.send("currentQueueSize", inFlightCount.incrementAndGet());
+        System.out.println("sseService.send(" + inFlightCount + ")");
 
         String s3Prefix = String.format("storage/sessions/%s/", sessionId);
 
@@ -81,12 +85,12 @@ public class SenderApiController {
 
         // 다항식 연산 시작
         try {
-            int alpha = getParms().getFirst();
-            int windowing = getParms().getLast();
+            int alpha = requestParams.get(sessionId).getAlpha();
+            int windowing = requestParams.get(sessionId).getWindowing();
             sseService.send("alpha", alpha); // 현재 작업중인 request의 파라미터로 변경
             sseService.send("windowing", windowing);
 
-            String s3PreprocessPrefix = isCongested() ? CONGESTED_DIR : DEFAULT_DIR;
+            String s3PreprocessPrefix = (alpha == CONGESTION_ALPHA) ? CONGESTED_DIR : DEFAULT_DIR;
             CompletableFuture<String> futureResult = nativeAsync.productPolynomial(
                     STORAGE_DIR, sessionId, alpha, windowing, s3PreprocessPrefix);
             futureResult

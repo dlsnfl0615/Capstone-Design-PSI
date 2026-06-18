@@ -71,7 +71,8 @@ vector<vector<vector<uint64_t>>> SenderEvaluate::extract_all_coefficients(
     #pragma omp parallel for schedule(dynamic)
 
     for (int p = 0; p < alpha; p++) {
-        cout << "[debug][coeff] partition " << p << " start" << endl;
+//        cout << "[debug][coeff] partition " << p << " start" << endl;
+//        cout << "partition product started." << endl;
 
         vector<vector<uint64_t>> partition_coeffs(
             B_prime + 1,
@@ -329,8 +330,8 @@ vector<Ciphertext> SenderEvaluate::product(
             // receiver-result.cpp에서 idx % num_blocks로 block_idx를 복원함.
             result.push_back(move(partition_block_sum));
 
-            cout << "[product] partition " << partition_idx
-                 << ", block " << block_idx << " done" << endl;
+//            cout << "[product] partition " << partition_idx
+//                 << ", block " << block_idx << " done" << endl;
         }
     }
 
