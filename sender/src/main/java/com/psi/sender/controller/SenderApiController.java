@@ -1,6 +1,7 @@
 package com.psi.sender.controller;
 
 import com.psi.sender.component.RequestParms;
+import com.psi.sender.domain.Parameters;
 import com.psi.sender.service.NativeAsync;
 import com.psi.sender.service.S3Service;
 import com.psi.sender.service.SseService;
@@ -53,9 +54,9 @@ public class SenderApiController {
      * false: 혼잡 상태 아님. receiver에서 l을 4로 */
     @PostMapping("/parameters/congestion")
     public List<Integer> checkThreadQueue(@RequestParam("sessionId") String sessionId) {
-        List<Integer> parms = getParms();
-        Integer alpha = parms.get(0);
-        Integer windowing = parms.get(1);
+        Parameters parms = getParms();
+        int alpha = parms.getAlpha();
+        int windowing = parms.getWindowing();
 
         requestParams.put(sessionId, alpha, windowing);
 
@@ -123,12 +124,12 @@ public class SenderApiController {
         return inFlightCount.get() >= MAX_QUEUE_SIZE;
     }
 
-    private List<Integer> getParms() {
+    private Parameters getParms() {
         if (isCongested()) {
-            return List.of(CONGESTION_ALPHA, CONGESTION_WINDOWING);
+            return new Parameters(CONGESTION_ALPHA, CONGESTION_WINDOWING);
         }
 
-        return List.of(DEFAULT_ALPHA, DEFAULT_WINDOWING);
+        return new Parameters(DEFAULT_ALPHA, DEFAULT_WINDOWING);
     }
 
 //    @GetMapping(value = "/connect", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
