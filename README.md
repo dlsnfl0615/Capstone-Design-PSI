@@ -1,4 +1,3 @@
-cat << 'EOF' > README.md
 # Capstone-Design-PSI (Receiver Web Server)
 
 PSI(Private Set Intersection) 프로토콜을 BFV 완전동형암호(FHE)와 뻐꾸기 해싱(Cuckoo Hashing) 기반으로 구현한 캡스톤 디자인 프로젝트의 **Receiver(수신자) 웹 서버** 구현체입니다.
